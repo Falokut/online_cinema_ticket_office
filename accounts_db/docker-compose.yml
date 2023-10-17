@@ -1,0 +1,27 @@
+version: '3.8'
+
+networks:
+  account_db-network:
+    name: "account_db-net"
+
+services:
+  accounts_db:
+    restart: unless-stopped
+    image: postgres:16.0-alpine3.18
+    container_name: accounts_db
+    hostname: accounts_db
+    volumes:
+      - ./.container_data/database/postgres/data:/var/lib/postgres/data
+      - ./db/init-up.sql:/docker-entrypoint-initdb.d/init.up.sql
+    ports:
+      - 5436:5432
+    networks:
+      - account_db-network
+    env_file:
+      - containers-configs/postgres.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+

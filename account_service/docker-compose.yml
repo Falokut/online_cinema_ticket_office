@@ -1,0 +1,46 @@
+version: '3.8'
+
+networks:
+  account_service-network:
+    name: "account-service-net"
+  kafka-network:
+    external: true
+    name: kafka-net
+  account_db-network:
+    external: true
+    name: "account_db-net"
+
+services:
+  account_service:
+   restart: unless-stopped
+   container_name: account_service
+   build: ./
+   command: ./bin/app
+   ports:
+     - 8080:8080
+   networks:
+     - account_service-network
+     - kafka-network
+     - account_db-network
+   depends_on:
+     redis:
+      condition: service_healthy
+  
+  redis:
+    restart: unless-stopped
+    container_name: account_service_cache
+    hostname: redis
+    image: redis:7.2.1-alpine
+    volumes:
+      - ./.container_data/cache/data:/var/lib/redis
+    ports:
+      - 6378:6379
+    networks:
+      - account_service-network
+    env_file:
+      - containers-configs/redis.env
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

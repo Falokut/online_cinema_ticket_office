@@ -1,0 +1,28 @@
+version: '3.8'
+
+networks:
+  kafka-network:
+      name: "kafka-net"
+      external: true
+
+services:
+  email_service:
+    build: ./
+    command: ./bin/app
+    networks:
+     - kafka-network
+    volumes:
+      - ./container_logs:/logs/
+    deploy:
+      restart_policy: 
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+volumes:
+  container_logs:
+    driver: local
+      
+
+  

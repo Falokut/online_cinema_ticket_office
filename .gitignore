@@ -1,0 +1,19 @@
+
+# ignore all logs
+**/logs
+
+# ignore all git folders
+**/.git
+
+
+# ignore volumes
+.container_data/
+
+# protected file
+*.env.yml
+*.env
+
+# ignore all keys
+*.cnf
+*.pem
+*.srl

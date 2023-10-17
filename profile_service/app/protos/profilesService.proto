@@ -1,0 +1,40 @@
+syntax= "proto3";
+
+
+package profile_service;
+option go_package = "profile_service/protos";
+
+import "google/protobuf/timestamp.proto";
+
+
+service profileServiceV1 {
+    rpc GetUserProfile(GetUserProfileRequest) returns(GetUserProfileResponce){}
+    rpc UpdateProfilePicture(stream UpdateProfilePictureRequest) returns(UpdateProfilePictureResponce){}
+}
+
+message GetUserProfileRequest {
+    string UUID = 1;
+}
+
+message GetUserProfileResponce {
+    string Username = 1;
+    string Email = 2;
+    string ProfilePictureID = 3;
+    google.protobuf.Timestamp RegistrationDate = 4;
+}
+
+message ImageInfo {
+    string ImageType = 1;
+}
+
+message UpdateProfilePictureRequest {
+    string AccountUUID = 1;
+    oneof Data {
+        ImageInfo Info = 2;
+        bytes ChunkData = 3;
+    }
+}
+
+message UpdateProfilePictureResponce {
+    string PictureUUID = 1;
+}
