@@ -1,0 +1,88 @@
+syntax= "proto3";
+
+package account_service;
+option go_package = "account_service/v1/protos";
+import "google/protobuf/timestamp.proto";
+
+
+message Void { }
+
+message CreateAccountRequest {
+    string Email = 1;
+    string Username = 2;
+    string Password = 3;
+    string RepeatPassword = 4;
+}
+
+message GetAccountIDRequest {
+    string SessionID = 1;
+    string ClientIP = 2;
+}
+
+message AccountID {
+    string AccountID = 1;
+}
+
+
+message VerificationTokenRequest {
+    string Email = 1;
+    string URL = 2;
+}
+
+message VerifyAccountRequest {
+    string VerificationToken = 1;
+}
+
+message SignInRequest {
+    string Email = 1;
+    string Password = 2;
+    string ClientIP = 3;
+}
+
+message AccessResponce {
+    string SessionID = 1;
+}
+
+
+message LogoutRequest {
+    string SessionID = 1;
+    string ClientIP = 2;
+}
+
+message ChangePasswordTokenRequest {
+    string Email = 1;
+    string URL = 2;
+}
+
+message ChangePasswordTokenResponce {
+    bool Sended = 1;
+}
+
+message ChangePasswordRequest {
+    string ChangePasswordToken = 1;
+    string NewPassword = 2;
+} 
+
+
+message GetAllSessionsRequest {
+    // Current session
+    string SessionID = 1;
+    string ClientIP = 2;
+}
+
+message SessionInfo {
+    string  ClientIP    = 1;
+    // Like device or browser
+    string  SessionInfo = 2; 
+    google.protobuf.Timestamp    LastActivity = 3;
+}
+message AllSessionsResponce {
+    map<string, SessionInfo> Sessions = 1;
+}
+
+message TerminateSessionsRequest {
+    // Current session
+    string SessionID = 1;
+    string ClientIP = 2;
+    repeated string SessionsToTerminate = 3;
+}

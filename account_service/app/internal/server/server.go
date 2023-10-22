@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/Falokut/online_cinema_ticket_office/account_service/internal/service"
-	account_service "github.com/Falokut/online_cinema_ticket_office/account_service/pkg/account_service/protos"
+	account_service "github.com/Falokut/online_cinema_ticket_office/account_service/pkg/account_service/v1/protos"
 	"github.com/Falokut/online_cinema_ticket_office/account_service/pkg/logging"
 	"google.golang.org/grpc"
 )

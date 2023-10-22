@@ -4,7 +4,7 @@ import (
 	"errors"
 	"regexp"
 
-	account_service "github.com/Falokut/online_cinema_ticket_office/account_service/pkg/account_service/protos"
+	account_service "github.com/Falokut/online_cinema_ticket_office/account_service/pkg/account_service/v1/protos"
 )
 
 func validateSignupInput(input *account_service.CreateAccountRequest) error {

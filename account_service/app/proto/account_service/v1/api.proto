@@ -1,0 +1,83 @@
+syntax= "proto3";
+
+package account_service;
+import "messages.proto";
+option go_package = "account_service/v1/protos";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Account service";
+        version: "1.0";
+        contact: {
+            name: "Falokut";
+            url: "https://github.com/Falokut";
+            email: "timur.sinelnik@yandex.ru";
+        };
+    };
+
+    schemes: HTTP;
+    //schemes: HTTPS;
+    consumes: "application/json";
+    produces: "application/json";
+};
+
+service accountServiceV1 {
+    rpc CreateAccount(CreateAccountRequest) returns(Void){
+        option (google.api.http) = {
+            post: "/v1/create-account"
+            body: "*" 
+        };
+    } 
+    rpc RequestAccountVerificationToken(VerificationTokenRequest) returns(Void){
+        option (google.api.http) = {
+            get: "/v1/verfification/request"
+        };
+    }
+    rpc VerifyAccount(VerifyAccountRequest) returns(Void){
+        option (google.api.http) = {
+            post: "/v1/verify"
+            body: "*" 
+        };
+    }
+    rpc SignIn(SignInRequest) returns(AccessResponce){
+        option (google.api.http) = {
+            post: "/v1/sign-in"
+            body: "*" 
+        };
+    }
+    rpc GetAccountID(GetAccountIDRequest) returns(AccountID){
+        option (google.api.http) = {
+            get: "/v1/account-id"
+        };
+    } 
+    rpc Logout(LogoutRequest) returns(Void){
+        option (google.api.http) = {
+            post: "/v1/logout"
+            body: "*" 
+        };
+    }
+    rpc RequestChangePasswordToken(ChangePasswordTokenRequest) returns(ChangePasswordTokenResponce){
+        option (google.api.http) = {
+            get: "/v1/change-password/request"
+        };
+    }
+    rpc ChangePassword(ChangePasswordRequest) returns(Void){
+        option (google.api.http) = {
+            post: "/v1/change-password"
+            body: "*" 
+        };
+    }
+    rpc GetAllSessions(GetAllSessionsRequest) returns(AllSessionsResponce){
+        option (google.api.http) = {
+            get: "/v1/sessions"
+        };
+    }
+    rpc TerminateSessions(TerminateSessionsRequest) returns(Void){
+        option (google.api.http) = {
+            post: "/v1/sessions/terminate"
+            body: "*"
+        };
+    }
+}

@@ -2,14 +2,18 @@
 # ignore all logs
 **/logs
 
-# ignore all git folders
+# ignore all git folders inside project
 **/.git
 
 
 # ignore volumes
-.container_data/
+**/.container_data/
+**/container_logs
 
-# protected file
+# ignore all vscode-settings
+**/.vscode
+
+# protected files
 *.env.yml
 *.env
 

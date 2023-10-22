@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.24.3
-// source: app/protos/accountService.proto
+// source: api.proto
 
 package protos
 
@@ -22,16 +22,16 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AccountServiceV1Client interface {
-	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponce, error)
-	RequestAccountVerificationToken(ctx context.Context, in *VerificationTokenRequest, opts ...grpc.CallOption) (*VerificationTokenResponce, error)
-	VerifyAccount(ctx context.Context, in *VerifyAccountRequest, opts ...grpc.CallOption) (*VerifyAccountResponce, error)
+	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*Void, error)
+	RequestAccountVerificationToken(ctx context.Context, in *VerificationTokenRequest, opts ...grpc.CallOption) (*Void, error)
+	VerifyAccount(ctx context.Context, in *VerifyAccountRequest, opts ...grpc.CallOption) (*Void, error)
 	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*AccessResponce, error)
 	GetAccountID(ctx context.Context, in *GetAccountIDRequest, opts ...grpc.CallOption) (*AccountID, error)
-	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponce, error)
+	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*Void, error)
 	RequestChangePasswordToken(ctx context.Context, in *ChangePasswordTokenRequest, opts ...grpc.CallOption) (*ChangePasswordTokenResponce, error)
-	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponce, error)
+	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*Void, error)
 	GetAllSessions(ctx context.Context, in *GetAllSessionsRequest, opts ...grpc.CallOption) (*AllSessionsResponce, error)
-	TerminateSessions(ctx context.Context, in *TerminateSessionsRequest, opts ...grpc.CallOption) (*TerminateSessionsResponce, error)
+	TerminateSessions(ctx context.Context, in *TerminateSessionsRequest, opts ...grpc.CallOption) (*Void, error)
 }
 
 type accountServiceV1Client struct {
@@ -42,8 +42,8 @@ func NewAccountServiceV1Client(cc grpc.ClientConnInterface) AccountServiceV1Clie
 	return &accountServiceV1Client{cc}
 }
 
-func (c *accountServiceV1Client) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponce, error) {
-	out := new(CreateAccountResponce)
+func (c *accountServiceV1Client) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/CreateAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -51,8 +51,8 @@ func (c *accountServiceV1Client) CreateAccount(ctx context.Context, in *CreateAc
 	return out, nil
 }
 
-func (c *accountServiceV1Client) RequestAccountVerificationToken(ctx context.Context, in *VerificationTokenRequest, opts ...grpc.CallOption) (*VerificationTokenResponce, error) {
-	out := new(VerificationTokenResponce)
+func (c *accountServiceV1Client) RequestAccountVerificationToken(ctx context.Context, in *VerificationTokenRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/RequestAccountVerificationToken", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -60,8 +60,8 @@ func (c *accountServiceV1Client) RequestAccountVerificationToken(ctx context.Con
 	return out, nil
 }
 
-func (c *accountServiceV1Client) VerifyAccount(ctx context.Context, in *VerifyAccountRequest, opts ...grpc.CallOption) (*VerifyAccountResponce, error) {
-	out := new(VerifyAccountResponce)
+func (c *accountServiceV1Client) VerifyAccount(ctx context.Context, in *VerifyAccountRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/VerifyAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -87,8 +87,8 @@ func (c *accountServiceV1Client) GetAccountID(ctx context.Context, in *GetAccoun
 	return out, nil
 }
 
-func (c *accountServiceV1Client) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponce, error) {
-	out := new(LogoutResponce)
+func (c *accountServiceV1Client) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/Logout", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -105,8 +105,8 @@ func (c *accountServiceV1Client) RequestChangePasswordToken(ctx context.Context,
 	return out, nil
 }
 
-func (c *accountServiceV1Client) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponce, error) {
-	out := new(ChangePasswordResponce)
+func (c *accountServiceV1Client) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/ChangePassword", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -123,8 +123,8 @@ func (c *accountServiceV1Client) GetAllSessions(ctx context.Context, in *GetAllS
 	return out, nil
 }
 
-func (c *accountServiceV1Client) TerminateSessions(ctx context.Context, in *TerminateSessionsRequest, opts ...grpc.CallOption) (*TerminateSessionsResponce, error) {
-	out := new(TerminateSessionsResponce)
+func (c *accountServiceV1Client) TerminateSessions(ctx context.Context, in *TerminateSessionsRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/TerminateSessions", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -136,16 +136,16 @@ func (c *accountServiceV1Client) TerminateSessions(ctx context.Context, in *Term
 // All implementations must embed UnimplementedAccountServiceV1Server
 // for forward compatibility
 type AccountServiceV1Server interface {
-	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponce, error)
-	RequestAccountVerificationToken(context.Context, *VerificationTokenRequest) (*VerificationTokenResponce, error)
-	VerifyAccount(context.Context, *VerifyAccountRequest) (*VerifyAccountResponce, error)
+	CreateAccount(context.Context, *CreateAccountRequest) (*Void, error)
+	RequestAccountVerificationToken(context.Context, *VerificationTokenRequest) (*Void, error)
+	VerifyAccount(context.Context, *VerifyAccountRequest) (*Void, error)
 	SignIn(context.Context, *SignInRequest) (*AccessResponce, error)
 	GetAccountID(context.Context, *GetAccountIDRequest) (*AccountID, error)
-	Logout(context.Context, *LogoutRequest) (*LogoutResponce, error)
+	Logout(context.Context, *LogoutRequest) (*Void, error)
 	RequestChangePasswordToken(context.Context, *ChangePasswordTokenRequest) (*ChangePasswordTokenResponce, error)
-	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponce, error)
+	ChangePassword(context.Context, *ChangePasswordRequest) (*Void, error)
 	GetAllSessions(context.Context, *GetAllSessionsRequest) (*AllSessionsResponce, error)
-	TerminateSessions(context.Context, *TerminateSessionsRequest) (*TerminateSessionsResponce, error)
+	TerminateSessions(context.Context, *TerminateSessionsRequest) (*Void, error)
 	mustEmbedUnimplementedAccountServiceV1Server()
 }
 
@@ -153,13 +153,13 @@ type AccountServiceV1Server interface {
 type UnimplementedAccountServiceV1Server struct {
 }
 
-func (UnimplementedAccountServiceV1Server) CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponce, error) {
+func (UnimplementedAccountServiceV1Server) CreateAccount(context.Context, *CreateAccountRequest) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
 }
-func (UnimplementedAccountServiceV1Server) RequestAccountVerificationToken(context.Context, *VerificationTokenRequest) (*VerificationTokenResponce, error) {
+func (UnimplementedAccountServiceV1Server) RequestAccountVerificationToken(context.Context, *VerificationTokenRequest) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestAccountVerificationToken not implemented")
 }
-func (UnimplementedAccountServiceV1Server) VerifyAccount(context.Context, *VerifyAccountRequest) (*VerifyAccountResponce, error) {
+func (UnimplementedAccountServiceV1Server) VerifyAccount(context.Context, *VerifyAccountRequest) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyAccount not implemented")
 }
 func (UnimplementedAccountServiceV1Server) SignIn(context.Context, *SignInRequest) (*AccessResponce, error) {
@@ -168,19 +168,19 @@ func (UnimplementedAccountServiceV1Server) SignIn(context.Context, *SignInReques
 func (UnimplementedAccountServiceV1Server) GetAccountID(context.Context, *GetAccountIDRequest) (*AccountID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccountID not implemented")
 }
-func (UnimplementedAccountServiceV1Server) Logout(context.Context, *LogoutRequest) (*LogoutResponce, error) {
+func (UnimplementedAccountServiceV1Server) Logout(context.Context, *LogoutRequest) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
 }
 func (UnimplementedAccountServiceV1Server) RequestChangePasswordToken(context.Context, *ChangePasswordTokenRequest) (*ChangePasswordTokenResponce, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestChangePasswordToken not implemented")
 }
-func (UnimplementedAccountServiceV1Server) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponce, error) {
+func (UnimplementedAccountServiceV1Server) ChangePassword(context.Context, *ChangePasswordRequest) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
 }
 func (UnimplementedAccountServiceV1Server) GetAllSessions(context.Context, *GetAllSessionsRequest) (*AllSessionsResponce, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllSessions not implemented")
 }
-func (UnimplementedAccountServiceV1Server) TerminateSessions(context.Context, *TerminateSessionsRequest) (*TerminateSessionsResponce, error) {
+func (UnimplementedAccountServiceV1Server) TerminateSessions(context.Context, *TerminateSessionsRequest) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TerminateSessions not implemented")
 }
 func (UnimplementedAccountServiceV1Server) mustEmbedUnimplementedAccountServiceV1Server() {}
@@ -425,5 +425,5 @@ var AccountServiceV1_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "app/protos/accountService.proto",
+	Metadata: "api.proto",
 }

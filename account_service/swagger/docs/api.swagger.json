@@ -1,0 +1,525 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Account service",
+    "version": "1.0",
+    "contact": {
+      "name": "Falokut",
+      "url": "https://github.com/Falokut",
+      "email": "timur.sinelnik@yandex.ru"
+    }
+  },
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/account-id": {
+      "get": {
+        "operationId": "accountServiceV1_GetAccountID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/account_serviceAccountID"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "SessionID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "ClientIP",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "accountServiceV1"
+        ]
+      }
+    },
+    "/v1/change-password": {
+      "post": {
+        "operationId": "accountServiceV1_ChangePassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/account_serviceVoid"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/account_serviceChangePasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "accountServiceV1"
+        ]
+      }
+    },
+    "/v1/change-password/request": {
+      "get": {
+        "operationId": "accountServiceV1_RequestChangePasswordToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/account_serviceChangePasswordTokenResponce"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "URL",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "accountServiceV1"
+        ]
+      }
+    },
+    "/v1/create-account": {
+      "post": {
+        "operationId": "accountServiceV1_CreateAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/account_serviceVoid"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/account_serviceCreateAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "accountServiceV1"
+        ]
+      }
+    },
+    "/v1/logout": {
+      "post": {
+        "operationId": "accountServiceV1_Logout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/account_serviceVoid"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/account_serviceLogoutRequest"
+            }
+          }
+        ],
+        "tags": [
+          "accountServiceV1"
+        ]
+      }
+    },
+    "/v1/sessions": {
+      "get": {
+        "operationId": "accountServiceV1_GetAllSessions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/account_serviceAllSessionsResponce"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "SessionID",
+            "description": "Current session.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "ClientIP",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "accountServiceV1"
+        ]
+      }
+    },
+    "/v1/sessions/terminate": {
+      "post": {
+        "operationId": "accountServiceV1_TerminateSessions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/account_serviceVoid"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/account_serviceTerminateSessionsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "accountServiceV1"
+        ]
+      }
+    },
+    "/v1/sign-in": {
+      "post": {
+        "operationId": "accountServiceV1_SignIn",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/account_serviceAccessResponce"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/account_serviceSignInRequest"
+            }
+          }
+        ],
+        "tags": [
+          "accountServiceV1"
+        ]
+      }
+    },
+    "/v1/verfification/request": {
+      "get": {
+        "operationId": "accountServiceV1_RequestAccountVerificationToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/account_serviceVoid"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "URL",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "accountServiceV1"
+        ]
+      }
+    },
+    "/v1/verify": {
+      "post": {
+        "operationId": "accountServiceV1_VerifyAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/account_serviceVoid"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/account_serviceVerifyAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "accountServiceV1"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "account_serviceAccessResponce": {
+      "type": "object",
+      "properties": {
+        "SessionID": {
+          "type": "string"
+        }
+      }
+    },
+    "account_serviceAccountID": {
+      "type": "object",
+      "properties": {
+        "AccountID": {
+          "type": "string"
+        }
+      }
+    },
+    "account_serviceAllSessionsResponce": {
+      "type": "object",
+      "properties": {
+        "Sessions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/account_serviceSessionInfo"
+          }
+        }
+      }
+    },
+    "account_serviceChangePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "ChangePasswordToken": {
+          "type": "string"
+        },
+        "NewPassword": {
+          "type": "string"
+        }
+      }
+    },
+    "account_serviceChangePasswordTokenResponce": {
+      "type": "object",
+      "properties": {
+        "Sended": {
+          "type": "boolean"
+        }
+      }
+    },
+    "account_serviceCreateAccountRequest": {
+      "type": "object",
+      "properties": {
+        "Email": {
+          "type": "string"
+        },
+        "Username": {
+          "type": "string"
+        },
+        "Password": {
+          "type": "string"
+        },
+        "RepeatPassword": {
+          "type": "string"
+        }
+      }
+    },
+    "account_serviceLogoutRequest": {
+      "type": "object",
+      "properties": {
+        "SessionID": {
+          "type": "string"
+        },
+        "ClientIP": {
+          "type": "string"
+        }
+      }
+    },
+    "account_serviceSessionInfo": {
+      "type": "object",
+      "properties": {
+        "ClientIP": {
+          "type": "string"
+        },
+        "SessionInfo": {
+          "type": "string",
+          "title": "Like device or browser"
+        },
+        "LastActivity": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "account_serviceSignInRequest": {
+      "type": "object",
+      "properties": {
+        "Email": {
+          "type": "string"
+        },
+        "Password": {
+          "type": "string"
+        },
+        "ClientIP": {
+          "type": "string"
+        }
+      }
+    },
+    "account_serviceTerminateSessionsRequest": {
+      "type": "object",
+      "properties": {
+        "SessionID": {
+          "type": "string",
+          "title": "Current session"
+        },
+        "ClientIP": {
+          "type": "string"
+        },
+        "SessionsToTerminate": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "account_serviceVerifyAccountRequest": {
+      "type": "object",
+      "properties": {
+        "VerificationToken": {
+          "type": "string"
+        }
+      }
+    },
+    "account_serviceVoid": {
+      "type": "object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

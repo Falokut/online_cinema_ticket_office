@@ -9,7 +9,7 @@ import (
 	"github.com/Falokut/online_cinema_ticket_office/account_service/internal/config"
 	"github.com/Falokut/online_cinema_ticket_office/account_service/internal/model"
 	"github.com/Falokut/online_cinema_ticket_office/account_service/internal/repository"
-	account_service "github.com/Falokut/online_cinema_ticket_office/account_service/pkg/account_service/protos"
+	account_service "github.com/Falokut/online_cinema_ticket_office/account_service/pkg/account_service/v1/protos"
 	"github.com/Falokut/online_cinema_ticket_office/account_service/pkg/jwt"
 	"github.com/Falokut/online_cinema_ticket_office/account_service/pkg/logging"
 	"github.com/google/uuid"
@@ -44,7 +44,7 @@ func NewAccountService(repo repository.AccountRepository, logger logging.Logger,
 		nonActivatedAccountTTL: time.Hour, emailWriter: emailWriter, cfg: cfg}
 }
 
-func (s *AccountService) CreateAccount(ctx context.Context, in *account_service.CreateAccountRequest) (*account_service.CreateAccountResponce, error) {
+func (s *AccountService) CreateAccount(ctx context.Context, in *account_service.CreateAccountRequest) (*account_service.Void, error) {
 	if err := validateSignupInput(in); err != nil {
 		return nil, s.createErrorResponce(err.Error(), codes.InvalidArgument)
 	}
@@ -70,7 +70,7 @@ func (s *AccountService) CreateAccount(ctx context.Context, in *account_service.
 	if err != nil {
 		return nil, s.createErrorResponce(err.Error(), codes.Internal)
 	}
-	return &account_service.CreateAccountResponce{IsSuccessfully: true}, nil
+	return &account_service.Void{}, nil
 }
 
 type emailData struct {
@@ -79,7 +79,7 @@ type emailData struct {
 	LinkTTL  float64 `json:"link_TTL"`
 }
 
-func (s *AccountService) RequestAccountVerificationToken(ctx context.Context, in *account_service.VerificationTokenRequest) (*account_service.VerificationTokenResponce, error) {
+func (s *AccountService) RequestAccountVerificationToken(ctx context.Context, in *account_service.VerificationTokenRequest) (*account_service.Void, error) {
 	inAccountDB, err := s.repo.IsAccountWithEmailExist(in.Email)
 	if err != nil {
 		return nil, s.createErrorResponce(err.Error(), codes.Internal)
@@ -125,10 +125,10 @@ func (s *AccountService) RequestAccountVerificationToken(ctx context.Context, in
 		}
 	}()
 
-	return &account_service.VerificationTokenResponce{Sended: true}, nil
+	return &account_service.Void{}, nil
 }
 
-func (s *AccountService) VerifyAccount(ctx context.Context, in *account_service.VerifyAccountRequest) (*account_service.VerifyAccountResponce, error) {
+func (s *AccountService) VerifyAccount(ctx context.Context, in *account_service.VerifyAccountRequest) (*account_service.Void, error) {
 	s.logger.Debug("Parsing token")
 	email, err := jwt.ParseToken(in.VerificationToken, config.GetConfig().JWT.VerifyAccountToken.Secret)
 	if err != nil {
@@ -163,7 +163,7 @@ func (s *AccountService) VerifyAccount(ctx context.Context, in *account_service.
 	if err := s.redisRepo.RegistrationCache.DeleteAccountFromCache(email); err != nil {
 		s.logger.Warning("Can't delete account from registration cache: ", err.Error())
 	}
-	return &account_service.VerifyAccountResponce{AccountCreated: true}, nil
+	return &account_service.Void{}, nil
 }
 
 func (s *AccountService) SignIn(ctx context.Context, in *account_service.SignInRequest) (*account_service.AccessResponce, error) {
@@ -180,7 +180,7 @@ func (s *AccountService) SignIn(ctx context.Context, in *account_service.SignInR
 
 	s.logger.Debug("Caching session")
 	SessionID := uuid.NewString()
-	if err := s.redisRepo.SessionCache.CacheSession(model.SessionCache{SessionID: SessionID, AccountID: u.UUID, ClientIP: in.ClientIP}); err != nil {
+	if err := s.redisRepo.SessionCache.CacheSession(model.SessionCache{SessionID: SessionID, AccountID: u.UUID, ClientIP: in.ClientIP, LastActivity: time.Now()}); err != nil {
 		return nil, s.createErrorResponce(err.Error(), codes.Internal)
 	}
 
@@ -202,7 +202,7 @@ func (s *AccountService) GetAccountID(ctx context.Context, in *account_service.G
 	return &account_service.AccountID{AccountID: cache.AccountID}, nil
 }
 
-func (s *AccountService) Logout(ctx context.Context, in *account_service.LogoutRequest) (*account_service.LogoutResponce, error) {
+func (s *AccountService) Logout(ctx context.Context, in *account_service.LogoutRequest) (*account_service.Void, error) {
 	s.logger.Debug("Checking session")
 	cache, err := s.checkSession(in.SessionID, in.ClientIP)
 	if err != nil {
@@ -215,7 +215,7 @@ func (s *AccountService) Logout(ctx context.Context, in *account_service.LogoutR
 		return nil, s.createErrorResponce(err.Error(), codes.Internal)
 	}
 
-	return &account_service.LogoutResponce{Successfully: true}, nil
+	return &account_service.Void{}, nil
 }
 
 func (s *AccountService) RequestChangePasswordToken(ctx context.Context, in *account_service.ChangePasswordTokenRequest) (*account_service.ChangePasswordTokenResponce, error) {
@@ -249,7 +249,7 @@ func (s *AccountService) RequestChangePasswordToken(ctx context.Context, in *acc
 	return &account_service.ChangePasswordTokenResponce{Sended: true}, nil
 }
 
-func (s *AccountService) ChangePassword(ctx context.Context, in *account_service.ChangePasswordRequest) (*account_service.ChangePasswordResponce, error) {
+func (s *AccountService) ChangePassword(ctx context.Context, in *account_service.ChangePasswordRequest) (*account_service.Void, error) {
 	s.logger.Debug("Parsing jwt token")
 	email, err := jwt.ParseToken(in.ChangePasswordToken, config.GetConfig().JWT.ChangePasswordToken.Secret)
 	if err != nil {
@@ -282,12 +282,12 @@ func (s *AccountService) ChangePassword(ctx context.Context, in *account_service
 		return nil, s.createErrorResponce(err.Error(), codes.Internal)
 	}
 
-	return &account_service.ChangePasswordResponce{Success: true}, nil
+	return &account_service.Void{}, nil
 }
 
 func (s *AccountService) GetAllSessions(ctx context.Context, in *account_service.GetAllSessionsRequest) (*account_service.AllSessionsResponce, error) {
 	s.logger.Debug("Checking session")
-	cache, err := s.checkSession(in.CurrentSessionID, in.ClientIP)
+	cache, err := s.checkSession(in.SessionID, in.ClientIP)
 	if err != nil {
 		return nil, err
 	}
@@ -311,19 +311,19 @@ func (s *AccountService) GetAllSessions(ctx context.Context, in *account_service
 	return &account_service.AllSessionsResponce{Sessions: sessionsInfo}, nil
 }
 
-func (s *AccountService) TerminateSessions(ctx context.Context, in *account_service.TerminateSessionsRequest) (*account_service.TerminateSessionsResponce, error) {
+func (s *AccountService) TerminateSessions(ctx context.Context, in *account_service.TerminateSessionsRequest) (*account_service.Void, error) {
 	s.logger.Debug("Checking session")
-	cache, err := s.checkSession(in.CurrentSessionID, in.ClientIP)
+	cache, err := s.checkSession(in.SessionID, in.ClientIP)
 	if err != nil {
 		return nil, err
 	}
 
 	s.logger.Debug("Terminating sessions")
-	if err := s.redisRepo.SessionCache.TerminateSessions(in.SessionToTerminate, cache.AccountID); err != nil {
+	if err := s.redisRepo.SessionCache.TerminateSessions(in.SessionsToTerminate, cache.AccountID); err != nil {
 		return nil, s.createErrorResponce(err.Error(), codes.Internal)
 	}
 
-	return &account_service.TerminateSessionsResponce{SuccessfullyTerminated: true}, nil
+	return &account_service.Void{}, nil
 }
 
 func (s *AccountService) createErrorResponce(errorMessage string, statusCode codes.Code) error {
