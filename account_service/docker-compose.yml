@@ -1,31 +1,43 @@
 version: '3.8'
 
 networks:
-  account_service-network:
-    name: "account-service-net"
-  kafka-network:
+  account_service_network:
+    name: "account_service_net"
+    driver: bridge
+  kafka_network:
     external: true
     name: kafka-net
-  account_db-network:
+  account_db_network:
     external: true
     name: "account_db-net"
+  tracing_network:
+    name: "tracing_network"
+
 
 services:
   account_service:
    restart: unless-stopped
    container_name: account_service
+   hostname: account_service
    build: ./
    command: ./bin/app
+   volumes:
+   - ./docker/containers-configs/app-configs:/configs
    ports:
      - 8080:8080
+     - 7000:7000
    networks:
-     - account_service-network
-     - kafka-network
-     - account_db-network
+     - account_service_network
+     - kafka_network
+     - account_db_network
+     - tracing_network 
    depends_on:
-     redis:
-      condition: service_healthy
-  
+    - redis
+    - prometheus
+    - node_exporter
+    - grafana
+    - jaeger
+    
   redis:
     restart: unless-stopped
     container_name: account_service_cache
@@ -36,11 +48,64 @@ services:
     ports:
       - 6378:6379
     networks:
-      - account_service-network
+      - account_service_network
     env_file:
-      - containers-configs/redis.env
+      - docker/containers-configs/redis.env
     healthcheck:
       test: ["CMD", "redis-cli","ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  prometheus:
+      container_name: prometheus_container
+      image: prom/prometheus
+      hostname: prometheus
+      volumes:
+        - ./docker/containers-configs/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:Z
+      command:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+        - '--storage.tsdb.path=/prometheus'
+        - '--storage.tsdb.retention=20d'
+        - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+        - '--web.console.templates=/usr/share/prometheus/consoles'
+      ports:
+        - 9090:9090
+      networks:
+        - tracing_network
+        - account_service_network
+
+  jaeger:
+    container_name: jaeger_container
+    restart: always
+    image: jaegertracing/all-in-one:1.21
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    hostname: jaeger
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14268:14268
+      - 14250:14250
+      - 9411:9411
+    networks:
+      - tracing_network
+
+  node_exporter:
+    container_name: node_exporter_container
+    image: prom/node-exporter
+    ports:
+      - 9101:9100
+    networks:
+     - tracing_network
+
+  grafana:
+    container_name: grafana_container
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    networks:
+     - tracing_network

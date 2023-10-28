@@ -34,12 +34,10 @@ email_kafka_config:
   max_bytes: 10e6
 
 jaeger:
-  service_name: "Account_Service"
-  sampler_type: "const"
-  sampler_param: 1.0
-  host: localhost:6831
-  log_spans: false
+  service_name: "account_service"
+  host: jaeger:6831
+  log_spans: true
 
 prometheus:
   address: 0.0.0.0:7000
-  service_name: "Account_Service"
+  service_name: "account_service"

@@ -9,6 +9,11 @@
       "email": "timur.sinelnik@yandex.ru"
     }
   },
+  "tags": [
+    {
+      "name": "accountServiceV1"
+    }
+  ],
   "schemes": [
     "http"
   ],
@@ -29,6 +34,31 @@
               "$ref": "#/definitions/account_serviceAccountID"
             }
           },
+          "400": {
+            "description": "Returned when has problem with parameters in headers.",
+            "schema": {}
+          },
+          "401": {
+            "description": "Returned when session_id not found in header params.",
+            "schema": {}
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when session with specified id not found.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
@@ -38,15 +68,17 @@
         },
         "parameters": [
           {
-            "name": "SessionID",
-            "in": "query",
-            "required": false,
+            "name": "session_id",
+            "description": "ID of the session issued when logging in to the account",
+            "in": "header",
+            "required": true,
             "type": "string"
           },
           {
-            "name": "ClientIP",
-            "in": "query",
-            "required": false,
+            "name": "client_ip",
+            "description": "IP address of the user's client",
+            "in": "header",
+            "required": true,
             "type": "string"
           }
         ],
@@ -62,7 +94,29 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/account_serviceVoid"
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "400": {
+            "description": "Returned when has wrong token or specified password not valid.",
+            "schema": {}
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when specified account with email in token not found.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           },
           "default": {
@@ -89,12 +143,31 @@
     },
     "/v1/change-password/request": {
       "get": {
+        "summary": "Sending message into email queue with change password token",
         "operationId": "accountServiceV1_RequestChangePasswordToken",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/account_serviceChangePasswordTokenResponce"
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when account with specified email doesn't exist.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           },
           "default": {
@@ -130,7 +203,31 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/account_serviceVoid"
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "400": {
+            "description": "Returned when specified params is not valid or account with this email alredy exist.",
+            "schema": {}
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           },
           "default": {
@@ -162,7 +259,33 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/account_serviceVoid"
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "400": {
+            "description": "Returned when has problem with parameters in headers.",
+            "schema": {}
+          },
+          "401": {
+            "description": "Returned when session_id not found in header params.",
+            "schema": {}
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when session with specified id not found.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           },
           "default": {
@@ -172,16 +295,6 @@
             }
           }
         },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/account_serviceLogoutRequest"
-            }
-          }
-        ],
         "tags": [
           "accountServiceV1"
         ]
@@ -197,6 +310,31 @@
               "$ref": "#/definitions/account_serviceAllSessionsResponce"
             }
           },
+          "400": {
+            "description": "Returned when has problem with parameters in headers.",
+            "schema": {}
+          },
+          "401": {
+            "description": "Returned when session_id not found in header params.",
+            "schema": {}
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when session with specified id not found.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          },
           "default": {
             "description": "An unexpected error response.",
             "schema": {
@@ -206,16 +344,17 @@
         },
         "parameters": [
           {
-            "name": "SessionID",
-            "description": "Current session.",
-            "in": "query",
-            "required": false,
+            "name": "session_id",
+            "description": "ID of the session issued when logging in to the account.",
+            "in": "header",
+            "required": true,
             "type": "string"
           },
           {
-            "name": "ClientIP",
-            "in": "query",
-            "required": false,
+            "name": "client_ip",
+            "description": "IP address of the user's client.",
+            "in": "header",
+            "required": true,
             "type": "string"
           }
         ],
@@ -231,7 +370,33 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/account_serviceVoid"
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "400": {
+            "description": "Returned when has problem with parameters in headers.",
+            "schema": {}
+          },
+          "401": {
+            "description": "Returned when session_id not found in header params.",
+            "schema": {}
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when session with specified id not found",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           },
           "default": {
@@ -243,12 +408,28 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "SessionsToTerminate",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "session_id",
+            "description": "ID of the session issued when logging in to the account",
+            "in": "header",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/account_serviceTerminateSessionsRequest"
-            }
+            "type": "string"
+          },
+          {
+            "name": "client_ip",
+            "description": "IP address of the user's client",
+            "in": "header",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -264,6 +445,27 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/account_serviceAccessResponce"
+            }
+          },
+          "400": {
+            "description": "Returned when specified password is not an account password.",
+            "schema": {}
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when account with specified email not found.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           },
           "default": {
@@ -290,12 +492,37 @@
     },
     "/v1/verfification/request": {
       "get": {
+        "summary": "Sending message into email queue with account verification token",
         "operationId": "accountServiceV1_RequestAccountVerificationToken",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/account_serviceVoid"
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "400": {
+            "description": "Returned when account with specified email alredy exist or email is not valid",
+            "schema": {}
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           },
           "default": {
@@ -324,14 +551,36 @@
         ]
       }
     },
-    "/v1/verify": {
+    "/v1/verify/{VerificationToken}": {
       "post": {
         "operationId": "accountServiceV1_VerifyAccount",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/account_serviceVoid"
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "400": {
+            "description": "Returned when has wrong token.",
+            "schema": {}
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when account with specified email in token not found.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
             }
           },
           "default": {
@@ -343,11 +592,17 @@
         },
         "parameters": [
           {
+            "name": "VerificationToken",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/account_serviceVerifyAccountRequest"
+              "type": "object"
             }
           }
         ],
@@ -396,14 +651,6 @@
         }
       }
     },
-    "account_serviceChangePasswordTokenResponce": {
-      "type": "object",
-      "properties": {
-        "Sended": {
-          "type": "boolean"
-        }
-      }
-    },
     "account_serviceCreateAccountRequest": {
       "type": "object",
       "properties": {
@@ -421,22 +668,12 @@
         }
       }
     },
-    "account_serviceLogoutRequest": {
-      "type": "object",
-      "properties": {
-        "SessionID": {
-          "type": "string"
-        },
-        "ClientIP": {
-          "type": "string"
-        }
-      }
-    },
     "account_serviceSessionInfo": {
       "type": "object",
       "properties": {
         "ClientIP": {
-          "type": "string"
+          "type": "string",
+          "title": "IP address of the user's client"
         },
         "SessionInfo": {
           "type": "string",
@@ -458,50 +695,19 @@
           "type": "string"
         },
         "ClientIP": {
-          "type": "string"
-        }
-      }
-    },
-    "account_serviceTerminateSessionsRequest": {
-      "type": "object",
-      "properties": {
-        "SessionID": {
           "type": "string",
-          "title": "Current session"
-        },
-        "ClientIP": {
-          "type": "string"
-        },
-        "SessionsToTerminate": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "title": "IP address of the user's client"
         }
       }
-    },
-    "account_serviceVerifyAccountRequest": {
-      "type": "object",
-      "properties": {
-        "VerificationToken": {
-          "type": "string"
-        }
-      }
-    },
-    "account_serviceVoid": {
-      "type": "object"
     },
     "protobufAny": {
       "type": "object",
       "properties": {
-        "typeUrl": {
+        "@type": {
           "type": "string"
-        },
-        "value": {
-          "type": "string",
-          "format": "byte"
         }
-      }
+      },
+      "additionalProperties": {}
     },
     "rpcStatus": {
       "type": "object",
@@ -516,6 +722,7 @@
         "details": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/protobufAny"
           }
         }

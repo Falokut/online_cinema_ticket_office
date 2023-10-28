@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Falokut/online_cinema_ticket_office/account_service/internal/repository"
+	"github.com/Falokut/online_cinema_ticket_office/account_service/pkg/jaeger"
 	"github.com/Falokut/online_cinema_ticket_office/account_service/pkg/logging"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/redis/go-redis/v9"
@@ -18,7 +19,7 @@ type token struct {
 type redisOptions struct {
 	Network  string `yaml:"network"`
 	Addr     string `yaml:"addr"`
-	Password string `env:"PASSWORD"`
+	Password string `yaml:"password" env:"REDIS_PASSWORD"`
 	DB       int    `yaml:"db"`
 }
 
@@ -41,10 +42,16 @@ type Config struct {
 	Listen   struct {
 		BindIP string `yaml:"bind_ip" env:"BIND_IP"`
 		Port   uint16 `yaml:"port" env:"PORT"`
-	}
-	SessionsTTL time.Duration       `yaml:"sessions_ttl"` // The lifetime of an inactive session in the cache
-	DBConfig    repository.DBConfig `yaml:"db_config"`
-	EmailKafka  KafkaConfig         `yaml:"email_kafka_config"`
+	} `yaml:"listen"`
+	PrometheusConfig struct {
+		Address string `yaml:"address" env:"PROMETHEUS_ADDRESS"`
+		Name    string `yaml:"service_name" ENV:"PROMETHEUS_SERVICE_NAME"`
+	} `yaml:"prometheus"`
+
+	SessionsTTL  time.Duration       `yaml:"sessions_ttl"` // The lifetime of an inactive session in the cache
+	DBConfig     repository.DBConfig `yaml:"db_config"`
+	EmailKafka   KafkaConfig         `yaml:"email_kafka_config"`
+	JaegerConfig jaeger.Config       `yaml:"jaeger"`
 
 	RegistrationCacheOptions    redisOptions `yaml:"redis_registration_options"`
 	SessionCacheOptions         redisOptions `yaml:"session_cache_options"`

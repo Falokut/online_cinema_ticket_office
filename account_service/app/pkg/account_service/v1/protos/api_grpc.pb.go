@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -22,16 +23,18 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AccountServiceV1Client interface {
-	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*Void, error)
-	RequestAccountVerificationToken(ctx context.Context, in *VerificationTokenRequest, opts ...grpc.CallOption) (*Void, error)
-	VerifyAccount(ctx context.Context, in *VerifyAccountRequest, opts ...grpc.CallOption) (*Void, error)
+	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Sending message into email queue with account verification token
+	RequestAccountVerificationToken(ctx context.Context, in *VerificationTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	VerifyAccount(ctx context.Context, in *VerifyAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*AccessResponce, error)
-	GetAccountID(ctx context.Context, in *GetAccountIDRequest, opts ...grpc.CallOption) (*AccountID, error)
-	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*Void, error)
-	RequestChangePasswordToken(ctx context.Context, in *ChangePasswordTokenRequest, opts ...grpc.CallOption) (*ChangePasswordTokenResponce, error)
-	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*Void, error)
-	GetAllSessions(ctx context.Context, in *GetAllSessionsRequest, opts ...grpc.CallOption) (*AllSessionsResponce, error)
-	TerminateSessions(ctx context.Context, in *TerminateSessionsRequest, opts ...grpc.CallOption) (*Void, error)
+	GetAccountID(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AccountID, error)
+	Logout(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Sending message into email queue with change password token
+	RequestChangePasswordToken(ctx context.Context, in *ChangePasswordTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetAllSessions(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllSessionsResponce, error)
+	TerminateSessions(ctx context.Context, in *TerminateSessionsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type accountServiceV1Client struct {
@@ -42,8 +45,8 @@ func NewAccountServiceV1Client(cc grpc.ClientConnInterface) AccountServiceV1Clie
 	return &accountServiceV1Client{cc}
 }
 
-func (c *accountServiceV1Client) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*Void, error) {
-	out := new(Void)
+func (c *accountServiceV1Client) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/CreateAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -51,8 +54,8 @@ func (c *accountServiceV1Client) CreateAccount(ctx context.Context, in *CreateAc
 	return out, nil
 }
 
-func (c *accountServiceV1Client) RequestAccountVerificationToken(ctx context.Context, in *VerificationTokenRequest, opts ...grpc.CallOption) (*Void, error) {
-	out := new(Void)
+func (c *accountServiceV1Client) RequestAccountVerificationToken(ctx context.Context, in *VerificationTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/RequestAccountVerificationToken", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -60,8 +63,8 @@ func (c *accountServiceV1Client) RequestAccountVerificationToken(ctx context.Con
 	return out, nil
 }
 
-func (c *accountServiceV1Client) VerifyAccount(ctx context.Context, in *VerifyAccountRequest, opts ...grpc.CallOption) (*Void, error) {
-	out := new(Void)
+func (c *accountServiceV1Client) VerifyAccount(ctx context.Context, in *VerifyAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/VerifyAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -78,7 +81,7 @@ func (c *accountServiceV1Client) SignIn(ctx context.Context, in *SignInRequest, 
 	return out, nil
 }
 
-func (c *accountServiceV1Client) GetAccountID(ctx context.Context, in *GetAccountIDRequest, opts ...grpc.CallOption) (*AccountID, error) {
+func (c *accountServiceV1Client) GetAccountID(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AccountID, error) {
 	out := new(AccountID)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/GetAccountID", in, out, opts...)
 	if err != nil {
@@ -87,8 +90,8 @@ func (c *accountServiceV1Client) GetAccountID(ctx context.Context, in *GetAccoun
 	return out, nil
 }
 
-func (c *accountServiceV1Client) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*Void, error) {
-	out := new(Void)
+func (c *accountServiceV1Client) Logout(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/Logout", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -96,8 +99,8 @@ func (c *accountServiceV1Client) Logout(ctx context.Context, in *LogoutRequest, 
 	return out, nil
 }
 
-func (c *accountServiceV1Client) RequestChangePasswordToken(ctx context.Context, in *ChangePasswordTokenRequest, opts ...grpc.CallOption) (*ChangePasswordTokenResponce, error) {
-	out := new(ChangePasswordTokenResponce)
+func (c *accountServiceV1Client) RequestChangePasswordToken(ctx context.Context, in *ChangePasswordTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/RequestChangePasswordToken", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -105,8 +108,8 @@ func (c *accountServiceV1Client) RequestChangePasswordToken(ctx context.Context,
 	return out, nil
 }
 
-func (c *accountServiceV1Client) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*Void, error) {
-	out := new(Void)
+func (c *accountServiceV1Client) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/ChangePassword", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -114,7 +117,7 @@ func (c *accountServiceV1Client) ChangePassword(ctx context.Context, in *ChangeP
 	return out, nil
 }
 
-func (c *accountServiceV1Client) GetAllSessions(ctx context.Context, in *GetAllSessionsRequest, opts ...grpc.CallOption) (*AllSessionsResponce, error) {
+func (c *accountServiceV1Client) GetAllSessions(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllSessionsResponce, error) {
 	out := new(AllSessionsResponce)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/GetAllSessions", in, out, opts...)
 	if err != nil {
@@ -123,8 +126,8 @@ func (c *accountServiceV1Client) GetAllSessions(ctx context.Context, in *GetAllS
 	return out, nil
 }
 
-func (c *accountServiceV1Client) TerminateSessions(ctx context.Context, in *TerminateSessionsRequest, opts ...grpc.CallOption) (*Void, error) {
-	out := new(Void)
+func (c *accountServiceV1Client) TerminateSessions(ctx context.Context, in *TerminateSessionsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/TerminateSessions", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -136,16 +139,18 @@ func (c *accountServiceV1Client) TerminateSessions(ctx context.Context, in *Term
 // All implementations must embed UnimplementedAccountServiceV1Server
 // for forward compatibility
 type AccountServiceV1Server interface {
-	CreateAccount(context.Context, *CreateAccountRequest) (*Void, error)
-	RequestAccountVerificationToken(context.Context, *VerificationTokenRequest) (*Void, error)
-	VerifyAccount(context.Context, *VerifyAccountRequest) (*Void, error)
+	CreateAccount(context.Context, *CreateAccountRequest) (*emptypb.Empty, error)
+	// Sending message into email queue with account verification token
+	RequestAccountVerificationToken(context.Context, *VerificationTokenRequest) (*emptypb.Empty, error)
+	VerifyAccount(context.Context, *VerifyAccountRequest) (*emptypb.Empty, error)
 	SignIn(context.Context, *SignInRequest) (*AccessResponce, error)
-	GetAccountID(context.Context, *GetAccountIDRequest) (*AccountID, error)
-	Logout(context.Context, *LogoutRequest) (*Void, error)
-	RequestChangePasswordToken(context.Context, *ChangePasswordTokenRequest) (*ChangePasswordTokenResponce, error)
-	ChangePassword(context.Context, *ChangePasswordRequest) (*Void, error)
-	GetAllSessions(context.Context, *GetAllSessionsRequest) (*AllSessionsResponce, error)
-	TerminateSessions(context.Context, *TerminateSessionsRequest) (*Void, error)
+	GetAccountID(context.Context, *emptypb.Empty) (*AccountID, error)
+	Logout(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	// Sending message into email queue with change password token
+	RequestChangePasswordToken(context.Context, *ChangePasswordTokenRequest) (*emptypb.Empty, error)
+	ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error)
+	GetAllSessions(context.Context, *emptypb.Empty) (*AllSessionsResponce, error)
+	TerminateSessions(context.Context, *TerminateSessionsRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAccountServiceV1Server()
 }
 
@@ -153,34 +158,34 @@ type AccountServiceV1Server interface {
 type UnimplementedAccountServiceV1Server struct {
 }
 
-func (UnimplementedAccountServiceV1Server) CreateAccount(context.Context, *CreateAccountRequest) (*Void, error) {
+func (UnimplementedAccountServiceV1Server) CreateAccount(context.Context, *CreateAccountRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
 }
-func (UnimplementedAccountServiceV1Server) RequestAccountVerificationToken(context.Context, *VerificationTokenRequest) (*Void, error) {
+func (UnimplementedAccountServiceV1Server) RequestAccountVerificationToken(context.Context, *VerificationTokenRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestAccountVerificationToken not implemented")
 }
-func (UnimplementedAccountServiceV1Server) VerifyAccount(context.Context, *VerifyAccountRequest) (*Void, error) {
+func (UnimplementedAccountServiceV1Server) VerifyAccount(context.Context, *VerifyAccountRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyAccount not implemented")
 }
 func (UnimplementedAccountServiceV1Server) SignIn(context.Context, *SignInRequest) (*AccessResponce, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
 }
-func (UnimplementedAccountServiceV1Server) GetAccountID(context.Context, *GetAccountIDRequest) (*AccountID, error) {
+func (UnimplementedAccountServiceV1Server) GetAccountID(context.Context, *emptypb.Empty) (*AccountID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccountID not implemented")
 }
-func (UnimplementedAccountServiceV1Server) Logout(context.Context, *LogoutRequest) (*Void, error) {
+func (UnimplementedAccountServiceV1Server) Logout(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
 }
-func (UnimplementedAccountServiceV1Server) RequestChangePasswordToken(context.Context, *ChangePasswordTokenRequest) (*ChangePasswordTokenResponce, error) {
+func (UnimplementedAccountServiceV1Server) RequestChangePasswordToken(context.Context, *ChangePasswordTokenRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestChangePasswordToken not implemented")
 }
-func (UnimplementedAccountServiceV1Server) ChangePassword(context.Context, *ChangePasswordRequest) (*Void, error) {
+func (UnimplementedAccountServiceV1Server) ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
 }
-func (UnimplementedAccountServiceV1Server) GetAllSessions(context.Context, *GetAllSessionsRequest) (*AllSessionsResponce, error) {
+func (UnimplementedAccountServiceV1Server) GetAllSessions(context.Context, *emptypb.Empty) (*AllSessionsResponce, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllSessions not implemented")
 }
-func (UnimplementedAccountServiceV1Server) TerminateSessions(context.Context, *TerminateSessionsRequest) (*Void, error) {
+func (UnimplementedAccountServiceV1Server) TerminateSessions(context.Context, *TerminateSessionsRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TerminateSessions not implemented")
 }
 func (UnimplementedAccountServiceV1Server) mustEmbedUnimplementedAccountServiceV1Server() {}
@@ -269,7 +274,7 @@ func _AccountServiceV1_SignIn_Handler(srv interface{}, ctx context.Context, dec 
 }
 
 func _AccountServiceV1_GetAccountID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAccountIDRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -281,13 +286,13 @@ func _AccountServiceV1_GetAccountID_Handler(srv interface{}, ctx context.Context
 		FullMethod: "/account_service.accountServiceV1/GetAccountID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServiceV1Server).GetAccountID(ctx, req.(*GetAccountIDRequest))
+		return srv.(AccountServiceV1Server).GetAccountID(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _AccountServiceV1_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LogoutRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -299,7 +304,7 @@ func _AccountServiceV1_Logout_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: "/account_service.accountServiceV1/Logout",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServiceV1Server).Logout(ctx, req.(*LogoutRequest))
+		return srv.(AccountServiceV1Server).Logout(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -341,7 +346,7 @@ func _AccountServiceV1_ChangePassword_Handler(srv interface{}, ctx context.Conte
 }
 
 func _AccountServiceV1_GetAllSessions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAllSessionsRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -353,7 +358,7 @@ func _AccountServiceV1_GetAllSessions_Handler(srv interface{}, ctx context.Conte
 		FullMethod: "/account_service.accountServiceV1/GetAllSessions",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServiceV1Server).GetAllSessions(ctx, req.(*GetAllSessionsRequest))
+		return srv.(AccountServiceV1Server).GetAllSessions(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }

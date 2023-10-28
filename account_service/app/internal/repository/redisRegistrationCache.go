@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Falokut/online_cinema_ticket_office/account_service/pkg/logging"
+	"github.com/opentracing/opentracing-go"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -17,13 +18,13 @@ type redisRegistrationCache struct {
 }
 
 func NewRedisRegistrationCache(opt *redis.Options, logger logging.Logger) (*redisRegistrationCache, error) {
-	logger.Println("Creating registration cache client")
+	logger.Info("Creating registration cache client")
 	rdb := redis.NewClient(opt)
 	if rdb == nil {
 		return nil, errors.New("Can't create new redis client")
 	}
 
-	logger.Println("Pinging registration cache client")
+	logger.Info("Pinging registration cache client")
 	_, err := rdb.Ping(context.Background()).Result()
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Connection is not established: %s", err.Error()))
@@ -33,12 +34,16 @@ func NewRedisRegistrationCache(opt *redis.Options, logger logging.Logger) (*redi
 }
 
 func (r *redisRegistrationCache) ShutDown() {
-	r.logger.Println("Registration cache repository shutting down")
+	r.logger.Info("Registration cache repository shutting down")
 	r.rdb.Close()
 }
 
-func (r redisRegistrationCache) IsAccountInCache(email string) (bool, error) {
-	num, err := r.rdb.Exists(context.Background(), email).Result()
+func (r redisRegistrationCache) IsAccountInCache(ctx context.Context, email string) (bool, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsCache.UpdateSessionsForAccount")
+	span.SetTag("custom-tag", "redis cache")
+	defer span.Finish()
+
+	num, err := r.rdb.Exists(ctx, email).Result()
 	if err != nil {
 		return false, err
 	}
@@ -46,14 +51,20 @@ func (r redisRegistrationCache) IsAccountInCache(email string) (bool, error) {
 	return num > 0, nil
 }
 
-func (r *redisRegistrationCache) CacheAccount(email string, account CachedAccount, NonActivatedAccountTTL time.Duration) error {
-	r.logger.Println("Marshalling data")
+func (r *redisRegistrationCache) CacheAccount(ctx context.Context,
+	email string, account CachedAccount, NonActivatedAccountTTL time.Duration) error {
+
+	span, ctx := opentracing.StartSpanFromContext(ctx, "RegistrationCache.CacheAccount")
+	span.SetTag("custom-tag", "redis cache")
+	defer span.Finish()
+
+	r.logger.Info("Marshalling data")
 	serialized, err := json.Marshal(&account)
 	if err != nil {
 		return err
 	}
 
-	_, err = r.rdb.Set(context.Background(), email, serialized, NonActivatedAccountTTL).Result()
+	_, err = r.rdb.Set(ctx, email, serialized, NonActivatedAccountTTL).Result()
 	if err != nil {
 		return errors.New("Can't cache account")
 	}
@@ -61,9 +72,13 @@ func (r *redisRegistrationCache) CacheAccount(email string, account CachedAccoun
 	return nil
 }
 
-func (r redisRegistrationCache) GetCachedAccount(email string) (CachedAccount, error) {
+func (r redisRegistrationCache) GetCachedAccount(ctx context.Context, email string) (CachedAccount, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "RegistrationCache.GetCachedAccount")
+	span.SetTag("custom-tag", "redis cache")
+	defer span.Finish()
+
 	r.logger.Printf("Getting account with %s email", email)
-	body, err := r.rdb.Get(context.Background(), email).Bytes()
+	body, err := r.rdb.Get(ctx, email).Bytes()
 	if err != nil && err != redis.Nil {
 		return CachedAccount{}, err
 	} else if err == redis.Nil {
@@ -72,13 +87,14 @@ func (r redisRegistrationCache) GetCachedAccount(email string) (CachedAccount, e
 
 	var account CachedAccount
 	err = json.Unmarshal(body, &account)
-	if err != nil {
-		return CachedAccount{}, err
-	}
 
-	return account, nil
+	return account, err
 }
 
-func (r *redisRegistrationCache) DeleteAccountFromCache(email string) error {
-	return r.rdb.Del(context.Background(), email).Err()
+func (r *redisRegistrationCache) DeleteAccountFromCache(ctx context.Context, email string) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "RegistrationCache.DeleteAccountFromCache")
+	span.SetTag("custom-tag", "redis cache")
+	defer span.Finish()
+
+	return r.rdb.Del(ctx, email).Err()
 }

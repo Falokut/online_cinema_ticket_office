@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,7 +9,11 @@ import (
 	"github.com/Falokut/online_cinema_ticket_office/account_service/internal/repository"
 	"github.com/Falokut/online_cinema_ticket_office/account_service/internal/server"
 	"github.com/Falokut/online_cinema_ticket_office/account_service/internal/service"
+	jaegerTracer "github.com/Falokut/online_cinema_ticket_office/account_service/pkg/jaeger"
 	"github.com/Falokut/online_cinema_ticket_office/account_service/pkg/logging"
+	"github.com/Falokut/online_cinema_ticket_office/account_service/pkg/metrics"
+
+	"github.com/opentracing/opentracing-go"
 	"github.com/segmentio/kafka-go"
 	"github.com/sirupsen/logrus"
 )
@@ -24,46 +27,63 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	logger.Println(appCfg.JaegerConfig)
+	tracer, closer, err := jaegerTracer.InitJaeger(appCfg.JaegerConfig)
+	if err != nil {
+		logger.Fatal("cannot create tracer", err)
+	}
+	logger.Info("Jaeger connected")
+	defer closer.Close()
+
+	opentracing.SetGlobalTracer(tracer)
+
 	logger.Logger.SetLevel(log_level)
-	logger.Infoln("Registration cache initializing")
+	logger.Info("Registration cache initializing")
 	regCacheOpt := appCfg.RegistrationCacheOptions.ConvertToRedisOptions()
 	registrationCache, err := repository.NewRedisRegistrationCache(regCacheOpt, logger)
 	if err != nil {
-		logger.Fatalf("Shutting down, connection to the redis registration cache is not established: %s options: %v", err.Error(), regCacheOpt)
-		return
+		logger.Fatalf("Shutting down, connection to the redis registration cache is not established: %s options: %v",
+			err.Error(), regCacheOpt)
 	}
 
-	logger.Infoln("Token cache initializing")
+	logger.Info("Token cache initializing")
 	sessionCacheOpt := appCfg.SessionCacheOptions.ConvertToRedisOptions()
 	accountSessionCacheOpt := appCfg.AccountSessionsCacheOptions.ConvertToRedisOptions()
-	sessionCache, err := repository.NewSessionCache(sessionCacheOpt, accountSessionCacheOpt, logger, appCfg.SessionsTTL)
+	sessionCache, err := repository.NewSessionCache(sessionCacheOpt,
+		accountSessionCacheOpt, logger, appCfg.SessionsTTL)
 	if err != nil {
-		logger.Fatalf("Shutting down, connection to the redis token cache is not established: %s options: %v", err.Error(), sessionCacheOpt)
-		return
+		logger.Fatalf("Shutting down, connection to the redis token cache is not established: %s options: %v",
+			err.Error(), sessionCacheOpt)
 	}
 
-	logger.Infoln("database initializing")
+	logger.Info("Database initializing")
 	database, err := repository.NewPostgreDB(appCfg.DBConfig)
 	if err != nil {
 		logger.Fatalf("Shutting down, connection to the database is not established: %s", err.Error())
-		return
 	}
 
 	redisRepo := repository.NewCacheRepository(registrationCache, sessionCache)
 
-	logger.Infoln("repository initializing")
+	logger.Info("Repository initializing")
 	repo := repository.NewAccountRepository(database)
 
-	logger.Infoln("service initializing")
-	service := service.NewAccountService(repo, logger, redisRepo, GetKafkaWriter(appCfg.EmailKafka), appCfg)
+	logger.Info("Metrics initializing")
+	metric, err := metrics.CreateMetrics(appCfg.PrometheusConfig.Address,
+		appCfg.PrometheusConfig.Name, logger)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	logger.Info("Service initializing")
+	service := service.NewAccountService(repo,
+		logger, redisRepo, GetKafkaWriter(appCfg.EmailKafka), appCfg, metric)
 
 	s := server.NewServer(logger, service)
-	logger.Infoln("server initializing")
+	logger.Info("Server initializing")
 	go func() {
-		logger.Infoln("server running")
-		if err := s.Run(getServerConfig(appCfg)); err != nil {
-			log.Fatalf("%s", err.Error())
-			return
+		logger.Info("Server running")
+		if err := s.Run(getServerConfig(appCfg), metric); err != nil {
+			logger.Fatalf("%s", err.Error())
 		}
 	}()
 
@@ -72,7 +92,6 @@ func main() {
 
 	<-quit
 	s.ShutDown()
-	logger.Infoln("Shutted down successfully")
 }
 
 func getServerConfig(appCfg *config.Config) server.Config {

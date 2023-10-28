@@ -4,19 +4,11 @@ package account_service;
 option go_package = "account_service/v1/protos";
 import "google/protobuf/timestamp.proto";
 
-
-message Void { }
-
 message CreateAccountRequest {
     string Email = 1;
     string Username = 2;
     string Password = 3;
     string RepeatPassword = 4;
-}
-
-message GetAccountIDRequest {
-    string SessionID = 1;
-    string ClientIP = 2;
 }
 
 message AccountID {
@@ -36,6 +28,7 @@ message VerifyAccountRequest {
 message SignInRequest {
     string Email = 1;
     string Password = 2;
+    // IP address of the user's client
     string ClientIP = 3;
 }
 
@@ -43,19 +36,9 @@ message AccessResponce {
     string SessionID = 1;
 }
 
-
-message LogoutRequest {
-    string SessionID = 1;
-    string ClientIP = 2;
-}
-
 message ChangePasswordTokenRequest {
     string Email = 1;
     string URL = 2;
-}
-
-message ChangePasswordTokenResponce {
-    bool Sended = 1;
 }
 
 message ChangePasswordRequest {
@@ -64,13 +47,8 @@ message ChangePasswordRequest {
 } 
 
 
-message GetAllSessionsRequest {
-    // Current session
-    string SessionID = 1;
-    string ClientIP = 2;
-}
-
 message SessionInfo {
+    // IP address of the user's client
     string  ClientIP    = 1;
     // Like device or browser
     string  SessionInfo = 2; 
@@ -81,8 +59,5 @@ message AllSessionsResponce {
 }
 
 message TerminateSessionsRequest {
-    // Current session
-    string SessionID = 1;
-    string ClientIP = 2;
-    repeated string SessionsToTerminate = 3;
+    repeated string SessionsToTerminate = 1;
 }

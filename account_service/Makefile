@@ -41,7 +41,7 @@ server:
 docker-build:
 	docker build -t $(project_name) .
 
-docker-compose-build:
+.docker-compose:
 	docker-compose up --build $(project_name)
 	
 docker-compose-up:
