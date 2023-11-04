@@ -33,9 +33,9 @@ func NewRedisRegistrationCache(opt *redis.Options, logger logging.Logger) (*redi
 	return &redisRegistrationCache{rdb: rdb, logger: logger}, nil
 }
 
-func (r *redisRegistrationCache) ShutDown() {
+func (r *redisRegistrationCache) ShutDown() error {
 	r.logger.Info("Registration cache repository shutting down")
-	r.rdb.Close()
+	return r.rdb.Close()
 }
 
 func (r redisRegistrationCache) IsAccountInCache(ctx context.Context, email string) (bool, error) {

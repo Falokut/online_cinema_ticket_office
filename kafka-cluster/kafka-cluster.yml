@@ -1,0 +1,42 @@
+version: '3.8'
+
+networks:
+  kafka_network:
+    name: "kafka_network"
+    driver: bridge
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    networks:
+      - kafka_network
+    volumes:
+      - .container_data/zookeeper_data:/kafka
+    restart: unless-stopped
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    hostname: kafka
+    ports:
+      - 29092:29092
+    networks:
+      - kafka_network
+    environment:
+      KAFKA_BROKER_ID: 0
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://localhost:29092
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "emails:1:1,accounts_events:1:1"
+    volumes:
+      - .container_data/kafka_data_1:/kafka
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      zookeeper:
+        condition: service_started
+    restart: unless-stopped

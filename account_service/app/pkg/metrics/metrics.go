@@ -48,8 +48,9 @@ func CreateMetrics(address string, name string, logger logging.Logger) (Metrics,
 		prometheus.CounterOpts{
 			Name: name + "_cache_hits",
 		},
-		[]string{"status", "method", "path"},
+		[]string{"status", "method"},
 	)
+
 	if err := prometheus.Register(metr.CacheHits); err != nil {
 		return nil, err
 	}
@@ -58,7 +59,7 @@ func CreateMetrics(address string, name string, logger logging.Logger) (Metrics,
 		prometheus.CounterOpts{
 			Name: name + "_cache_miss",
 		},
-		[]string{"status", "method", "path"},
+		[]string{"status", "method"},
 	)
 	if err := prometheus.Register(metr.CacheMiss); err != nil {
 		return nil, err
@@ -89,17 +90,15 @@ func CreateMetrics(address string, name string, logger logging.Logger) (Metrics,
 
 func (metr *PrometheusMetrics) IncHits(status int, method, path string) {
 	metr.HitsTotal.Inc()
-	metr.CacheHits.WithLabelValues(strconv.Itoa(status), method, path).Inc()
+	metr.Hits.WithLabelValues(strconv.Itoa(status), method, path).Inc()
 }
 
 func (metr *PrometheusMetrics) IncCacheHits(status int, method string) {
-	metr.HitsTotal.Inc()
 	metr.CacheHits.WithLabelValues(strconv.Itoa(status), method).Inc()
 }
 
 func (metr *PrometheusMetrics) IncCacheMiss(status int, method string) {
-	metr.HitsTotal.Inc()
-	metr.Hits.WithLabelValues(strconv.Itoa(status), method).Inc()
+	metr.CacheMiss.WithLabelValues(strconv.Itoa(status), method).Inc()
 }
 
 func (metr *PrometheusMetrics) ObserveResponseTime(status int, method, path string, observeTime float64) {

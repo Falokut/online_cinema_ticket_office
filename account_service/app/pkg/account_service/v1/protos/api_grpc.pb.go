@@ -35,6 +35,7 @@ type AccountServiceV1Client interface {
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetAllSessions(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AllSessionsResponce, error)
 	TerminateSessions(ctx context.Context, in *TerminateSessionsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteAccount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type accountServiceV1Client struct {
@@ -135,6 +136,15 @@ func (c *accountServiceV1Client) TerminateSessions(ctx context.Context, in *Term
 	return out, nil
 }
 
+func (c *accountServiceV1Client) DeleteAccount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/account_service.accountServiceV1/DeleteAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AccountServiceV1Server is the server API for AccountServiceV1 service.
 // All implementations must embed UnimplementedAccountServiceV1Server
 // for forward compatibility
@@ -151,6 +161,7 @@ type AccountServiceV1Server interface {
 	ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error)
 	GetAllSessions(context.Context, *emptypb.Empty) (*AllSessionsResponce, error)
 	TerminateSessions(context.Context, *TerminateSessionsRequest) (*emptypb.Empty, error)
+	DeleteAccount(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAccountServiceV1Server()
 }
 
@@ -187,6 +198,9 @@ func (UnimplementedAccountServiceV1Server) GetAllSessions(context.Context, *empt
 }
 func (UnimplementedAccountServiceV1Server) TerminateSessions(context.Context, *TerminateSessionsRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TerminateSessions not implemented")
+}
+func (UnimplementedAccountServiceV1Server) DeleteAccount(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccount not implemented")
 }
 func (UnimplementedAccountServiceV1Server) mustEmbedUnimplementedAccountServiceV1Server() {}
 
@@ -381,6 +395,24 @@ func _AccountServiceV1_TerminateSessions_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AccountServiceV1_DeleteAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountServiceV1Server).DeleteAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/account_service.accountServiceV1/DeleteAccount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountServiceV1Server).DeleteAccount(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AccountServiceV1_ServiceDesc is the grpc.ServiceDesc for AccountServiceV1 service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -427,6 +459,10 @@ var AccountServiceV1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TerminateSessions",
 			Handler:    _AccountServiceV1_TerminateSessions_Handler,
+		},
+		{
+			MethodName: "DeleteAccount",
+			Handler:    _AccountServiceV1_DeleteAccount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

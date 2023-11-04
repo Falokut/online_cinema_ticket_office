@@ -364,6 +364,24 @@ func local_request_AccountServiceV1_TerminateSessions_0(ctx context.Context, mar
 
 }
 
+func request_AccountServiceV1_DeleteAccount_0(ctx context.Context, marshaler runtime.Marshaler, client AccountServiceV1Client, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq emptypb.Empty
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.DeleteAccount(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_AccountServiceV1_DeleteAccount_0(ctx context.Context, marshaler runtime.Marshaler, server AccountServiceV1Server, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq emptypb.Empty
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.DeleteAccount(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 // RegisterAccountServiceV1HandlerServer registers the http handlers for service AccountServiceV1 to "mux".
 // UnaryRPC     :call AccountServiceV1Server directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -617,6 +635,31 @@ func RegisterAccountServiceV1HandlerServer(ctx context.Context, mux *runtime.Ser
 		}
 
 		forward_AccountServiceV1_TerminateSessions_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_AccountServiceV1_DeleteAccount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/account_service.AccountServiceV1/DeleteAccount", runtime.WithHTTPPathPattern("/v1/account/delete"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_AccountServiceV1_DeleteAccount_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AccountServiceV1_DeleteAccount_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -881,6 +924,28 @@ func RegisterAccountServiceV1HandlerClient(ctx context.Context, mux *runtime.Ser
 
 	})
 
+	mux.Handle("POST", pattern_AccountServiceV1_DeleteAccount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/account_service.AccountServiceV1/DeleteAccount", runtime.WithHTTPPathPattern("/v1/account/delete"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_AccountServiceV1_DeleteAccount_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AccountServiceV1_DeleteAccount_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -904,6 +969,8 @@ var (
 	pattern_AccountServiceV1_GetAllSessions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "sessions"}, ""))
 
 	pattern_AccountServiceV1_TerminateSessions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "sessions", "terminate"}, ""))
+
+	pattern_AccountServiceV1_DeleteAccount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "account", "delete"}, ""))
 )
 
 var (
@@ -926,4 +993,6 @@ var (
 	forward_AccountServiceV1_GetAllSessions_0 = runtime.ForwardResponseMessage
 
 	forward_AccountServiceV1_TerminateSessions_0 = runtime.ForwardResponseMessage
+
+	forward_AccountServiceV1_DeleteAccount_0 = runtime.ForwardResponseMessage
 )

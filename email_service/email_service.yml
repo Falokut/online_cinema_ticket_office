@@ -1,0 +1,27 @@
+version: '3.8'
+
+include:
+- ../kafka-cluster/kafka-cluster.yml
+
+services:
+  email_service:
+    build: ./
+    command: ./bin/app
+    networks:
+     - kafka_network
+    volumes:
+      - ./container_logs:/logs/
+    depends_on:
+      - kafka
+    deploy:
+      restart_policy: 
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+volumes:
+  container_logs:
+    driver: local
+      
+
+  

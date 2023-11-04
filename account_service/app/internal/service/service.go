@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"time"
 
 	"github.com/Falokut/online_cinema_ticket_office/account_service/internal/config"
@@ -39,11 +40,6 @@ type AccountService struct {
 	metrics                metrics.Metrics
 }
 
-func (s *AccountService) ShutDown() {
-	s.logger.Println("Service shutting down")
-	s.repo.ShutDown()
-	s.redisRepo.ShutDown()
-}
 func NewAccountService(repo repository.AccountRepository, logger logging.Logger,
 	redisRepo repository.CacheRepo, emailWriter *kafka.Writer,
 	cfg *config.Config, metrics metrics.Metrics) *AccountService {
@@ -208,19 +204,26 @@ func (s *AccountService) SignIn(ctx context.Context,
 	defer span.Finish()
 
 	s.logger.Debug("Getting user by email")
-	u, err := s.repo.GetUserByEmail(ctx, in.Email)
+	account, err := s.repo.GetUserByEmail(ctx, in.Email)
 	if err != nil {
 		return nil, s.createErrorResponce(err.Error(), codes.NotFound)
 	}
 
 	s.logger.Debug("Password and hash comparison")
-	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(in.Password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(in.Password)); err != nil {
 		return nil, s.createErrorResponce(err.Error(), codes.InvalidArgument)
+	}
+
+	ClientIP, err := s.getClientIPFromCtx(ctx)
+	if err != nil {
+		s.logger.Errorf("getClientIPFromCtx: %v", err)
+		return nil, err
 	}
 
 	s.logger.Debug("Caching session")
 	SessionID := uuid.NewString()
-	if err := s.redisRepo.SessionsCache.CacheSession(ctx, model.SessionCache{SessionID: SessionID, AccountID: u.UUID, ClientIP: in.ClientIP, LastActivity: time.Now()}); err != nil {
+	if err := s.redisRepo.SessionsCache.CacheSession(ctx, model.SessionCache{SessionID: SessionID,
+		AccountID: account.UUID, ClientIP: ClientIP, LastActivity: time.Now()}); err != nil {
 		return nil, s.createErrorResponce(err.Error(), codes.Internal)
 	}
 
@@ -232,21 +235,8 @@ func (s *AccountService) GetAccountID(ctx context.Context,
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.GetAccountID")
 	defer span.Finish()
 
-	s.logger.Debug("Getting session id from ctx")
-	SessionID, err := s.getSessionIDFromCtx(ctx)
-	if err != nil {
-		s.logger.Errorf("getSessionIDFromCtx: %v", err)
-		return nil, err
-	}
-
-	ClientIP, err := s.getClientIPFromCtx(ctx)
-	if err != nil {
-		s.logger.Errorf("getClientIPFromIP: %v", err)
-		return nil, err
-	}
-
 	s.logger.Debug("Checking session")
-	cache, err := s.checkSession(ctx, SessionID, ClientIP)
+	cache, SessionID, _, err := s.checkSession(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -266,21 +256,8 @@ func (s *AccountService) Logout(ctx context.Context,
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.Logout")
 	defer span.Finish()
 
-	s.logger.Debug("Getting session id from ctx")
-	SessionID, err := s.getSessionIDFromCtx(ctx)
-	if err != nil {
-		s.logger.Errorf("getSessionIDFromCtx: %v", err)
-		return nil, err
-	}
-
-	ClientIP, err := s.getClientIPFromCtx(ctx)
-	if err != nil {
-		s.logger.Errorf("getClientIPFromIP: %v", err)
-		return nil, err
-	}
-
 	s.logger.Debug("Checking session")
-	cache, err := s.checkSession(ctx, SessionID, ClientIP)
+	cache, SessionID, _, err := s.checkSession(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -337,6 +314,11 @@ func (s *AccountService) ChangePassword(ctx context.Context,
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.ChangePassword")
 	defer span.Finish()
 
+	s.logger.Debug("Validating incoming password")
+	if err := validatePassword(in.NewPassword); err != nil {
+		return nil, s.createErrorResponce(err.Error(), codes.InvalidArgument)
+	}
+
 	s.logger.Debug("Parsing jwt token")
 	email, err := jwt.ParseToken(in.ChangePasswordToken, config.GetConfig().JWT.ChangePasswordToken.Secret)
 	if err != nil {
@@ -352,16 +334,16 @@ func (s *AccountService) ChangePassword(ctx context.Context,
 		return nil, s.createErrorResponce(err.Error(), codes.NotFound)
 	}
 
-	s.logger.Debug("Validating incoming password")
-	if err := validatePassword(in.NewPassword); err != nil {
-		return nil, s.createErrorResponce(err.Error(), codes.InvalidArgument)
-	}
+	GeneratingHashSpan, _ := opentracing.StartSpanFromContext(ctx,
+		"AccountService.ChangePassword.GenerateHash")
 
 	s.logger.Debug("Generating hash for incoming password")
 	password_hash, err := bcrypt.GenerateFromPassword([]byte(in.NewPassword), config.GetConfig().Crypto.BcryptCost)
 	if err != nil {
+		GeneratingHashSpan.Finish()
 		return nil, s.createErrorResponce("Can't generate hash.", codes.Internal)
 	}
+	GeneratingHashSpan.Finish()
 
 	s.logger.Debug("Changing account password")
 	err = s.repo.ChangePassword(ctx, email, string(password_hash))
@@ -377,21 +359,8 @@ func (s *AccountService) GetAllSessions(ctx context.Context,
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.GetAllSessions")
 	defer span.Finish()
 
-	s.logger.Debug("Getting session id from ctx")
-	SessionID, err := s.getSessionIDFromCtx(ctx)
-	if err != nil {
-		s.logger.Errorf("getSessionIDFromCtx: %v", err)
-		return nil, err
-	}
-
-	ClientIP, err := s.getClientIPFromCtx(ctx)
-	if err != nil {
-		s.logger.Errorf("getClientIPFromIP: %v", err)
-		return nil, err
-	}
-
 	s.logger.Debug("Checking session")
-	cache, err := s.checkSession(ctx, SessionID, ClientIP)
+	cache, _, _, err := s.checkSession(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -424,21 +393,8 @@ func (s *AccountService) TerminateSessions(ctx context.Context,
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.TerminateSessions")
 	defer span.Finish()
 
-	s.logger.Debug("Getting session id from ctx")
-	SessionID, err := s.getSessionIDFromCtx(ctx)
-	if err != nil {
-		s.logger.Errorf("getSessionIDFromCtx: %v", err)
-		return nil, err
-	}
-
-	ClientIP, err := s.getClientIPFromCtx(ctx)
-	if err != nil {
-		s.logger.Errorf("getClientIPFromIP: %v", err)
-		return nil, err
-	}
-
 	s.logger.Debug("Checking session")
-	cache, err := s.checkSession(ctx, SessionID, ClientIP)
+	cache, _, _, err := s.checkSession(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -451,28 +407,68 @@ func (s *AccountService) TerminateSessions(ctx context.Context,
 	return &emptypb.Empty{}, nil
 }
 
+func (s *AccountService) DeleteAccount(ctx context.Context,
+	in *emptypb.Empty) (*emptypb.Empty, error) {
+
+	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.DeleteAccount")
+	defer span.Finish()
+	s.logger.Debug("Checking session")
+
+	cache, _, _, err := s.checkSession(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.repo.DeleteAccount(ctx, cache.AccountID)
+	if err != nil {
+		return nil, s.createErrorResponce(fmt.Sprint("DeleteAccount.Repo.DeleteAccount: ", err.Error()), codes.Internal)
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
 func (s *AccountService) createErrorResponce(errorMessage string, statusCode codes.Code) error {
 	s.logger.Error(errorMessage)
 	return status.Error(statusCode, errorMessage)
 }
 
-func (s *AccountService) checkSession(ctx context.Context,
-	SessionID string, ClientIP string) (model.SessionCache, error) {
+func (s *AccountService) checkSession(ctx context.Context) (cache model.SessionCache, SessionID, ClientIP string, err error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.checkSession")
 	defer span.Finish()
 
-	cache, err := s.redisRepo.SessionsCache.GetSessionCache(ctx, SessionID)
+	s.logger.Debug("Getting session id from ctx")
+	SessionID, err = s.getSessionIDFromCtx(ctx)
+	if err != nil {
+		s.logger.Errorf("getSessionIDFromCtx: %v", err)
+		return
+	}
+
+	ClientIP, err = s.getClientIPFromCtx(ctx)
+	if err != nil {
+		s.logger.Errorf("getClientIPFromCtx: %v", err)
+		return
+	}
+	if net.ParseIP(ClientIP) == nil {
+		err = s.createErrorResponce(fmt.Sprint("checkSession.ClientIP.IPCheck: ", grpc_errors.ErrInvalidClientIP),
+			codes.InvalidArgument)
+		return
+	}
+
+	cache, err = s.redisRepo.SessionsCache.GetSessionCache(ctx, SessionID)
 	if err != nil {
 		const status = codes.NotFound
 		s.metrics.IncCacheMiss(int(status), "checkSession")
-		return model.SessionCache{}, s.createErrorResponce(err.Error(), status)
+		err = s.createErrorResponce(err.Error(), status)
+		return
 	}
 	s.metrics.IncCacheHits(int(codes.OK), "checkSession")
 
 	if ClientIP != cache.ClientIP {
-		return model.SessionCache{}, s.createErrorResponce("Access denied", codes.PermissionDenied)
+		err = s.createErrorResponce("Access denied", codes.PermissionDenied)
+		return
 	}
-	return cache, nil
+
+	return
 }
 
 func (s *AccountService) getSessionIDFromCtx(ctx context.Context) (string, error) {
@@ -482,8 +478,13 @@ func (s *AccountService) getSessionIDFromCtx(ctx context.Context) (string, error
 	}
 
 	sessionID := md.Get("session_id")
+	if len(sessionID) == 0 {
+		return "", s.createErrorResponce(fmt.Sprint("metadata.getSessionId: ", grpc_errors.ErrNoCtxMetaData),
+			codes.Unauthenticated)
+	}
 	if sessionID[0] == "" {
-		return "", status.Errorf(codes.InvalidArgument, "md.Get sessionId: %v", grpc_errors.ErrInvalidSessionId)
+		return "", s.createErrorResponce(fmt.Sprint("metadata.getSessionId: ", grpc_errors.ErrInvalidSessionId),
+			codes.InvalidArgument)
 	}
 
 	return sessionID[0], nil
@@ -492,13 +493,16 @@ func (s *AccountService) getSessionIDFromCtx(ctx context.Context) (string, error
 func (s *AccountService) getClientIPFromCtx(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", status.Errorf(codes.InvalidArgument, "metadata.FromIncomingContext: %v", grpc_errors.ErrNoCtxMetaData)
+		return "", s.createErrorResponce(fmt.Sprint("metadata.FromIncomingContext: ", grpc_errors.ErrNoCtxMetaData),
+			codes.InvalidArgument)
 	}
 
-	sessionID := md.Get("client_ip")
-	if sessionID[0] == "" || len(sessionID) == 0 {
-		return "", status.Errorf(codes.InvalidArgument, "md.Get sessionId: %v", grpc_errors.ErrInvalidClientIP)
+	ClientIP := md.Get("client_ip")
+
+	if len(ClientIP) == 0 || ClientIP[0] == "" {
+		return "", s.createErrorResponce(fmt.Sprint("metadata.getClientIP: ", grpc_errors.ErrInvalidClientIP),
+			codes.InvalidArgument)
 	}
 
-	return sessionID[0], nil
+	return ClientIP[0], nil
 }

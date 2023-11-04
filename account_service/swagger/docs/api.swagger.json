@@ -87,6 +87,70 @@
         ]
       }
     },
+    "/v1/account/delete": {
+      "post": {
+        "operationId": "accountServiceV1_DeleteAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "400": {
+            "description": "Returned when has problem with parameters in headers.",
+            "schema": {}
+          },
+          "401": {
+            "description": "Returned when session_id not found in header params.",
+            "schema": {}
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when account with specified id not found",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "session_id",
+            "description": "ID of the session issued when logging in to the account",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "client_ip",
+            "description": "IP address of the user's client",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "accountServiceV1"
+        ]
+      }
+    },
     "/v1/change-password": {
       "post": {
         "operationId": "accountServiceV1_ChangePassword",
@@ -483,6 +547,13 @@
             "schema": {
               "$ref": "#/definitions/account_serviceSignInRequest"
             }
+          },
+          {
+            "name": "client_ip",
+            "description": "IP address of the user's client.",
+            "in": "header",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -677,7 +748,7 @@
         },
         "SessionInfo": {
           "type": "string",
-          "title": "Like device or browser"
+          "title": "Session info, is may be device or browser info"
         },
         "LastActivity": {
           "type": "string",
@@ -693,10 +764,6 @@
         },
         "Password": {
           "type": "string"
-        },
-        "ClientIP": {
-          "type": "string",
-          "title": "IP address of the user's client"
         }
       }
     },

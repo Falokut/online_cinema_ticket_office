@@ -48,9 +48,9 @@ func NewSessionCache(sessionCacheOpt *redis.Options, accountSessionsOpt *redis.O
 	return &redisSessionsCache{sessions_rdb: sessions_rdb, account_sessions_rdb: account_sessions_rdb, logger: logger, SessionTTL: SessionTTL}, nil
 }
 
-func (r *redisSessionsCache) ShutDown() {
+func (r *redisSessionsCache) ShutDown() error {
 	r.logger.Infoln("Token cache repository shutting down")
-	r.sessions_rdb.Close()
+	return r.sessions_rdb.Close()
 }
 
 func (r *redisSessionsCache) CacheSession(ctx context.Context, toCache model.SessionCache) error {

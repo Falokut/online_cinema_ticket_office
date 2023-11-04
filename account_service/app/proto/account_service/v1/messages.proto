@@ -28,8 +28,6 @@ message VerifyAccountRequest {
 message SignInRequest {
     string Email = 1;
     string Password = 2;
-    // IP address of the user's client
-    string ClientIP = 3;
 }
 
 message AccessResponce {
@@ -50,7 +48,7 @@ message ChangePasswordRequest {
 message SessionInfo {
     // IP address of the user's client
     string  ClientIP    = 1;
-    // Like device or browser
+    // Session info, is may be device or browser info
     string  SessionInfo = 2; 
     google.protobuf.Timestamp    LastActivity = 3;
 }
@@ -61,3 +59,4 @@ message AllSessionsResponce {
 message TerminateSessionsRequest {
     repeated string SessionsToTerminate = 1;
 }
+ 

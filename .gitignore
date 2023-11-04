@@ -1,6 +1,7 @@
 
 # ignore all logs
 **/logs
+*.log
 
 # ignore all git folders inside project
 **/.git
@@ -8,7 +9,7 @@
 
 # ignore volumes
 **/.container_data/
-**/container_logs
+**/container_logs/
 
 # ignore all vscode-settings
 **/.vscode
@@ -21,3 +22,4 @@
 *.cnf
 *.pem
 *.srl
+

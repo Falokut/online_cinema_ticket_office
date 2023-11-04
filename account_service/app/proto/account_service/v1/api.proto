@@ -130,6 +130,14 @@ service accountServiceV1 {
                     value: {
                         description: "Returned when account with specified email not found."
                     }
+            };
+            parameters: {
+                headers: {
+                    name: "client_ip";
+                    description: "IP address of the user's client.";
+                    type: STRING;
+                    required: true; 
+                };
             }; 
         };
     }
@@ -309,6 +317,45 @@ service accountServiceV1 {
                 key: "404"
                     value: {
                         description: "Returned when session with specified id not found"
+                    }
+            }; 
+        };
+    }
+
+
+    rpc DeleteAccount(google.protobuf.Empty) returns(google.protobuf.Empty){
+        option (google.api.http) = { post: "/v1/account/delete" };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            parameters: {
+                headers: {
+                    name: "session_id";
+                    description: "ID of the session issued when logging in to the account";
+                    type: STRING;
+                    required: true; 
+                };
+                headers: {
+                    name: "client_ip";
+                    description: "IP address of the user's client";
+                    type: STRING;
+                    required: true; 
+                };
+            }
+            responses: {
+                key: "400"
+                    value: {
+                        description: "Returned when has problem with parameters in headers."
+                    }
+            };
+            responses: {
+                key: "401"
+                    value: {
+                        description: "Returned when session_id not found in header params."
+                    }
+            };
+            responses: {
+                key: "404"
+                    value: {
+                        description: "Returned when account with specified id not found"
                     }
             }; 
         };

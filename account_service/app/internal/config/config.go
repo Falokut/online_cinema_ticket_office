@@ -69,23 +69,24 @@ type Config struct {
 var instance *Config
 var once sync.Once
 
+const configsPath = "configs/"
+
 func GetConfig() *Config {
 	once.Do(func() {
 		logger := logging.GetLogger()
 		instance = &Config{}
 
-		err := cleanenv.ReadEnv(instance)
-		if err != nil {
+		if err := cleanenv.ReadConfig(configsPath+"secrets.env.yml", instance); err != nil {
 			help, _ := cleanenv.GetDescription(instance, nil)
 			logger.Fatal(help, " ", err)
 		}
 
-		if err := cleanenv.ReadConfig("configs/config.yml", instance); err != nil {
+		if err := cleanenv.ReadConfig(configsPath+"config.yml", instance); err != nil {
 			help, _ := cleanenv.GetDescription(instance, nil)
 			logger.Fatal(help, " ", err)
 		}
 
-		if err := cleanenv.ReadConfig("configs/secrets.env.yml", instance); err != nil {
+		if err := cleanenv.ReadEnv(instance); err != nil {
 			help, _ := cleanenv.GetDescription(instance, nil)
 			logger.Fatal(help, " ", err)
 		}

@@ -1,0 +1,184 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Profiles service",
+    "version": "1.0",
+    "contact": {
+      "name": "Falokut",
+      "url": "https://github.com/Falokut",
+      "email": "timur.sinelnik@yandex.ru"
+    }
+  },
+  "tags": [
+    {
+      "name": "profileServiceV1"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/profile": {
+      "get": {
+        "operationId": "profileServiceV1_GetUserProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profiles_serviceGetUserProfileResponce"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when account with specified id not found.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "AccountID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "profileServiceV1"
+        ]
+      }
+    },
+    "/v1/profile/update-picture": {
+      "patch": {
+        "operationId": "profileServiceV1_UpdateProfilePictureID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when account with specified id not found.",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/profiles_serviceUpdateProfilePictureIDRequest"
+            }
+          }
+        ],
+        "tags": [
+          "profileServiceV1"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "profiles_serviceGetUserProfileResponce": {
+      "type": "object",
+      "properties": {
+        "Username": {
+          "type": "string"
+        },
+        "Email": {
+          "type": "string"
+        },
+        "ProfilePictureID": {
+          "type": "string"
+        },
+        "RegistrationDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "profiles_serviceUpdateProfilePictureIDRequest": {
+      "type": "object",
+      "properties": {
+        "AccountID": {
+          "type": "string"
+        },
+        "PictureID": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

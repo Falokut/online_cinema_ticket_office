@@ -1,0 +1,31 @@
+version: '3.8'
+
+include:
+- ../accounts_db/accounts_db.yml
+
+networks:
+  profiles_service_network:
+    name: "profiles_service_network"
+    driver: bridge
+
+services:
+  profiles_service:
+   hostname: profiles_service
+   build: ./
+   command: ./bin/app
+   volumes:
+   - ./docker/containers-configs/app-configs:/configs
+   ports:
+     - 8001:8080
+   networks:
+     - profiles_service_network
+     - account_db_network
+     - tracing_network
+   depends_on:
+     - accounts_db
+   deploy:
+      restart_policy:
+          condition: on-failure
+          delay: 5s
+          max_attempts: 3
+          window: 120s

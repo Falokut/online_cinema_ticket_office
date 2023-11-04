@@ -32,8 +32,8 @@ func NewAccountRepository(db *sqlx.DB) *postgreRepository {
 	return &postgreRepository{db: db}
 }
 
-func (r *postgreRepository) ShutDown() {
-	r.db.Close()
+func (r *postgreRepository) ShutDown() error {
+	return r.db.Close()
 }
 
 func (r *postgreRepository) CreateAccountAndProfile(ctx context.Context, account model.CreateAccountAndProfile) error {
@@ -109,10 +109,10 @@ func (r *postgreRepository) ChangePassword(ctx context.Context, email string, pa
 	query := fmt.Sprintf("UPDATE %s SET password_hash=$1 WHERE email=$2;", accountTableName)
 
 	res, err := r.db.Exec(query, password_hash, email)
-
 	if err != nil {
 		return err
 	}
+
 	num, err := res.RowsAffected()
 	if err != nil || num == 0 {
 		return errors.New("Rows are not affected")

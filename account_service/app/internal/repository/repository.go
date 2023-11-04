@@ -13,7 +13,7 @@ type AccountRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (model.Account, error)
 	ChangePassword(ctx context.Context, email string, password_hash string) error
 	DeleteAccount(ctx context.Context, id string) error
-	ShutDown()
+	ShutDown() error
 }
 
 type CachedAccount struct {
@@ -26,7 +26,7 @@ type RegistrationCacheRepository interface {
 	CacheAccount(ctx context.Context, email string, Account CachedAccount, NonActivatedAccountTTL time.Duration) error
 	DeleteAccountFromCache(ctx context.Context, email string) error
 	GetCachedAccount(ctx context.Context, email string) (CachedAccount, error)
-	ShutDown()
+	ShutDown() error
 }
 
 type SeccionsCacheRepository interface {
@@ -35,7 +35,7 @@ type SeccionsCacheRepository interface {
 	UpdateLastActivityForSession(ctx context.Context, cachedSession model.SessionCache, sessionID string, LastActivityTime time.Time) error
 	GetSessionCache(ctx context.Context, sessionID string) (model.SessionCache, error)
 	GetSessionsForAccount(ctx context.Context, accountID string) (map[string]sessionInfo, error)
-	ShutDown()
+	ShutDown() error
 }
 
 type CacheRepo struct {
@@ -47,16 +47,11 @@ func NewCacheRepository(account RegistrationCacheRepository, SessionsCache Secci
 	return CacheRepo{RegistrationCache: account, SessionsCache: SessionsCache}
 }
 
-func (r *CacheRepo) ShutDown() {
-	r.RegistrationCache.ShutDown()
-	r.SessionsCache.ShutDown()
-}
-
 type DBConfig struct {
 	Host     string `yaml:"host" env:"DB_HOST"`
 	Port     string `yaml:"port" env:"DB_PORT"`
 	Username string `yaml:"username" env:"DB_USERNAME"`
-	Password string `yaml:"password" env:"DB_PASSWORD,env-required"  env-default:"password"`
+	Password string `yaml:"password" env:"DB_PASSWORD,env-required" env-default:"password"`
 	DBName   string `yaml:"db_name" env:"DB_NAME"`
 	SSLMode  string `yaml:"ssl_mode" env:"DB_SSL_MODE"`
 }

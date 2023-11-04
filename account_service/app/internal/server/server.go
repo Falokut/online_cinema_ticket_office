@@ -58,7 +58,6 @@ func (s *server) Run(cfg Config, metric metrics.Metrics) error {
 
 func (s *server) ShutDown() {
 	s.logger.Println("Shutting down")
-	s.service.ShutDown()
 	s.grpcServer.GracefulStop()
 	wg.Wait()
 }
