@@ -1,0 +1,63 @@
+syntax= "proto3";
+
+package accounts_service;
+option go_package = "accounts_service/v1/protos";
+import "google/protobuf/timestamp.proto";
+
+message CreateAccountRequest {
+    string Email = 1 [json_name = "email"];
+    string Username = 2 [json_name = "usename"];
+    string Password = 3 [json_name = "password"];
+    string RepeatPassword = 4 [json_name = "repeat_password"];
+}
+
+message AccountID {
+    string AccountID = 1 [json_name = "account_id"];
+}
+
+
+message VerificationTokenRequest {
+    string Email = 1 [json_name = "email"];
+    string URL = 2 [json_name = "url"];
+}
+
+message VerifyAccountRequest {
+    string VerificationToken = 1 [json_name = "verification_token"];
+}
+
+message SignInRequest {
+    string Email = 1 [json_name = "email"];
+    string Password = 2 [json_name = "password"];
+    string  SessionInfo = 3 [json_name = "session_info"]; 
+}
+
+message AccessResponce {
+    string SessionID = 1 [json_name = "session_id"];
+}
+
+message ChangePasswordTokenRequest {
+    string Email = 1 [json_name = "email"];
+    string URL = 2 [json_name = "url"];
+}
+
+message ChangePasswordRequest {
+    string ChangePasswordToken = 1 [json_name = "change_password_token"];
+    string NewPassword = 2 [json_name = "new_password"];
+} 
+
+
+message SessionInfo {
+    // IP address of the user's client
+    string  ClientIP = 1 [json_name = "client_ip"];
+    // Session info, is may be device or browser info
+    string  SessionInfo = 2 [json_name = "session_info"]; 
+    google.protobuf.Timestamp LastActivity = 3 [json_name = "last_activity"];
+}
+message AllSessionsResponce {
+    map<string, SessionInfo> Sessions = 1 [json_name = "sessions"];
+}
+
+message TerminateSessionsRequest {
+    repeated string SessionsToTerminate = 1 [json_name = "sessions_to_terminate"];
+}
+ 

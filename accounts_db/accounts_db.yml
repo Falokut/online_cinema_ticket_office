@@ -1,8 +1,8 @@
 version: '3.8'
 
 networks:
-  account_db_network:
-    name: "account_db_network"
+  accounts_db_network:
+    name: "accounts_db_network"
 
 services:
   accounts_db:
@@ -16,7 +16,7 @@ services:
     ports:
       - 5436:5432
     networks:
-      - account_db_network
+      - accounts_db_network
     env_file:
       - containers-configs/postgres.env
     healthcheck:

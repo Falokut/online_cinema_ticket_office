@@ -1,0 +1,49 @@
+log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
+sessions_ttl: 336h
+
+listen:
+  host: 0.0.0.0
+  port: 8080
+  server_mode: "BOTH"
+  allowed_headers:
+  - session_id
+  - client_ip
+
+db_config: 
+  host: "accounts_db"
+  port: "5432"
+  username: "accounts_service"
+  db_name: "accounts_db"
+  ssl_mode: "disable"
+
+redis_registration_options:
+  network: "tcp"
+  addr: "redis:6379"
+  db: 0
+
+session_cache_options:
+  network: "tcp"
+  addr: "redis:6379"
+  db: 1
+
+account_sessions_cache_options:
+  network: "tcp"
+  addr: "redis:6379"
+  db: 2
+  
+email_kafka_config:
+  brokers:
+    - "kafka:9092"
+  topic: "emails"
+  max_bytes: 10e6
+
+jaeger:
+  service_name: "Accounts_Service"
+  address: jaeger:6831
+  log_spans: true
+
+prometheus:
+  service_name: "Accounts_Service"
+  server_config:
+    host: 0.0.0.0
+    port: 7000
