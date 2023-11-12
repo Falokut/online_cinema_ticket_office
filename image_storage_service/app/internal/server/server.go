@@ -25,6 +25,7 @@ type server struct {
 	logger         logging.Logger
 	grpcServer     *grpc.Server
 	AllowedHeaders []string
+	mux            cmux.CMux
 }
 
 type Config struct {
@@ -43,15 +44,15 @@ func (s *server) Run(cfg Config, metric metrics.Metrics) error {
 	if err != nil {
 		return err
 	}
-	m := cmux.New(lis)
+	s.mux = cmux.New(lis)
 
-	if err := s.RunRestGRPCServer(m, cfg, metric); err != nil {
+	if err := s.RunGRPCServer(cfg, metric); err != nil {
 		return err
 	}
 
-	s.RunRestAPIServer(m, cfg)
+	s.RunRestAPIServer(cfg)
 
-	if err := m.Serve(); err != nil {
+	if err := s.mux.Serve(); err != nil {
 		return err
 	}
 
@@ -59,7 +60,7 @@ func (s *server) Run(cfg Config, metric metrics.Metrics) error {
 
 	return nil
 }
-func (s *server) RunRestGRPCServer(m cmux.CMux, cfg Config, metric metrics.Metrics) error {
+func (s *server) RunGRPCServer(cfg Config, metric metrics.Metrics) error {
 	s.logger.Info("GRPC server initializing")
 	im := interceptors.NewInterceptorManager(s.logger, metric)
 
@@ -74,7 +75,7 @@ func (s *server) RunRestGRPCServer(m cmux.CMux, cfg Config, metric metrics.Metri
 	image_storage_service.RegisterImageStorageServiceV1Server(s.grpcServer, s.service)
 	s.logger.Infof("GRPC server initialized. Start listening on %s:%s", cfg.Host, cfg.Port)
 	go func() {
-		grpcL := m.Match(cmux.HTTP2HeaderField("content-type", "application/grpc"))
+		grpcL := s.mux.Match(cmux.HTTP2HeaderField("content-type", "application/grpc"))
 		if err := s.grpcServer.Serve(grpcL); err != nil {
 			s.logger.Fatalf("GRPC error while serving: %v", err)
 		}
@@ -82,13 +83,13 @@ func (s *server) RunRestGRPCServer(m cmux.CMux, cfg Config, metric metrics.Metri
 
 	return nil
 }
-func (s *server) RunRestAPIServer(m cmux.CMux, cfg Config) {
+func (s *server) RunRestAPIServer(cfg Config) {
 	s.logger.Info("Rest server initializing")
 	h := handlers.NewHandler(s.logger, s.service)
 	rest_m := h.RegisterHandler()
 
 	go func() {
-		restL := m.Match(cmux.HTTP1Fast())
+		restL := s.mux.Match(cmux.HTTP1Fast())
 		s.logger.Infof("REST server initialized. Listen on %s:%s", cfg.Host, cfg.Port)
 		if err := http.Serve(restL, rest_m); err != nil {
 			s.logger.Fatalf("REST server error while serving: %v", err)
@@ -98,6 +99,7 @@ func (s *server) RunRestAPIServer(m cmux.CMux, cfg Config) {
 func (s *server) ShutDown() {
 	s.logger.Println("Shutting down")
 	s.grpcServer.GracefulStop()
+	s.mux.Close()
 }
 
 func (s *server) headerMatcherFunc(header string) (string, bool) {

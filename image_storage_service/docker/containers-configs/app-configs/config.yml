@@ -1,5 +1,5 @@
 log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
-max_image_size: 25165824 # 3 MB
+max_image_size: 25165824 # ~25 MB
 
 listen:
   host: 0.0.0.0
