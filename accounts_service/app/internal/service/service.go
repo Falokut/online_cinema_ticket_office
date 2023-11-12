@@ -420,11 +420,6 @@ func (s *AccountService) DeleteAccount(ctx context.Context,
 	return &emptypb.Empty{}, nil
 }
 
-// func (s *AccountService) createErrorResponce(errorMessage string, statusCode codes.Code) error {
-// 	s.logger.Error(errorMessage)
-// 	return status.Error(statusCode, errorMessage)
-// }
-
 func (s *AccountService) checkSession(ctx context.Context) (cache model.SessionCache, SessionID, ClientIP string, err error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.checkSession")
 	defer span.Finish()
@@ -463,8 +458,8 @@ func (s *AccountService) checkSession(ctx context.Context) (cache model.SessionC
 }
 
 const (
-	session_id_context = "session_id"
-	client_ip_context  = "client_ip"
+	session_id_context = "X-Session-Id"
+	client_ip_context  = "X-Client-Ip"
 )
 
 func (s *AccountService) getSessionIDFromCtx(ctx context.Context) (string, error) {
@@ -474,11 +469,8 @@ func (s *AccountService) getSessionIDFromCtx(ctx context.Context) (string, error
 	}
 
 	sessionID := md.Get(session_id_context)
-	if len(sessionID) == 0 {
-		return "", s.errorHandler.createErrorResponce(ErrInvalidSessionId, "")
-	}
-	if sessionID[0] == "" {
-		return "", s.errorHandler.createErrorResponce(ErrInvalidSessionId, "")
+	if len(sessionID) == 0 || sessionID[0] == "" {
+		return "", s.errorHandler.createErrorResponce(ErrInvalidSessionId, "no session id provided")
 	}
 
 	return sessionID[0], nil
@@ -492,7 +484,7 @@ func (s *AccountService) getClientIPFromCtx(ctx context.Context) (string, error)
 
 	clientIP := md.Get(client_ip_context)
 	if len(clientIP) == 0 || clientIP[0] == "" {
-		return "", s.errorHandler.createErrorResponce(ErrInvalidClientIP, "")
+		return "", s.errorHandler.createErrorResponce(ErrInvalidClientIP, "no client ip provided")
 	}
 
 	return clientIP[0], nil

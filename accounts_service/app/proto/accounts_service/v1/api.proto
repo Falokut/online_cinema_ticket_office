@@ -78,7 +78,7 @@ service accountsServiceV1 {
     // Sending message into email queue with account verification token
     rpc RequestAccountVerificationToken(VerificationTokenRequest) returns(google.protobuf.Empty){
         option (google.api.http) = {
-            get: "/v1/verfification/request"
+            get: "/v1/verification/request"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
@@ -133,7 +133,7 @@ service accountsServiceV1 {
             };
             parameters: {
                 headers: {
-                    name: "client_ip";
+                    name: "X-Client-Ip";
                     description: "IP address of the user's client.";
                     type: STRING;
                     required: true; 
@@ -147,13 +147,13 @@ service accountsServiceV1 {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             parameters: {
                 headers: {
-                    name: "session_id";
+                    name: "X-Session-Id";
                     description: "ID of the session issued when logging in to the account";
                     type: STRING;
                     required: true; 
                 };
                 headers: {
-                    name: "client_ip";
+                    name: "X-Client-Ip";
                     description: "IP address of the user's client";
                     type: STRING;
                     required: true; 
@@ -169,7 +169,7 @@ service accountsServiceV1 {
             responses: {
                 key: "401"
                     value: {
-                        description: "Returned when session_id not found in header params."
+                        description: "Returned when X-Session-Id not found in header params."
                     }
             };
             responses: {
@@ -188,13 +188,13 @@ service accountsServiceV1 {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             parameters: {
                 headers: {
-                    name: "session_id";
+                    name: "X-Session-Id";
                     description: "ID of the session issued when logging in to the account";
                     type: STRING;
                     required: true; 
                 };
                 headers: {
-                    name: "client_ip";
+                    name: "X-Client-Ip";
                     description: "IP address of the user's client";
                     type: STRING;
                     required: true; 
@@ -209,7 +209,7 @@ service accountsServiceV1 {
             responses: {
                 key: "401"
                     value: {
-                        description: "Returned when session_id not found in header params."
+                        description: "Returned when X-Session-Id not found in header params."
                     }
             };
             responses: {
@@ -264,13 +264,13 @@ service accountsServiceV1 {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             parameters: {
                 headers: {
-                    name: "session_id";
+                    name: "X-Session-Id";
                     description: "ID of the session issued when logging in to the account.";
                     type: STRING;
                     required: true; 
                 };
                 headers: {
-                    name: "client_ip";
+                    name: "X-Client-Ip";
                     description: "IP address of the user's client.";
                     type: STRING;
                     required: true; 
@@ -285,7 +285,7 @@ service accountsServiceV1 {
             responses: {
                 key: "401"
                     value: {
-                        description: "Returned when session_id not found in header params."
+                        description: "Returned when X-Session-Id not found in header params."
                     }
             };
             responses: {
@@ -302,13 +302,13 @@ service accountsServiceV1 {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             parameters: {
                 headers: {
-                    name: "session_id";
+                    name: "X-Session-Id";
                     description: "ID of the session issued when logging in to the account";
                     type: STRING;
                     required: true; 
                 };
                 headers: {
-                    name: "client_ip";
+                    name: "X-Client-Ip";
                     description: "IP address of the user's client";
                     type: STRING;
                     required: true; 
@@ -323,7 +323,7 @@ service accountsServiceV1 {
             responses: {
                 key: "401"
                     value: {
-                        description: "Returned when session_id not found in header params."
+                        description: "Returned when X-Session-Id not found in header params."
                     }
             };
             responses: {
@@ -341,13 +341,13 @@ service accountsServiceV1 {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             parameters: {
                 headers: {
-                    name: "session_id";
+                    name: "X-Session-Id";
                     description: "ID of the session issued when logging in to the account";
                     type: STRING;
                     required: true; 
                 };
                 headers: {
-                    name: "client_ip";
+                    name: "X-Client-Ip";
                     description: "IP address of the user's client";
                     type: STRING;
                     required: true; 
@@ -362,7 +362,7 @@ service accountsServiceV1 {
             responses: {
                 key: "401"
                     value: {
-                        description: "Returned when session_id not found in header params."
+                        description: "Returned when X-Session-Id not found in header params."
                     }
             };
             responses: {

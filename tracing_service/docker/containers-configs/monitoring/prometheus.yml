@@ -11,9 +11,9 @@ scrape_configs:
     static_configs:
       - targets: ['node_exporter:9100']
 
-  - job_name: 'account_service'
+  - job_name: 'accounts_service'
     static_configs:
-      - targets: ['account_service:7000']
+      - targets: ['accounts_service:7000']
 
   - job_name: 'profiles_service'
     static_configs:

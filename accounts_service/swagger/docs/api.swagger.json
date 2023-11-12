@@ -39,7 +39,7 @@
             "schema": {}
           },
           "401": {
-            "description": "Returned when session_id not found in header params.",
+            "description": "Returned when X-Session-ID not found in header params.",
             "schema": {}
           },
           "403": {
@@ -68,14 +68,14 @@
         },
         "parameters": [
           {
-            "name": "session_id",
+            "name": "X-Session-ID",
             "description": "ID of the session issued when logging in to the account",
             "in": "header",
             "required": true,
             "type": "string"
           },
           {
-            "name": "client_ip",
+            "name": "X-Client-IP",
             "description": "IP address of the user's client",
             "in": "header",
             "required": true,
@@ -103,7 +103,7 @@
             "schema": {}
           },
           "401": {
-            "description": "Returned when session_id not found in header params.",
+            "description": "Returned when X-Session-ID not found in header params.",
             "schema": {}
           },
           "403": {
@@ -132,14 +132,14 @@
         },
         "parameters": [
           {
-            "name": "session_id",
+            "name": "X-Session-ID",
             "description": "ID of the session issued when logging in to the account",
             "in": "header",
             "required": true,
             "type": "string"
           },
           {
-            "name": "client_ip",
+            "name": "X-Client-IP",
             "description": "IP address of the user's client",
             "in": "header",
             "required": true,
@@ -332,7 +332,7 @@
             "schema": {}
           },
           "401": {
-            "description": "Returned when session_id not found in header params.",
+            "description": "Returned when X-Session-ID not found in header params.",
             "schema": {}
           },
           "403": {
@@ -361,14 +361,14 @@
         },
         "parameters": [
           {
-            "name": "session_id",
+            "name": "X-Session-ID",
             "description": "ID of the session issued when logging in to the account",
             "in": "header",
             "required": true,
             "type": "string"
           },
           {
-            "name": "client_ip",
+            "name": "X-Client-IP",
             "description": "IP address of the user's client",
             "in": "header",
             "required": true,
@@ -395,7 +395,7 @@
             "schema": {}
           },
           "401": {
-            "description": "Returned when session_id not found in header params.",
+            "description": "Returned when X-Session-ID not found in header params.",
             "schema": {}
           },
           "403": {
@@ -424,14 +424,14 @@
         },
         "parameters": [
           {
-            "name": "session_id",
+            "name": "X-Session-ID",
             "description": "ID of the session issued when logging in to the account.",
             "in": "header",
             "required": true,
             "type": "string"
           },
           {
-            "name": "client_ip",
+            "name": "X-Client-IP",
             "description": "IP address of the user's client.",
             "in": "header",
             "required": true,
@@ -459,7 +459,7 @@
             "schema": {}
           },
           "401": {
-            "description": "Returned when session_id not found in header params.",
+            "description": "Returned when X-Session-ID not found in header params.",
             "schema": {}
           },
           "403": {
@@ -498,14 +498,14 @@
             "collectionFormat": "multi"
           },
           {
-            "name": "session_id",
+            "name": "X-Session-ID",
             "description": "ID of the session issued when logging in to the account",
             "in": "header",
             "required": true,
             "type": "string"
           },
           {
-            "name": "client_ip",
+            "name": "X-Client-IP",
             "description": "IP address of the user's client",
             "in": "header",
             "required": true,
@@ -565,7 +565,7 @@
             }
           },
           {
-            "name": "client_ip",
+            "name": "X-Client-IP",
             "description": "IP address of the user's client.",
             "in": "header",
             "required": true,
@@ -577,7 +577,7 @@
         ]
       }
     },
-    "/v1/verfification/request": {
+    "/v1/verification/request": {
       "get": {
         "summary": "Sending message into email queue with account verification token",
         "operationId": "accountsServiceV1_RequestAccountVerificationToken",

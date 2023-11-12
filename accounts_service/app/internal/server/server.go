@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	"sync"
 
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/interceptors"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/service"
@@ -20,8 +19,6 @@ import (
 	"github.com/soheilhy/cmux"
 	"google.golang.org/grpc"
 )
-
-var wg sync.WaitGroup
 
 type server struct {
 	service        *service.AccountService
@@ -120,13 +117,13 @@ func (s *server) ShutDown() {
 		s.grpcServer.GracefulStop()
 	}
 	s.mux.Close()
-	wg.Wait()
 }
 
 func (s *server) headerMatcherFunc(header string) (string, bool) {
 	for _, AllowedHeader := range s.AllowedHeaders {
-		if strings.ToLower(header) == AllowedHeader {
-			return AllowedHeader, true
+		s.logger.Debugf("Received %s header", header)
+		if header == AllowedHeader {
+			return header, true
 		}
 	}
 

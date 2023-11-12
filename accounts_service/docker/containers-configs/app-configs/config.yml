@@ -6,8 +6,8 @@ listen:
   port: 8080
   server_mode: "BOTH"
   allowed_headers:
-  - session_id
-  - client_ip
+  - X-Session-Id
+  - X-Client-Ip
 
 db_config: 
   host: "accounts_db"

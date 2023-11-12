@@ -2,11 +2,13 @@ version: '3.8'
 
 include:
   - accounts_db/accounts_db.yml
-  - account_service/account_service.yml
+  - accounts_service/accounts_service.yml
   - profiles_service/profiles_service.yml
-  - trace_service/trace_service.yml
+  - tracing_service/tracing_service.yml
   - email_service/email_service.yml
   - kafka-cluster/kafka-cluster.yml
+  - image_storage_service/image_storage_service.yml
+
 
 services:
     gateway:
@@ -15,14 +17,15 @@ services:
         - 80:80
       networks:
         - profiles_service_network
-        - account_service_network
+       # - accounts_service_network
         - tracing_network
       volumes:
-        - .nginx/configs/:/etc/nginx/conf.d
+        - .nginx/configs/nginx.conf:/etc/nginx/nginx.conf
       depends_on:
-        - account_service
+        - accounts_service
         - profiles_service
         - email_service
+        - image_storage_service
         - prometheus
         - jaeger
         - node_exporter
