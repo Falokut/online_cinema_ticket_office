@@ -25,6 +25,7 @@ type server struct {
 	logger         logging.Logger
 	grpcServer     *grpc.Server
 	AllowedHeaders []string
+	im             *interceptors.InterceptorManager
 	mux            cmux.CMux
 }
 
@@ -47,34 +48,34 @@ func (s *server) Run(cfg Config, metric metrics.Metrics) {
 		s.logger.Fatal("error while listening", err)
 	}
 	s.mux = cmux.New(lis)
+	s.im = interceptors.NewInterceptorManager(s.logger, metric)
 
 	switch Mode {
 	case "REST":
-		s.RunRestAPI(cfg)
+		s.RunRestAPI(cfg, metric)
 	case "GRPC":
 		s.RunGRPC(cfg, metric)
 	case "BOTH":
-		s.RunRestAPI(cfg)
+		s.RunRestAPI(cfg, metric)
 		s.RunGRPC(cfg, metric)
 	}
 	if err := s.mux.Serve(); err != nil {
 		s.logger.Fatal(err)
 	}
+	grpc_prometheus.Register(s.grpcServer)
 
 	s.logger.Info("server running on mode: " + Mode)
 }
 
 func (s *server) RunGRPC(cfg Config, metric metrics.Metrics) {
 	s.logger.Info("GRPC server initializing")
-	im := interceptors.NewInterceptorManager(s.logger, metric)
 
-	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(im.Logger), grpc.ChainUnaryInterceptor(
+	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(s.im.Logger), grpc.ChainUnaryInterceptor(
 		grpc_ctxtags.UnaryServerInterceptor(),
-		grpc_prometheus.UnaryServerInterceptor,
+		s.im.Metrics,
 		grpcrecovery.UnaryServerInterceptor(),
 	))
 
-	grpc_prometheus.Register(s.grpcServer)
 	accounts_service.RegisterAccountsServiceV1Server(s.grpcServer, s.service)
 	go func() {
 		grpcL := s.mux.Match(cmux.HTTP2HeaderField("content-type", "application/grpc"))
@@ -86,7 +87,7 @@ func (s *server) RunGRPC(cfg Config, metric metrics.Metrics) {
 
 }
 
-func (s *server) RunRestAPI(cfg Config) {
+func (s *server) RunRestAPI(cfg Config, metric metrics.Metrics) {
 	s.logger.Info("REST server initializing")
 
 	s.AllowedHeaders = cfg.AllowedHeaders
@@ -100,10 +101,15 @@ func (s *server) RunRestAPI(cfg Config) {
 		s.logger.Fatalf("REST server error while registering handler server: %v", err)
 	}
 
+	server := http.Server{
+		Handler: s.im.RestLogger(s.im.RestMetrics(mux)),
+	}
+
 	s.logger.Info("Rest server initializing")
 	go func() {
 		restL := s.mux.Match(cmux.HTTP1Fast())
-		if err := http.Serve(restL, mux); err != nil {
+
+		if err := server.Serve(restL); err != nil {
 			s.logger.Fatalf("REST server error while serving: %v", err)
 		}
 	}()

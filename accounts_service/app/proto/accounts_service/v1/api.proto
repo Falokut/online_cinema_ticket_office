@@ -61,7 +61,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service accountsServiceV1 {
     rpc CreateAccount(CreateAccountRequest) returns(google.protobuf.Empty){
         option (google.api.http) = {
-            post: "/v1/create-account"
+            post: "/v1/account/create"
             body: "*" 
         };
 

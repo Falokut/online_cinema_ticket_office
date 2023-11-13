@@ -95,7 +95,8 @@ func RunMetricServer(cfg MetricsServerConfig) error {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("metrics/", promhttp.Handler())
+
+	mux.Handle("/metrics", promhttp.Handler())
 
 	return http.Serve(lis, mux)
 }

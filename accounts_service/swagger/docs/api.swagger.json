@@ -39,7 +39,7 @@
             "schema": {}
           },
           "401": {
-            "description": "Returned when X-Session-ID not found in header params.",
+            "description": "Returned when X-Session-Id not found in header params.",
             "schema": {}
           },
           "403": {
@@ -68,18 +68,74 @@
         },
         "parameters": [
           {
-            "name": "X-Session-ID",
+            "name": "X-Session-Id",
             "description": "ID of the session issued when logging in to the account",
             "in": "header",
             "required": true,
             "type": "string"
           },
           {
-            "name": "X-Client-IP",
+            "name": "X-Client-Ip",
             "description": "IP address of the user's client",
             "in": "header",
             "required": true,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "accountsServiceV1"
+        ]
+      }
+    },
+    "/v1/account/create": {
+      "post": {
+        "operationId": "accountsServiceV1_CreateAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "400": {
+            "description": "Returned when specified params is not valid or account with this email alredy exist.",
+            "schema": {}
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/accounts_serviceCreateAccountRequest"
+            }
           }
         ],
         "tags": [
@@ -103,7 +159,7 @@
             "schema": {}
           },
           "401": {
-            "description": "Returned when X-Session-ID not found in header params.",
+            "description": "Returned when X-Session-Id not found in header params.",
             "schema": {}
           },
           "403": {
@@ -132,14 +188,14 @@
         },
         "parameters": [
           {
-            "name": "X-Session-ID",
+            "name": "X-Session-Id",
             "description": "ID of the session issued when logging in to the account",
             "in": "header",
             "required": true,
             "type": "string"
           },
           {
-            "name": "X-Client-IP",
+            "name": "X-Client-Ip",
             "description": "IP address of the user's client",
             "in": "header",
             "required": true,
@@ -260,62 +316,6 @@
         ]
       }
     },
-    "/v1/create-account": {
-      "post": {
-        "operationId": "accountsServiceV1_CreateAccount",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
-          },
-          "400": {
-            "description": "Returned when specified params is not valid or account with this email alredy exist.",
-            "schema": {}
-          },
-          "403": {
-            "description": "Returned when the user does not have permission to access the resource.",
-            "schema": {
-              "type": "string",
-              "format": "string"
-            }
-          },
-          "404": {
-            "description": "Returned when the resource does not exist.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          },
-          "500": {
-            "description": "Something went wrong.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/accounts_serviceCreateAccountRequest"
-            }
-          }
-        ],
-        "tags": [
-          "accountsServiceV1"
-        ]
-      }
-    },
     "/v1/logout": {
       "post": {
         "operationId": "accountsServiceV1_Logout",
@@ -332,7 +332,7 @@
             "schema": {}
           },
           "401": {
-            "description": "Returned when X-Session-ID not found in header params.",
+            "description": "Returned when X-Session-Id not found in header params.",
             "schema": {}
           },
           "403": {
@@ -361,14 +361,14 @@
         },
         "parameters": [
           {
-            "name": "X-Session-ID",
+            "name": "X-Session-Id",
             "description": "ID of the session issued when logging in to the account",
             "in": "header",
             "required": true,
             "type": "string"
           },
           {
-            "name": "X-Client-IP",
+            "name": "X-Client-Ip",
             "description": "IP address of the user's client",
             "in": "header",
             "required": true,
@@ -395,7 +395,7 @@
             "schema": {}
           },
           "401": {
-            "description": "Returned when X-Session-ID not found in header params.",
+            "description": "Returned when X-Session-Id not found in header params.",
             "schema": {}
           },
           "403": {
@@ -424,14 +424,14 @@
         },
         "parameters": [
           {
-            "name": "X-Session-ID",
+            "name": "X-Session-Id",
             "description": "ID of the session issued when logging in to the account.",
             "in": "header",
             "required": true,
             "type": "string"
           },
           {
-            "name": "X-Client-IP",
+            "name": "X-Client-Ip",
             "description": "IP address of the user's client.",
             "in": "header",
             "required": true,
@@ -459,7 +459,7 @@
             "schema": {}
           },
           "401": {
-            "description": "Returned when X-Session-ID not found in header params.",
+            "description": "Returned when X-Session-Id not found in header params.",
             "schema": {}
           },
           "403": {
@@ -498,14 +498,14 @@
             "collectionFormat": "multi"
           },
           {
-            "name": "X-Session-ID",
+            "name": "X-Session-Id",
             "description": "ID of the session issued when logging in to the account",
             "in": "header",
             "required": true,
             "type": "string"
           },
           {
-            "name": "X-Client-IP",
+            "name": "X-Client-Ip",
             "description": "IP address of the user's client",
             "in": "header",
             "required": true,
@@ -565,7 +565,7 @@
             }
           },
           {
-            "name": "X-Client-IP",
+            "name": "X-Client-Ip",
             "description": "IP address of the user's client.",
             "in": "header",
             "required": true,

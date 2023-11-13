@@ -17,7 +17,7 @@ services:
         - 80:80
       networks:
         - profiles_service_network
-       # - accounts_service_network
+        - accounts_service_network
         - tracing_network
       volumes:
         - .nginx/configs/nginx.conf:/etc/nginx/nginx.conf

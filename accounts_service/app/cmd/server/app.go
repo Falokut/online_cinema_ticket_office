@@ -45,7 +45,8 @@ func main() {
 	}
 
 	go func() {
-		logger.Info("Metrics server running")
+		logger.Infof("Metrics server running at %s:%s", appCfg.PrometheusConfig.ServerConfig.Host,
+			appCfg.PrometheusConfig.ServerConfig.Port)
 		if err := metrics.RunMetricServer(appCfg.PrometheusConfig.ServerConfig); err != nil {
 			logger.Fatal(err)
 		}

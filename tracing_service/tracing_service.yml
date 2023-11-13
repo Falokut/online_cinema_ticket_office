@@ -7,29 +7,33 @@ networks:
 
 services:
   prometheus:
-      container_name: prometheus_container
-      image: prom/prometheus
-      hostname: prometheus
-      volumes:
-        - ./docker/containers-configs/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:Z
-      command:
-        - '--config.file=/etc/prometheus/prometheus.yml'
-        - '--storage.tsdb.path=/prometheus'
-        - '--storage.tsdb.retention=20d'
-        - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-        - '--web.console.templates=/usr/share/prometheus/consoles'
-      ports:
-        - 9090:9090
-      networks:
-        - tracing_network
-        
+    container_name: prometheus_container
+    image: prom/prometheus
+    hostname: prometheus
+    volumes:
+      - ./docker/containers-configs/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./.container_data/prometheus/:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=20d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+    networks:
+      - tracing_network
+    depends_on:
+      - node_exporter
+    labels:
+      org.label-schema.group: "monitoring"
+
   jaeger:
     container_name: jaeger_container
-    restart: always
     image: jaegertracing/all-in-one:1.21
+    hostname: jaeger
     environment:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411
-    hostname: jaeger
     ports:
       - 5775:5775/udp
       - 6831:6831/udp
@@ -43,16 +47,34 @@ services:
       - tracing_network
 
   node_exporter:
-    container_name: node_exporter_container
     image: prom/node-exporter
+    container_name: node_exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: unless-stopped
     ports:
-      - 9101:9100
+      - 9100
     networks:
-     - tracing_network
+      - tracing_network
+    # network_mode: host
+    labels:
+      org.label-schema.group: "monitoring"
 
   grafana:
     container_name: grafana_container
     image: grafana/grafana
+    restart: unless-stopped
+    environment:
+    - GF_PATHS_DATA=/var/lib/grafana
+    volumes:
+      - ./grafana/data:/var/lib/grafana/
     ports:
       - 3000:3000
     networks:
