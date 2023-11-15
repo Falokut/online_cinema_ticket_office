@@ -61,7 +61,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service accountsServiceV1 {
     rpc CreateAccount(CreateAccountRequest) returns(google.protobuf.Empty){
         option (google.api.http) = {
-            post: "/v1/account/create"
+            post: "/v1/sign-up"
             body: "*" 
         };
 
@@ -78,7 +78,7 @@ service accountsServiceV1 {
     // Sending message into email queue with account verification token
     rpc RequestAccountVerificationToken(VerificationTokenRequest) returns(google.protobuf.Empty){
         option (google.api.http) = {
-            get: "/v1/verification/request"
+            get: "/v1/verification"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
@@ -92,7 +92,7 @@ service accountsServiceV1 {
 
     rpc VerifyAccount(VerifyAccountRequest) returns(google.protobuf.Empty){
         option (google.api.http) = {
-            post: "/v1/verify/{VerificationToken}"
+            post: "/v1/verification/{VerificationToken}"
             body: "*" 
         };
 
@@ -142,7 +142,7 @@ service accountsServiceV1 {
         };
     }
 
-    rpc GetAccountID(google.protobuf.Empty) returns(AccountID){
+    rpc GetAccountID(google.protobuf.Empty) returns(google.protobuf.Empty){
         option (google.api.http) = { get: "/v1/account-id" };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             parameters: {
@@ -159,12 +159,23 @@ service accountsServiceV1 {
                     required: true; 
                 };
             };
-
+            responses: {
+                key: "200"
+                value: {
+                    headers: {
+                        key: "X-Account-Id"
+                        value: {
+                            type: "string"
+                        }
+                    }
+                   
+                }
+            };
             responses: {
                 key: "400"
-                    value: {
-                        description: "Returned when has problem with parameters in headers."
-                    }
+                value: {
+                    description: "Returned when has problem with parameters in headers."
+                }
             };
             responses: {
                 key: "401"
@@ -202,21 +213,21 @@ service accountsServiceV1 {
             };
             responses: {
                 key: "400"
-                    value: {
-                        description: "Returned when has problem with parameters in headers."
-                    }
+                value: {
+                    description: "Returned when has problem with parameters in headers."
+                }
             };
             responses: {
                 key: "401"
-                    value: {
-                        description: "Returned when X-Session-Id not found in header params."
-                    }
+                value: {
+                    description: "Returned when X-Session-Id not found in header params."
+                }
             };
             responses: {
                 key: "404"
-                    value: {
-                        description: "Returned when session with specified id not found."
-                    }
+                value: {
+                    description: "Returned when session with specified id not found."
+                }
             }; 
         };
     }
@@ -225,7 +236,7 @@ service accountsServiceV1 {
     // Sending message into email queue with change password token
     rpc RequestChangePasswordToken(ChangePasswordTokenRequest) returns(google.protobuf.Empty){
         option (google.api.http) = {
-            get: "/v1/change-password/request"
+            get: "/v1/change-password"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
@@ -337,7 +348,7 @@ service accountsServiceV1 {
 
 
     rpc DeleteAccount(google.protobuf.Empty) returns(google.protobuf.Empty){
-        option (google.api.http) = { post: "/v1/account/delete" };
+        option (google.api.http) = { delete: "/v1/account" };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             parameters: {
                 headers: {

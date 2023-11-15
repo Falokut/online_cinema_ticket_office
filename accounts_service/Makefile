@@ -45,4 +45,4 @@ server:
 	docker-compose -f $(project_name).yml -p $(project_name) up --build $(project_name)
 	
 .docker-compose-up:
-	docker-compose up $(project_name)
+	docker-compose -f $(project_name).yml up $(project_name)

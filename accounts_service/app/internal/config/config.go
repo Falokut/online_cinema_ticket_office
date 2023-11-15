@@ -43,10 +43,11 @@ type Config struct {
 	LogLevel string `yaml:"log_level" env:"LOG_LEVEL"`
 
 	Listen struct {
-		Host           string   `yaml:"host" env:"HOST"`
-		Port           string   `yaml:"port" env:"PORT"`
-		Mode           string   `yaml:"server_mode" env:"SERVER_MODE"` // support GRPC, REST, BOTH
-		AllowedHeaders []string `yaml:"allowed_headers"`               // Need for REST API gateway, list of metadata headers
+		Host                   string            `yaml:"host" env:"HOST"`
+		Port                   string            `yaml:"port" env:"PORT"`
+		Mode                   string            `yaml:"server_mode" env:"SERVER_MODE"` // support GRPC, REST, BOTH
+		AllowedHeaders         []string          `yaml:"allowed_headers"`               // Need for REST API gateway, list of metadata headers
+		AllowedOutgoingHeaders map[string]string `yaml:"allowed_outgoing_header"`       // Key - pretty header name, value - header name
 	} `yaml:"listen"`
 
 	PrometheusConfig struct {

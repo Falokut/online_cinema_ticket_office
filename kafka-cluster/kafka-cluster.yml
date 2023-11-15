@@ -13,9 +13,18 @@ services:
       - 2181:2181
     networks:
       - kafka_network
-    volumes:
-      - .container_data/zookeeper_data:/kafka
-    restart: unless-stopped
+    deploy:
+      restart_policy:
+          condition: on-failure
+          delay: 5s
+          max_attempts: 3
+          window: 120s
+    healthcheck:
+      test: nc -z localhost 2181 || exit -1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s 
 
   kafka:
     image: wurstmeister/kafka
@@ -33,10 +42,18 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "emails:1:1,accounts_events:1:1"
-    volumes:
-      - .container_data/kafka_data_1:/kafka
-      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       zookeeper:
-        condition: service_started
-    restart: unless-stopped
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-c", "unset" , "JMX_PORT" ,";" ,"kafka-topics.sh","--zookeeper","zookeeper:2181","--list"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      restart_policy:
+          condition: on-failure
+          delay: 5s
+          max_attempts: 3
+          window: 120s

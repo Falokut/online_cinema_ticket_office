@@ -11,6 +11,7 @@ import (
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/model"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/repository"
 	accounts_service "github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/accounts_service/v1/protos"
+	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/grpc_errors"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/jwt"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/metrics"
@@ -19,6 +20,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/segmentio/kafka-go"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -56,6 +58,8 @@ func (s *AccountService) CreateAccount(ctx context.Context,
 	in *accounts_service.CreateAccountRequest) (*emptypb.Empty, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.CreateAccount")
 	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
 	if err := validateSignupInput(in); err != nil {
 		return nil, s.errorHandler.createErrorResponce(err, "")
@@ -78,7 +82,7 @@ func (s *AccountService) CreateAccount(ctx context.Context,
 			"please try another one or verify email and log in")
 	}
 
-	s.logger.Debug("Generating hash from password")
+	s.logger.Info("Generating hash from password")
 	password_hash, err := bcrypt.GenerateFromPassword([]byte(in.Password), config.GetConfig().Crypto.BcryptCost)
 	if err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, "Can't generate hash")
@@ -104,6 +108,8 @@ func (s *AccountService) RequestAccountVerificationToken(ctx context.Context,
 	span, ctx := opentracing.StartSpanFromContext(ctx,
 		"AccountService.RequestAccountVerificationToken")
 	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
 	inAccountDB, err := s.repo.IsAccountWithEmailExist(ctx, in.Email)
 	if err != nil {
@@ -113,7 +119,7 @@ func (s *AccountService) RequestAccountVerificationToken(ctx context.Context,
 		return nil, s.errorHandler.createErrorResponce(ErrAccountAlreadyActivated, "")
 	}
 
-	if err := validateEmail(in.Email); err != nil {
+	if err = validateEmail(in.Email); err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInvalidArgument, err.Error())
 
 	}
@@ -158,14 +164,16 @@ func (s *AccountService) VerifyAccount(ctx context.Context,
 	in *accounts_service.VerifyAccountRequest) (*emptypb.Empty, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.VerifyAccount")
 	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
-	s.logger.Debug("Parsing token")
+	s.logger.Info("Parsing token")
 	email, err := jwt.ParseToken(in.VerificationToken, config.GetConfig().JWT.VerifyAccountToken.Secret)
 	if err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInvalidArgument, err.Error())
 	}
 
-	s.logger.Debug("Checking account existing in cache")
+	s.logger.Info("Checking account existing in cache")
 	acc, err := s.redisRepo.RegistrationCache.GetCachedAccount(ctx, email)
 	if err != nil {
 		s.metrics.IncCacheMiss("VerifyAccount")
@@ -180,13 +188,13 @@ func (s *AccountService) VerifyAccount(ctx context.Context,
 		RegistrationDate: time.Now(),
 	}
 
-	s.logger.Debug("Creating accound and profile")
-	if err := s.repo.CreateAccountAndProfile(ctx, account); err != nil {
+	s.logger.Info("Creating accound and profile")
+	if err = s.repo.CreateAccountAndProfile(ctx, account); err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
 
 	//The error is not critical, the data will still be deleted from the cache.
-	if err := s.redisRepo.RegistrationCache.DeleteAccountFromCache(ctx, email); err != nil {
+	if err = s.redisRepo.RegistrationCache.DeleteAccountFromCache(ctx, email); err != nil {
 		s.logger.Warning("Can't delete account from registration cache: ", err.Error())
 	}
 	return &emptypb.Empty{}, nil
@@ -196,6 +204,14 @@ func (s *AccountService) SignIn(ctx context.Context,
 	in *accounts_service.SignInRequest) (*accounts_service.AccessResponce, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.SignIn")
 	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
+
+	ClientIP, err := s.getClientIPFromCtx(ctx)
+	if err != nil {
+		s.logger.Errorf("getClientIPFromCtx: %v", err)
+		return nil, err
+	}
 
 	s.logger.Info("Getting user by email")
 	account, err := s.repo.GetUserByEmail(ctx, in.Email)
@@ -204,19 +220,13 @@ func (s *AccountService) SignIn(ctx context.Context,
 	}
 
 	s.logger.Info("Password and hash comparison")
-	if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(in.Password)); err != nil {
+	if err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(in.Password)); err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInvalidArgument, err.Error())
 	}
 
-	ClientIP, err := s.getClientIPFromCtx(ctx)
-	if err != nil {
-		s.logger.Errorf("getClientIPFromCtx: %v", err)
-		return nil, err
-	}
-
-	s.logger.Debug("Caching session")
+	s.logger.Info("Caching session")
 	SessionID := uuid.NewString()
-	if err := s.redisRepo.SessionsCache.CacheSession(ctx, model.SessionCache{SessionID: SessionID,
+	if err = s.redisRepo.SessionsCache.CacheSession(ctx, model.SessionCache{SessionID: SessionID,
 		AccountID: account.UUID, ClientIP: ClientIP, SessionInfo: in.SessionInfo, LastActivity: time.Now()}); err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
@@ -224,39 +234,60 @@ func (s *AccountService) SignIn(ctx context.Context,
 	return &accounts_service.AccessResponce{SessionID: SessionID}, nil
 }
 
+// --------------------- CONTEXTS ---------------------
+const (
+	AccountIdContext = "X-Account-Id"
+	SessionIdContext = "X-Session-Id"
+	ClientIpContext  = "X-Client-Ip"
+)
+
+//-----------------------------------------------------
+
 func (s *AccountService) GetAccountID(ctx context.Context,
-	in *emptypb.Empty) (*accounts_service.AccountID, error) {
+	in *emptypb.Empty) (*emptypb.Empty, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.GetAccountID")
 	defer span.Finish()
-
-	s.logger.Debug("Checking session")
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
+	s.logger.Info("Checking session")
 	cache, SessionID, _, err := s.checkSession(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	go func() {
-		s.logger.Debug("Updating last activity for given session")
-		if err := s.redisRepo.SessionsCache.UpdateLastActivityForSession(ctx, cache, SessionID, time.Now()); err != nil {
+		s.logger.Info("Updating last activity for given session")
+		span, ctx := opentracing.StartSpanFromContext(context.Background(),
+			"AccountService.GetAccountID.UpdateLastActivityForSession")
+		defer span.Finish()
+
+		err := s.redisRepo.SessionsCache.UpdateLastActivityForSession(ctx, cache, SessionID, time.Now())
+		if err != nil {
 			s.logger.Warning("Session last activity not updated, error: ", err.Error())
 		}
+
+		span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 	}()
 
-	return &accounts_service.AccountID{AccountID: cache.AccountID}, nil
+	header := metadata.Pairs(AccountIdContext, cache.AccountID)
+	grpc.SetHeader(ctx, header)
+	return &emptypb.Empty{}, nil
 }
 
 func (s *AccountService) Logout(ctx context.Context,
 	in *emptypb.Empty) (*emptypb.Empty, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.Logout")
 	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
-	s.logger.Debug("Checking session")
+	s.logger.Info("Checking session")
 	cache, SessionID, _, err := s.checkSession(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	s.logger.Debug("Terminate current session: ", SessionID)
+	s.logger.Debug("Terminating session: ", SessionID)
 	err = s.redisRepo.SessionsCache.TerminateSessions(ctx, []string{SessionID}, cache.AccountID)
 	if err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
@@ -269,6 +300,8 @@ func (s *AccountService) RequestChangePasswordToken(ctx context.Context,
 	in *accounts_service.ChangePasswordTokenRequest) (*emptypb.Empty, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.RequestChangePasswordToken")
 	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
 	exist, err := s.repo.IsAccountWithEmailExist(ctx, in.Email)
 	if err != nil {
@@ -307,19 +340,21 @@ func (s *AccountService) ChangePassword(ctx context.Context,
 	in *accounts_service.ChangePasswordRequest) (*emptypb.Empty, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.ChangePassword")
 	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
-	s.logger.Debug("Validating incoming password")
+	s.logger.Info("Validating incoming password")
 	if err := validatePassword(in.NewPassword); err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInvalidArgument, err.Error())
 	}
 
-	s.logger.Debug("Parsing jwt token")
+	s.logger.Info("Parsing jwt token")
 	email, err := jwt.ParseToken(in.ChangePasswordToken, config.GetConfig().JWT.ChangePasswordToken.Secret)
 	if err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInvalidArgument, err.Error())
 	}
 
-	s.logger.Debug("Checking account existing in DB")
+	s.logger.Info("Checking account existing in DB")
 	exist, err := s.repo.IsAccountWithEmailExist(ctx, email)
 	if err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
@@ -331,7 +366,7 @@ func (s *AccountService) ChangePassword(ctx context.Context,
 	GeneratingHashSpan, _ := opentracing.StartSpanFromContext(ctx,
 		"AccountService.ChangePassword.GenerateHash")
 
-	s.logger.Debug("Generating hash for incoming password")
+	s.logger.Info("Generating hash for incoming password")
 	password_hash, err := bcrypt.GenerateFromPassword([]byte(in.NewPassword), config.GetConfig().Crypto.BcryptCost)
 	if err != nil {
 		GeneratingHashSpan.Finish()
@@ -339,7 +374,7 @@ func (s *AccountService) ChangePassword(ctx context.Context,
 	}
 	GeneratingHashSpan.Finish()
 
-	s.logger.Debug("Changing account password")
+	s.logger.Info("Changing account password")
 	err = s.repo.ChangePassword(ctx, email, string(password_hash))
 	if err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
@@ -352,6 +387,8 @@ func (s *AccountService) GetAllSessions(ctx context.Context,
 	in *emptypb.Empty) (*accounts_service.AllSessionsResponce, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.GetAllSessions")
 	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
 	s.logger.Info("Checking session")
 	cache, _, _, err := s.checkSession(ctx)
@@ -385,16 +422,18 @@ func (s *AccountService) TerminateSessions(ctx context.Context,
 	in *accounts_service.TerminateSessionsRequest) (*emptypb.Empty, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.TerminateSessions")
 	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
-	s.logger.Debug("Checking session")
+	s.logger.Info("Checking session")
 	cache, _, _, err := s.checkSession(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	s.logger.Debug("Terminating sessions")
-	if err := s.redisRepo.SessionsCache.TerminateSessions(ctx, in.SessionsToTerminate, cache.AccountID); err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+	s.logger.Info("Terminating sessions")
+	if err = s.redisRepo.SessionsCache.TerminateSessions(ctx, in.SessionsToTerminate, cache.AccountID); err != nil {
+		return nil, s.errorHandler.createErrorResponce(ErrNotFound, err.Error())
 	}
 
 	return &emptypb.Empty{}, nil
@@ -405,8 +444,10 @@ func (s *AccountService) DeleteAccount(ctx context.Context,
 
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.DeleteAccount")
 	defer span.Finish()
-	s.logger.Debug("Checking session")
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
+	s.logger.Info("Checking session")
 	cache, _, _, err := s.checkSession(ctx)
 	if err != nil {
 		return nil, err
@@ -423,14 +464,16 @@ func (s *AccountService) DeleteAccount(ctx context.Context,
 func (s *AccountService) checkSession(ctx context.Context) (cache model.SessionCache, SessionID, ClientIP string, err error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.checkSession")
 	defer span.Finish()
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
-	s.logger.Debug("Getting session id from ctx")
+	s.logger.Info("Getting session id from ctx")
 	SessionID, err = s.getSessionIDFromCtx(ctx)
 	if err != nil {
 		s.logger.Errorf("getSessionIDFromCtx: %v", err)
 		return
 	}
 
+	s.logger.Info("Getting client ip from ctx")
 	ClientIP, err = s.getClientIPFromCtx(ctx)
 	if err != nil {
 		s.logger.Errorf("getClientIPFromCtx: %v", err)
@@ -441,12 +484,17 @@ func (s *AccountService) checkSession(ctx context.Context) (cache model.SessionC
 		return
 	}
 
+	s.logger.Info("Getting session cache")
 	cache, err = s.redisRepo.SessionsCache.GetSessionCache(ctx, SessionID)
-	if err != nil {
+	if err != nil && err != repository.ErrSessionNotFound {
 		s.metrics.IncCacheMiss("checkSession")
 		err = s.errorHandler.createErrorResponce(err, "")
 		return
+	} else if err == repository.ErrSessionNotFound {
+		err = s.errorHandler.createErrorResponce(ErrSessisonNotFound, "")
+		return
 	}
+
 	s.metrics.IncCacheHits("checkSession")
 
 	if ClientIP != cache.ClientIP {
@@ -457,18 +505,13 @@ func (s *AccountService) checkSession(ctx context.Context) (cache model.SessionC
 	return
 }
 
-const (
-	session_id_context = "X-Session-Id"
-	client_ip_context  = "X-Client-Ip"
-)
-
 func (s *AccountService) getSessionIDFromCtx(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return "", s.errorHandler.createErrorResponce(ErrNoCtxMetaData, "")
 	}
 
-	sessionID := md.Get(session_id_context)
+	sessionID := md.Get(SessionIdContext)
 	if len(sessionID) == 0 || sessionID[0] == "" {
 		return "", s.errorHandler.createErrorResponce(ErrInvalidSessionId, "no session id provided")
 	}
@@ -482,7 +525,7 @@ func (s *AccountService) getClientIPFromCtx(ctx context.Context) (string, error)
 		return "", s.errorHandler.createErrorResponce(ErrNoCtxMetaData, "")
 	}
 
-	clientIP := md.Get(client_ip_context)
+	clientIP := md.Get(ClientIpContext)
 	if len(clientIP) == 0 || clientIP[0] == "" {
 		return "", s.errorHandler.createErrorResponce(ErrInvalidClientIP, "no client ip provided")
 	}

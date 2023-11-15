@@ -27,15 +27,6 @@ func validateSignupInput(input *accounts_service.CreateAccountRequest) error {
 	return nil
 }
 
-func stringContainsChar(str []byte, toFind byte) bool {
-	for _, char := range str {
-		if char == toFind {
-			return true
-		}
-	}
-	return false
-}
-
 func validatePassword(Password string) error {
 	passwordLengh := len(Password)
 	if passwordLengh < 6 || passwordLengh > 32 {

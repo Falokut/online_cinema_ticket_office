@@ -396,7 +396,7 @@ func RegisterAccountsServiceV1HandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/CreateAccount", runtime.WithHTTPPathPattern("/v1/account/create"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/CreateAccount", runtime.WithHTTPPathPattern("/v1/sign-up"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -421,7 +421,7 @@ func RegisterAccountsServiceV1HandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/RequestAccountVerificationToken", runtime.WithHTTPPathPattern("/v1/verification/request"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/RequestAccountVerificationToken", runtime.WithHTTPPathPattern("/v1/verification"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -446,7 +446,7 @@ func RegisterAccountsServiceV1HandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/VerifyAccount", runtime.WithHTTPPathPattern("/v1/verify/{VerificationToken}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/VerifyAccount", runtime.WithHTTPPathPattern("/v1/verification/{VerificationToken}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -546,7 +546,7 @@ func RegisterAccountsServiceV1HandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/RequestChangePasswordToken", runtime.WithHTTPPathPattern("/v1/change-password/request"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/RequestChangePasswordToken", runtime.WithHTTPPathPattern("/v1/change-password"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -638,7 +638,7 @@ func RegisterAccountsServiceV1HandlerServer(ctx context.Context, mux *runtime.Se
 
 	})
 
-	mux.Handle("POST", pattern_AccountsServiceV1_DeleteAccount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_AccountsServiceV1_DeleteAccount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -646,7 +646,7 @@ func RegisterAccountsServiceV1HandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/DeleteAccount", runtime.WithHTTPPathPattern("/v1/account/delete"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/DeleteAccount", runtime.WithHTTPPathPattern("/v1/account"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -710,7 +710,7 @@ func RegisterAccountsServiceV1HandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/CreateAccount", runtime.WithHTTPPathPattern("/v1/account/create"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/CreateAccount", runtime.WithHTTPPathPattern("/v1/sign-up"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -732,7 +732,7 @@ func RegisterAccountsServiceV1HandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/RequestAccountVerificationToken", runtime.WithHTTPPathPattern("/v1/verification/request"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/RequestAccountVerificationToken", runtime.WithHTTPPathPattern("/v1/verification"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -754,7 +754,7 @@ func RegisterAccountsServiceV1HandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/VerifyAccount", runtime.WithHTTPPathPattern("/v1/verify/{VerificationToken}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/VerifyAccount", runtime.WithHTTPPathPattern("/v1/verification/{VerificationToken}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -842,7 +842,7 @@ func RegisterAccountsServiceV1HandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/RequestChangePasswordToken", runtime.WithHTTPPathPattern("/v1/change-password/request"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/RequestChangePasswordToken", runtime.WithHTTPPathPattern("/v1/change-password"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -924,13 +924,13 @@ func RegisterAccountsServiceV1HandlerClient(ctx context.Context, mux *runtime.Se
 
 	})
 
-	mux.Handle("POST", pattern_AccountsServiceV1_DeleteAccount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("DELETE", pattern_AccountsServiceV1_DeleteAccount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/DeleteAccount", runtime.WithHTTPPathPattern("/v1/account/delete"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accounts_service.AccountsServiceV1/DeleteAccount", runtime.WithHTTPPathPattern("/v1/account"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -950,11 +950,11 @@ func RegisterAccountsServiceV1HandlerClient(ctx context.Context, mux *runtime.Se
 }
 
 var (
-	pattern_AccountsServiceV1_CreateAccount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "account", "create"}, ""))
+	pattern_AccountsServiceV1_CreateAccount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "sign-up"}, ""))
 
-	pattern_AccountsServiceV1_RequestAccountVerificationToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "verification", "request"}, ""))
+	pattern_AccountsServiceV1_RequestAccountVerificationToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "verification"}, ""))
 
-	pattern_AccountsServiceV1_VerifyAccount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "verify", "VerificationToken"}, ""))
+	pattern_AccountsServiceV1_VerifyAccount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "verification", "VerificationToken"}, ""))
 
 	pattern_AccountsServiceV1_SignIn_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "sign-in"}, ""))
 
@@ -962,7 +962,7 @@ var (
 
 	pattern_AccountsServiceV1_Logout_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "logout"}, ""))
 
-	pattern_AccountsServiceV1_RequestChangePasswordToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "change-password", "request"}, ""))
+	pattern_AccountsServiceV1_RequestChangePasswordToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "change-password"}, ""))
 
 	pattern_AccountsServiceV1_ChangePassword_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "change-password"}, ""))
 
@@ -970,7 +970,7 @@ var (
 
 	pattern_AccountsServiceV1_TerminateSessions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "sessions", "terminate"}, ""))
 
-	pattern_AccountsServiceV1_DeleteAccount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "account", "delete"}, ""))
+	pattern_AccountsServiceV1_DeleteAccount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "account"}, ""))
 )
 
 var (

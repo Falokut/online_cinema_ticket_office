@@ -8,6 +8,8 @@ listen:
   allowed_headers:
   - X-Session-Id
   - X-Client-Ip
+  allowed_outgoing_header:
+    X-Account-Id: x-account-id
 
 db_config: 
   host: "accounts_db"

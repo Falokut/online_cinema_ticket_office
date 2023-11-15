@@ -11,11 +11,6 @@ message CreateAccountRequest {
     string RepeatPassword = 4 [json_name = "repeat_password"];
 }
 
-message AccountID {
-    string AccountID = 1 [json_name = "account_id"];
-}
-
-
 message VerificationTokenRequest {
     string Email = 1 [json_name = "email"];
     string URL = 2 [json_name = "url"];

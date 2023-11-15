@@ -102,10 +102,11 @@ func main() {
 
 func getListenServerConfig(cfg *config.Config) server.Config {
 	return server.Config{
-		Mode:           cfg.Listen.Mode,
-		Host:           cfg.Listen.Host,
-		Port:           cfg.Listen.Port,
-		AllowedHeaders: cfg.Listen.AllowedHeaders,
+		Mode:                   cfg.Listen.Mode,
+		Host:                   cfg.Listen.Host,
+		Port:                   cfg.Listen.Port,
+		AllowedHeaders:         cfg.Listen.AllowedHeaders,
+		AllowedOutgoingHeaders: cfg.Listen.AllowedOutgoingHeaders,
 	}
 }
 func getKafkaWriter(cfg config.KafkaConfig) *kafka.Writer {

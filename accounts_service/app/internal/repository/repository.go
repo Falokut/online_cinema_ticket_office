@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/model"
@@ -29,7 +30,11 @@ type RegistrationCacheRepository interface {
 	ShutDown() error
 }
 
-type SeccionsCacheRepository interface {
+var (
+	ErrSessionNotFound = errors.New("session not found")
+)
+
+type SessionsCacheRepository interface {
 	CacheSession(ctx context.Context, toCache model.SessionCache) error
 	TerminateSessions(ctx context.Context, sessionsID []string, accountID string) error
 	UpdateLastActivityForSession(ctx context.Context, cachedSession model.SessionCache, sessionID string, LastActivityTime time.Time) error
@@ -40,10 +45,10 @@ type SeccionsCacheRepository interface {
 
 type CacheRepo struct {
 	RegistrationCache RegistrationCacheRepository
-	SessionsCache     SeccionsCacheRepository
+	SessionsCache     SessionsCacheRepository
 }
 
-func NewCacheRepository(account RegistrationCacheRepository, SessionsCache SeccionsCacheRepository) CacheRepo {
+func NewCacheRepository(account RegistrationCacheRepository, SessionsCache SessionsCacheRepository) CacheRepo {
 	return CacheRepo{RegistrationCache: account, SessionsCache: SessionsCache}
 }
 

@@ -37,9 +37,9 @@ func (r *postgreRepository) ShutDown() error {
 }
 
 func (r *postgreRepository) CreateAccountAndProfile(ctx context.Context, account model.CreateAccountAndProfile) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx,
+	span, _ := opentracing.StartSpanFromContext(ctx,
 		"PostgreRepository.CreateAccountAndProfile")
-	span.SetTag("custom-tag", "database")
+	span.SetTag("database", "postgre")
 	defer span.Finish()
 
 	tx, err := r.db.BeginTx(context.Background(), nil)
@@ -58,19 +58,19 @@ func (r *postgreRepository) CreateAccountAndProfile(ctx context.Context, account
 	}
 
 	query = fmt.Sprintf("INSERT INTO %s (account_id, email, username, registration_date) VALUES ($1, $2, $3, $4);", profilesTableName)
-	res, err := tx.Exec(query, id, account.Email, account.Username, account.RegistrationDate)
+	res, _ := tx.Exec(query, id, account.Email, account.Username, account.RegistrationDate)
 	num, err := res.RowsAffected()
 	if num == 0 && err != nil {
-		return errors.New("No rows affected")
+		return errors.New("no rows affected")
 	}
 
 	return tx.Commit()
 }
 
 func (r *postgreRepository) IsAccountWithEmailExist(ctx context.Context, email string) (bool, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx,
+	span, _ := opentracing.StartSpanFromContext(ctx,
 		"PostgreRepository.IsAccountWithEmailExist")
-	span.SetTag("custom-tag", "database")
+	span.SetTag("database", "postgre")
 	defer span.Finish()
 
 	query := fmt.Sprintf("SELECT id FROM %s WHERE email=$1 LIMIT 1;", accountTableName)
@@ -88,23 +88,23 @@ func (r *postgreRepository) IsAccountWithEmailExist(ctx context.Context, email s
 }
 
 func (r *postgreRepository) GetUserByEmail(ctx context.Context, email string) (model.Account, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "PostgreRepository.GetUserByEmail")
-	span.SetTag("custom-tag", "database")
+	span, _ := opentracing.StartSpanFromContext(ctx, "PostgreRepository.GetUserByEmail")
+	span.SetTag("database", "postgre")
 	defer span.Finish()
 	query := fmt.Sprintf("SELECT * FROM %s WHERE email=$1 LIMIT 1;", accountTableName)
 
 	var acc model.Account
 	err := r.db.Get(&acc, query, email)
 	if err == sql.ErrNoRows {
-		return model.Account{}, errors.New("User with this email doesn't exist.")
+		return model.Account{}, errors.New("user with this email doesn't exist")
 	}
 
 	return acc, err
 }
 
 func (r *postgreRepository) ChangePassword(ctx context.Context, email string, password_hash string) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "PostgreRepository.ChangePassword")
-	span.SetTag("custom-tag", "database")
+	span, _ := opentracing.StartSpanFromContext(ctx, "PostgreRepository.ChangePassword")
+	span.SetTag("database", "postgre")
 	defer span.Finish()
 	query := fmt.Sprintf("UPDATE %s SET password_hash=$1 WHERE email=$2;", accountTableName)
 
@@ -115,15 +115,15 @@ func (r *postgreRepository) ChangePassword(ctx context.Context, email string, pa
 
 	num, err := res.RowsAffected()
 	if err != nil || num == 0 {
-		return errors.New("Rows are not affected")
+		return errors.New("rows are not affected")
 	}
 
 	return nil
 }
 
 func (r *postgreRepository) DeleteAccount(ctx context.Context, id string) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "PostgreRepository.DeleteAccount")
-	span.SetTag("custom-tag", "database")
+	span, _ := opentracing.StartSpanFromContext(ctx, "PostgreRepository.DeleteAccount")
+	span.SetTag("database", "postgre")
 	defer span.Finish()
 
 	query := fmt.Sprintf("DELETE * FROM %s WHERE id=$1;", accountTableName)

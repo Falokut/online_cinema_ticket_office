@@ -28,7 +28,7 @@ type AccountsServiceV1Client interface {
 	RequestAccountVerificationToken(ctx context.Context, in *VerificationTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	VerifyAccount(ctx context.Context, in *VerifyAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*AccessResponce, error)
-	GetAccountID(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AccountID, error)
+	GetAccountID(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Logout(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Sending message into email queue with change password token
 	RequestChangePasswordToken(ctx context.Context, in *ChangePasswordTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -82,8 +82,8 @@ func (c *accountsServiceV1Client) SignIn(ctx context.Context, in *SignInRequest,
 	return out, nil
 }
 
-func (c *accountsServiceV1Client) GetAccountID(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AccountID, error) {
-	out := new(AccountID)
+func (c *accountsServiceV1Client) GetAccountID(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/accounts_service.accountsServiceV1/GetAccountID", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -154,7 +154,7 @@ type AccountsServiceV1Server interface {
 	RequestAccountVerificationToken(context.Context, *VerificationTokenRequest) (*emptypb.Empty, error)
 	VerifyAccount(context.Context, *VerifyAccountRequest) (*emptypb.Empty, error)
 	SignIn(context.Context, *SignInRequest) (*AccessResponce, error)
-	GetAccountID(context.Context, *emptypb.Empty) (*AccountID, error)
+	GetAccountID(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	Logout(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	// Sending message into email queue with change password token
 	RequestChangePasswordToken(context.Context, *ChangePasswordTokenRequest) (*emptypb.Empty, error)
@@ -181,7 +181,7 @@ func (UnimplementedAccountsServiceV1Server) VerifyAccount(context.Context, *Veri
 func (UnimplementedAccountsServiceV1Server) SignIn(context.Context, *SignInRequest) (*AccessResponce, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
 }
-func (UnimplementedAccountsServiceV1Server) GetAccountID(context.Context, *emptypb.Empty) (*AccountID, error) {
+func (UnimplementedAccountsServiceV1Server) GetAccountID(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccountID not implemented")
 }
 func (UnimplementedAccountsServiceV1Server) Logout(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {

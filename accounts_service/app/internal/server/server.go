@@ -21,19 +21,21 @@ import (
 )
 
 type server struct {
-	service        *service.AccountService
-	logger         logging.Logger
-	grpcServer     *grpc.Server
-	AllowedHeaders []string
-	im             *interceptors.InterceptorManager
-	mux            cmux.CMux
+	service                *service.AccountService
+	logger                 logging.Logger
+	grpcServer             *grpc.Server
+	AllowedHeaders         []string
+	AllowedOutgoingHeaders map[string]string
+	im                     *interceptors.InterceptorManager
+	mux                    cmux.CMux
 }
 
 type Config struct {
-	Host           string
-	Port           string
-	Mode           string
-	AllowedHeaders []string
+	Host                   string
+	Port                   string
+	Mode                   string
+	AllowedHeaders         []string
+	AllowedOutgoingHeaders map[string]string
 }
 
 func NewServer(logger logging.Logger, service *service.AccountService) server {
@@ -91,9 +93,11 @@ func (s *server) RunRestAPI(cfg Config, metric metrics.Metrics) {
 	s.logger.Info("REST server initializing")
 
 	s.AllowedHeaders = cfg.AllowedHeaders
+	s.AllowedOutgoingHeaders = cfg.AllowedOutgoingHeaders
 
 	mux := runtime.NewServeMux(
 		runtime.WithIncomingHeaderMatcher(s.headerMatcherFunc),
+		runtime.WithOutgoingHeaderMatcher(s.outgoingHeaderMatcher),
 	)
 
 	if err := accounts_service.RegisterAccountsServiceV1HandlerServer(context.Background(),
@@ -125,9 +129,19 @@ func (s *server) ShutDown() {
 	s.mux.Close()
 }
 
+func (s *server) outgoingHeaderMatcher(header string) (string, bool) {
+	s.logger.Debugf("Outgoing %s header", header)
+	for preatyHeaderName, AllowedHeader := range s.AllowedOutgoingHeaders {
+		if header == AllowedHeader {
+			return preatyHeaderName, true
+		}
+	}
+
+	return runtime.DefaultHeaderMatcher(header)
+}
 func (s *server) headerMatcherFunc(header string) (string, bool) {
+	s.logger.Debugf("Received %s header", header)
 	for _, AllowedHeader := range s.AllowedHeaders {
-		s.logger.Debugf("Received %s header", header)
 		if header == AllowedHeader {
 			return header, true
 		}
