@@ -11,7 +11,7 @@ import (
 
 type Config struct {
 	ServiceName string `yaml:"service_name" env:"JAEGER_SERVICE_NAME"`
-	Host        string `yaml:"host" env:"JAEGER_HOST"`
+	Address     string `yaml:"address" env:"JAEGER_ADDRESS"`
 	LogSpans    bool   `yaml:"log_spans" env:"JAEGER_LOG_SPANS"`
 }
 
@@ -24,7 +24,7 @@ func InitJaeger(cfg Config) (opentracing.Tracer, io.Closer, error) {
 		},
 		Reporter: &jaegercfg.ReporterConfig{
 			LogSpans:           cfg.LogSpans,
-			LocalAgentHostPort: cfg.Host,
+			LocalAgentHostPort: cfg.Address,
 		},
 	}
 

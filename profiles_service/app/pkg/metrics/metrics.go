@@ -1,10 +1,11 @@
 package metrics
 
 import (
+	"fmt"
+	"net"
+	"net/http"
 	"strconv"
 
-	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/logging"
-	"github.com/labstack/echo"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -21,7 +22,7 @@ type PrometheusMetrics struct {
 	Times     *prometheus.HistogramVec
 }
 
-func CreateMetrics(address string, name string, logger logging.Logger) (Metrics, error) {
+func CreateMetrics(name string) (Metrics, error) {
 	var metr PrometheusMetrics
 	metr.HitsTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: name + "_hits_total",
@@ -53,14 +54,25 @@ func CreateMetrics(address string, name string, logger logging.Logger) (Metrics,
 	if err := prometheus.Register(collectors.NewBuildInfoCollector()); err != nil {
 		return nil, err
 	}
-	go func() {
-		router := echo.New()
-		router.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
-		if err := router.Start(address); err != nil {
-			logger.Fatal(err)
-		}
-	}()
+
 	return &metr, nil
+}
+
+type MetricsServerConfig struct {
+	Host string `yaml:"host" env:"METRIC_HOST"`
+	Port string `yaml:"port" env:"METRIC_PORT"`
+}
+
+func RunMetricServer(cfg MetricsServerConfig) error {
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", cfg.Host, cfg.Port))
+	if err != nil {
+		return err
+	}
+
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+
+	return http.Serve(lis, mux)
 }
 
 func (metr *PrometheusMetrics) IncHits(status int, method, path string) {

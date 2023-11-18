@@ -11,15 +11,18 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+//go:generate mockgen -source=metrics.go -destination=mocks/metrics.go
 type Metrics interface {
 	IncHits(status int, method, path string)
 	ObserveResponseTime(status int, method, path string, observeTime float64)
+	IncBytesUploaded(bytesUploaded int)
 }
 
 type PrometheusMetrics struct {
-	HitsTotal prometheus.Counter
-	Hits      *prometheus.CounterVec
-	Times     *prometheus.HistogramVec
+	HitsTotal     prometheus.Counter
+	Hits          *prometheus.CounterVec
+	Times         *prometheus.HistogramVec
+	BytesUploaded prometheus.Counter
 }
 
 func CreateMetrics(name string) (Metrics, error) {
@@ -31,6 +34,13 @@ func CreateMetrics(name string) (Metrics, error) {
 		return nil, err
 	}
 
+	metr.BytesUploaded = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: name + "_bytes_uploaded",
+	})
+
+	if err := prometheus.Register(metr.BytesUploaded); err != nil {
+		return nil, err
+	}
 	metr.Hits = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: name + "_hits",
@@ -70,7 +80,7 @@ func RunMetricServer(cfg MetricsServerConfig) error {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("metrics/", promhttp.Handler())
+	mux.Handle("/metrics", promhttp.Handler())
 
 	return http.Serve(lis, mux)
 }
@@ -81,4 +91,8 @@ func (metr *PrometheusMetrics) IncHits(status int, method, path string) {
 
 func (metr *PrometheusMetrics) ObserveResponseTime(status int, method, path string, observeTime float64) {
 	metr.Times.WithLabelValues(strconv.Itoa(status), method, path).Observe(observeTime)
+}
+
+func (metr *PrometheusMetrics) IncBytesUploaded(bytesUploaded int) {
+	metr.BytesUploaded.Add(float64(bytesUploaded))
 }

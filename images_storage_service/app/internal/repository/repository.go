@@ -16,4 +16,5 @@ type ImageStorage interface {
 	IsImageExist(ctx context.Context, imageID string, relativePath string) bool
 	DeleteImage(ctx context.Context, imageID string, relativePath string) error
 	RewriteImage(ctx context.Context, img []byte, filename string, relativePath string) error
+	Shutdown()
 }

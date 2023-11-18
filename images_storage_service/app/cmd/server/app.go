@@ -54,10 +54,10 @@ func main() {
 
 	logger.Info("Local storage initializing")
 	storage := repository.NewLocalStorage(logger.Logger, appCfg.BaseLocalStoragePath)
-
+	defer storage.Shutdown()
 	logger.Info("Service initializing")
 	service := service.NewImagesStorageService(logger.Logger,
-		service.Config{MaxImageSize: appCfg.MaxImageSize}, storage)
+		service.Config{MaxImageSize: appCfg.MaxImageSize}, storage, metric)
 
 	logger.Info("Server initializing")
 	s := server.NewServer(logger.Logger, service)
@@ -67,7 +67,7 @@ func main() {
 	signal.Notify(quit, syscall.SIGHUP, syscall.SIGTERM)
 
 	<-quit
-	s.ShutDown()
+	s.Shutdown()
 }
 
 func getListenServerConfig(cfg *config.Config) server.Config {

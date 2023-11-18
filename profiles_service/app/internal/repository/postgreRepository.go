@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/model"
@@ -43,6 +44,26 @@ func (r *postgreRepository) UpdateProfilePictureID(ctx context.Context, AccountI
 
 	_, err := r.db.Exec(query, PictureID, AccountID)
 	return err
+}
+
+func (r *postgreRepository) GetProfilePictureID(ctx context.Context, AccountID string) (string, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx,
+		"PostgreRepository.GetProfilePictureID")
+	defer span.Finish()
+	query := fmt.Sprintf("SELECT profile_picture_id FROM %s WHERE account_id=$1 LIMIT 1;",
+		profilesTableName)
+
+	var PictureID []sql.NullString
+	err := r.db.Select(&PictureID, query, AccountID)
+	if err != nil {
+		return "", err
+	}
+
+	if len(PictureID) == 0 || !PictureID[0].Valid {
+		return "", nil
+	}
+
+	return PictureID[0].String, nil
 }
 
 func (r *postgreRepository) Shutdown() error {

@@ -55,9 +55,8 @@ func (e *errorHandler) createErrorResponce(err error, errorMessage string) error
 		msg = fmt.Sprintf("%s. error: %v", errorMessage, err)
 	}
 
-	responceErr := status.Error(grpc_errors.GetGrpcCode(err), msg)
-	e.logger.Error(responceErr)
-	return responceErr
+	e.logger.Error(status.Error(grpc_errors.GetGrpcCode(err), msg))
+	return status.Error(grpc_errors.GetGrpcCode(err), err.Error())
 }
 
 func init() {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
@@ -16,8 +17,15 @@ type LocalImageStorage struct {
 	basePath string
 }
 
+var wg sync.WaitGroup
+
 func NewLocalStorage(logger *logrus.Logger, baseStoragePath string) *LocalImageStorage {
 	return &LocalImageStorage{logger: logger, basePath: baseStoragePath}
+}
+
+func (s *LocalImageStorage) Shutdown() {
+	s.logger.Info("Shutting down local image storage")
+	wg.Wait()
 }
 
 func (s *LocalImageStorage) SaveImage(ctx context.Context, img []byte, filename string, relativePath string) error {
@@ -25,6 +33,8 @@ func (s *LocalImageStorage) SaveImage(ctx context.Context, img []byte, filename 
 	defer span.Finish()
 	s.logger.Info("Start saving image")
 
+	wg.Add(1)
+	defer wg.Done()
 	s.logger.Info("Creating a file")
 	relativePath = filepath.Clean(fmt.Sprintf("%s/%s/%s", s.basePath, relativePath, filename))
 
@@ -77,9 +87,13 @@ func (s *LocalImageStorage) IsImageExist(ctx context.Context, filename string, r
 func (s *LocalImageStorage) DeleteImage(ctx context.Context, filename string, relativePath string) error {
 	span, _ := opentracing.StartSpanFromContext(ctx, "LocalImageStorage.DeleteImage")
 	defer span.Finish()
-
+	wg.Add(1)
+	defer wg.Done()
 	relativePath = filepath.Clean(fmt.Sprintf("%s/%s/%s", s.basePath, relativePath, filename))
 	err := os.Remove(relativePath)
+	if err == os.ErrNotExist {
+		return ErrNotExist
+	}
 	if err != nil {
 		return err
 	}
@@ -91,7 +105,8 @@ func (s *LocalImageStorage) RewriteImage(ctx context.Context, img []byte, filena
 	span, _ := opentracing.StartSpanFromContext(ctx, "LocalImageStorage.RewriteImage")
 	defer span.Finish()
 	s.logger.Info("Start getting image file")
-
+	wg.Add(1)
+	defer wg.Done()
 	relativePath = filepath.Clean(fmt.Sprintf("%s/%s/%s", s.basePath, relativePath, filename))
 
 	f, err := os.OpenFile(relativePath, os.O_RDWR|os.O_TRUNC, 0755)

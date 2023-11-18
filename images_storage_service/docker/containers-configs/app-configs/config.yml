@@ -7,12 +7,12 @@ listen:
   server_mode: "BOTH"
 
 jaeger:
-  service_name: "Image_Storage_Service"
+  service_name: "Images_Storage_Service"
   address: jaeger:6831
   log_spans: true
 
 prometheus:
-  service_name: "Image_Storage_Service"
+  service_name: "Images_Storage_Service"
   server_config:
     host: 0.0.0.0
     port: 7000

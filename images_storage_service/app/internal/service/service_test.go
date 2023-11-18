@@ -16,6 +16,8 @@ import (
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/internal/service"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/images_storage_service/v1/protos"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/logging"
+	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/metrics"
+	mock_metrics "github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/metrics/mocks"
 	"github.com/sirupsen/logrus"
 
 	"github.com/golang/mock/gomock"
@@ -78,6 +80,16 @@ func newServer(t *testing.T, register func(srv *grpc.Server)) *grpc.ClientConn {
 	return conn
 }
 
+func getMetrics(t *testing.T) metrics.Metrics {
+	c := gomock.NewController(t)
+
+	metr := mock_metrics.NewMockMetrics(c)
+	metr.EXPECT().IncBytesUploaded(gomock.Any()).AnyTimes()
+	metr.EXPECT().IncHits(gomock.Any(), gomock.Any(), gomock.Any).AnyTimes()
+	metr.EXPECT().ObserveResponseTime(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any).AnyTimes()
+	return metr
+}
+
 func newClient(t *testing.T, s *service.ImagesStorageService) *grpc.ClientConn {
 	return newServer(t, func(srv *grpc.Server) { protos.RegisterImagesStorageServiceV1Server(srv, s) })
 }
@@ -88,6 +100,7 @@ func TestGetImage(t *testing.T) {
 		imageBody      []byte
 		Category       string
 		mockBehavior   getMockBehavior
+		expectedError  error
 		expectedStatus codes.Code
 		caseMessage    string
 	}{
@@ -95,26 +108,29 @@ func TestGetImage(t *testing.T) {
 			ImageID:   uuid.NewString(),
 			imageBody: []byte("203 123 212 121"),
 			Category:  "asweqeqw",
-			mockBehavior: func(s *mock_repository.MockImageStorage, ctx context.Context, imageID string, relativePath string) {
+			mockBehavior: func(s *mock_repository.MockImageStorage,
+				ctx context.Context, imageID string, relativePath string) {
 				s.EXPECT().
 					GetImage(gomock.Any(), imageID, relativePath).
 					Return([]byte("203 123 212 121"), nil).
 					Times(1)
 			},
 			expectedStatus: codes.OK,
-			caseMessage:    "Case num %d, check reaction on received valid data",
+			caseMessage:    "Case num %d, check receiving valid data",
 		},
 		{
 			ImageID:   uuid.NewString(),
 			imageBody: []byte("123 121 21 21 99 12"),
-			mockBehavior: func(s *mock_repository.MockImageStorage, ctx context.Context, imageID string, relativePath string) {
+			mockBehavior: func(s *mock_repository.MockImageStorage,
+				ctx context.Context, imageID string, relativePath string) {
 				s.EXPECT().
 					GetImage(gomock.Any(), imageID, relativePath).
-					Return(nil, service.ErrCantFindImageByID).
+					Return(nil, os.ErrNotExist).
 					Times(1)
 			},
 			expectedStatus: codes.NotFound,
-			caseMessage:    "Case num %d, check reaction on error from repository, received valid valid data",
+			expectedError:  service.ErrCantFindImageByID,
+			caseMessage:    "Case num %d, check receiving valid data, but repository return error",
 		},
 	}
 
@@ -126,7 +142,7 @@ func TestGetImage(t *testing.T) {
 
 		repo := mock_repository.NewMockImageStorage(mockController)
 		conn := newClient(t, service.NewImagesStorageService(logger.Logger,
-			service.Config{}, repo))
+			service.Config{}, repo, getMetrics(t)))
 		defer conn.Close()
 
 		client := protos.NewImagesStorageServiceV1Client(conn)
@@ -146,6 +162,7 @@ func TestGetImage(t *testing.T) {
 			caseMessage,
 			"Must return expected status code",
 		)
+
 		if testCase.expectedStatus == codes.OK {
 			assert.NotNil(t, res, caseMessage, "Response mustn't be null")
 			assert.Equal(
@@ -155,6 +172,19 @@ func TestGetImage(t *testing.T) {
 				caseMessage,
 				"Service mustn't change image data from repository",
 			)
+		}
+		if testCase.expectedError != nil {
+			assert.NotNil(t, err, caseMessage, "Must return error")
+			if testCase.expectedError != nil {
+				err := status.Convert(err)
+				assert.Contains(
+					t,
+					err.Message(),
+					testCase.expectedError.Error(),
+					caseMessage,
+					"Must return expected error",
+				)
+			}
 		}
 	}
 }
@@ -236,7 +266,7 @@ func TestUploadImage(t *testing.T) {
 			},
 			expectedStatus: codes.Internal,
 			maxImageSize:   len(imagePNG),
-			expectedError:  os.ErrPermission,
+			expectedError:  service.ErrCantSaveImage,
 			caseMessage:    "Case num %d, check receiving valid image, but repository return error",
 		},
 	}
@@ -248,7 +278,7 @@ func TestUploadImage(t *testing.T) {
 		repo := mock_repository.NewMockImageStorage(mockController)
 
 		conn := newClient(t, service.NewImagesStorageService(logger.Logger,
-			service.Config{MaxImageSize: testCase.maxImageSize}, repo))
+			service.Config{MaxImageSize: testCase.maxImageSize}, repo, getMetrics(t)))
 		defer conn.Close()
 
 		client := protos.NewImagesStorageServiceV1Client(conn)
@@ -311,8 +341,8 @@ func TestDeleteImage(t *testing.T) {
 				s.EXPECT().DeleteImage(gomock.Any(), imageID, relativePath).Return(os.ErrPermission).Times(1)
 			},
 			expectedStatus: codes.Internal,
-			expectedError:  os.ErrPermission,
-			caseMessage:    "Case num %d, checks if method work when no errors",
+			expectedError:  service.ErrCantDeleteImage,
+			caseMessage:    "Case num %d, check receiving valid image, but repository return error",
 		},
 	}
 
@@ -322,7 +352,7 @@ func TestDeleteImage(t *testing.T) {
 		defer mockController.Finish()
 		repo := mock_repository.NewMockImageStorage(mockController)
 
-		conn := newClient(t, service.NewImagesStorageService(logger.Logger, service.Config{}, repo))
+		conn := newClient(t, service.NewImagesStorageService(logger.Logger, service.Config{}, repo, getMetrics(t)))
 		defer conn.Close()
 
 		client := protos.NewImagesStorageServiceV1Client(conn)
@@ -511,7 +541,7 @@ func TestReplaceImage(t *testing.T) {
 		repo := mock_repository.NewMockImageStorage(mockController)
 
 		conn := newClient(t, service.NewImagesStorageService(logger.Logger,
-			service.Config{MaxImageSize: testCase.maxImageSize}, repo))
+			service.Config{MaxImageSize: testCase.maxImageSize}, repo, getMetrics(t)))
 		defer conn.Close()
 
 		client := protos.NewImagesStorageServiceV1Client(conn)
@@ -590,7 +620,7 @@ func TestIsImageExist(t *testing.T) {
 		defer mockController.Finish()
 		repo := mock_repository.NewMockImageStorage(mockController)
 
-		conn := newClient(t, service.NewImagesStorageService(logger.Logger, service.Config{}, repo))
+		conn := newClient(t, service.NewImagesStorageService(logger.Logger, service.Config{}, repo, getMetrics(t)))
 		defer conn.Close()
 
 		client := protos.NewImagesStorageServiceV1Client(conn)
@@ -689,7 +719,7 @@ func TestStreamingUploadImage(t *testing.T) {
 			},
 			expectedStatus: codes.Internal,
 			maxImageSize:   len(imagePNG),
-			expectedError:  os.ErrPermission,
+			expectedError:  service.ErrCantSaveImage,
 			caseMessage:    "Case num %d, check receiving valid image, but repository return error",
 		},
 		{
@@ -712,7 +742,7 @@ func TestStreamingUploadImage(t *testing.T) {
 		repo := mock_repository.NewMockImageStorage(mockController)
 
 		conn := newClient(t, service.NewImagesStorageService(logger.Logger,
-			service.Config{MaxImageSize: testCase.maxImageSize}, repo))
+			service.Config{MaxImageSize: testCase.maxImageSize}, repo, getMetrics(t)))
 		defer conn.Close()
 
 		client := protos.NewImagesStorageServiceV1Client(conn)

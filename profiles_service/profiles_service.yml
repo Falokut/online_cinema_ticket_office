@@ -2,6 +2,7 @@ version: '3.8'
 
 include:
 - ../accounts_db/accounts_db.yml
+- ../images_storage_service/images_storage_service.yml
 
 networks:
   profiles_service_network:
@@ -14,18 +15,23 @@ services:
    build: ./
    command: ./bin/app
    volumes:
-   - ./docker/containers-configs/app-configs:/configs
-   ports:
-     - 8001:8080
+   - ./docker/containers-configs/app-configs/:/configs
+  # ports:
+      #- 8005:8080
    networks:
      - profiles_service_network
-     - account_db_network
+     - accounts_db_network
      - tracing_network
+     - images_storage_network
    depends_on:
      - accounts_db
+     - images_storage_service
    deploy:
+      mode: replicated
+      replicas: 3
+      endpoint_mode: dnsrr
       restart_policy:
-          condition: on-failure
-          delay: 5s
-          max_attempts: 3
-          window: 120s
+          condition: unless-stopped
+   labels:
+     servicename: "profiles_service"
+     org.label-schema.group: "monitoring"

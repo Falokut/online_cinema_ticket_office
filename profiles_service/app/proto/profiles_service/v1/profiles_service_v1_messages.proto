@@ -1,0 +1,19 @@
+
+syntax= "proto3";
+
+package profiles_service;
+option go_package = "profiles_service/v1/protos";
+import "google/protobuf/timestamp.proto";
+
+
+message GetUserProfileResponce {
+    string Username = 1 [json_name = "username"];
+    string Email = 2 [json_name = "email"];
+    string ProfilePictureURL = 3 [json_name = "profile_picture_url"];
+    google.protobuf.Timestamp RegistrationDate = 4  [json_name = "registration_date"];
+}
+
+message UpdateProfilePictureRequest {
+    // Image file as bytes (supports base64 encoding)
+    bytes image = 1 [json_name = "image"];
+}

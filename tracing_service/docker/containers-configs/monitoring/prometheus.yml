@@ -12,11 +12,6 @@ scrape_configs:
     static_configs:
       - targets: ['node_exporter:9100']
 
-  - job_name: 'cadvisor'
-    scrape_interval: 5s
-    static_configs:
-      - targets: ['cadvisor:8080']
-
   - job_name: profiles_service
     dns_sd_configs:
     - names:
@@ -28,5 +23,12 @@ scrape_configs:
     dns_sd_configs:
       - names:
           - accounts_service
+        type: A
+        port: 7000
+        
+  - job_name: images_storage_service
+    dns_sd_configs:
+      - names:
+          - images_storage_service
         type: A
         port: 7000

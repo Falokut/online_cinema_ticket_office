@@ -1,9 +1,12 @@
 log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
 
 listen:
-  type: port
-  #bind_ip: 127.0.0.1
+  host: 0.0.0.0
   port: 8080
+  server_mode: "BOTH"
+  allowed_headers:
+    - X-Account-Id
+  
 db_config: 
   host: "accounts_db"
   port: "5432"
@@ -12,10 +15,21 @@ db_config:
   ssl_mode: "disable"
 
 jaeger:
-  service_name: "profiles_service"
-  host: jaeger:6831
+  service_name: "Profiles_Service"
+  address: jaeger:6831
   log_spans: true
 
 prometheus:
-  address: 0.0.0.0:7000
-  service_name: "profiles_service"
+  service_name: "Profiles_Service"
+  server_config:
+    host: 0.0.0.0
+    port: 7000
+
+image_service:
+  storage_addr: "gateway:81"
+  image_width: 400
+  image_height: 400
+  image_resize_type: Default
+  image_resize_method: MitchellNetravali
+  base_profile_picture_url: "http://localhost:80/image"
+  profile_picture_category: "profiles-pictures"

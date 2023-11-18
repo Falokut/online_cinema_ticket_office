@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/model"
@@ -9,8 +10,13 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+var (
+	ErrProfileNotFound = errors.New("profile not found")
+)
+
 type ProfileRepository interface {
 	GetUserProfile(ctx context.Context, AccountID string) (model.UserProfile, error)
+	GetProfilePictureID(ctx context.Context, AccountID string) (string, error)
 	UpdateProfilePictureID(ctx context.Context, AccountID string, PictureID string) error
 }
 

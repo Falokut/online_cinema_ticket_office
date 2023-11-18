@@ -126,7 +126,7 @@ func (s *server) RunRestAPI(cfg Config, metric metrics.Metrics) {
 	s.logger.Infof("REST server initialized. Listen on %s:%s", cfg.Host, cfg.Port)
 }
 
-func (s *server) ShutDown() {
+func (s *server) Shutdown() {
 	s.logger.Info("shutting down")
 	if s.grpcServer != nil {
 		s.grpcServer.GracefulStop()
