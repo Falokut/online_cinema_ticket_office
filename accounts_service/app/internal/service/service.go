@@ -7,11 +7,11 @@ import (
 	"net"
 	"time"
 
+	"github.com/Falokut/grpc_errors"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/config"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/model"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/repository"
 	accounts_service "github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/accounts_service/v1/protos"
-	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/grpc_errors"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/jwt"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/metrics"

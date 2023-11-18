@@ -1,6 +1,6 @@
 module github.com/Falokut/online_cinema_ticket_office/accounts_service
 
-go 1.21.1
+go 1.21.4
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.0.0
@@ -23,7 +23,11 @@ require (
 	google.golang.org/protobuf v1.31.0
 )
 
-require github.com/felixge/httpsnoop v1.0.4
+require (
+	github.com/Falokut/grpc_errors v0.0.0-20231118095935-ec0969a606f9
+	github.com/Falokut/interceptors v0.0.0-20231118101928-701e970c4260
+	github.com/felixge/httpsnoop v1.0.4 // indirect
+)
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect

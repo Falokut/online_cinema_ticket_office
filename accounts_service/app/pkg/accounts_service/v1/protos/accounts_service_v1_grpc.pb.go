@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.24.3
-// source: api.proto
+// source: accounts_service_v1.proto
 
 package protos
 
@@ -466,5 +466,5 @@ var AccountsServiceV1_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api.proto",
+	Metadata: "accounts_service_v1.proto",
 }

@@ -99,7 +99,7 @@
               "properties": {}
             },
             "headers": {
-              "Grpc-Metadata-X-Account-Id": {
+              "X-Account-Id": {
                 "type": "string"
               }
             }

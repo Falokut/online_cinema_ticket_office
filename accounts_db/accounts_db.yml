@@ -11,7 +11,7 @@ services:
     container_name: accounts_db
     hostname: accounts_db
     volumes:
-      - ./.container_data/database/postgres/data:/var/lib/postgres/data
+      - ./.container_data/database/postgres/data:/var/lib/postgresql/data
       - ./db/init-up.sql:/docker-entrypoint-initdb.d/init.up.sql
     ports:
       - 5436:5432

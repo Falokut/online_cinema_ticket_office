@@ -1,7 +1,7 @@
 syntax= "proto3";
 
 package accounts_service;
-import "messages.proto";
+import "accounts_service_v1_messages.proto";
 option go_package = "accounts_service/v1/protos";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";

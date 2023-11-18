@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/grpc_errors"
+	"github.com/Falokut/grpc_errors"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/logging"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc/codes"

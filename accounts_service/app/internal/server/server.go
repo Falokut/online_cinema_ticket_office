@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/interceptors"
+	"github.com/Falokut/interceptors"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/service"
 	accounts_service "github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/accounts_service/v1/protos"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/logging"
@@ -50,7 +50,7 @@ func (s *server) Run(cfg Config, metric metrics.Metrics) {
 		s.logger.Fatal("error while listening", err)
 	}
 	s.mux = cmux.New(lis)
-	s.im = interceptors.NewInterceptorManager(s.logger, metric)
+	s.im = interceptors.NewInterceptorManager(s.logger.Logger, metric)
 
 	switch Mode {
 	case "REST":
