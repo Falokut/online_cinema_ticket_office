@@ -1,2 +1,0 @@
-make .docker-compose
-pause

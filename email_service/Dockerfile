@@ -1,4 +1,4 @@
-FROM golang:1.21.1-alpine AS builder
+FROM golang:1.21.4-alpine AS builder
 
 WORKDIR /email_service/go
 
@@ -10,7 +10,6 @@ FROM scratch
 
 COPY --from=builder  /email_service/go/app bin/
 COPY --from=builder  /email_service/go/configs configs/
-COPY --from=builder  /email_service/go/cert cert/
 COPY --from=builder  /email_service/go/templates templates/
 
 EXPOSE 8080

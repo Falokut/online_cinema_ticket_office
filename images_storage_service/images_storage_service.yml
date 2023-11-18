@@ -1,0 +1,30 @@
+version: "3.8"
+
+networks:
+   images_storage_network:
+      name: "images_storage_network"
+      
+services:
+  images_storage_service:
+   hostname: images_storage_service
+   build: ./
+   command: ./bin/app
+   ports:
+      - 8011:8080
+   networks:
+      - images_storage_network
+      - tracing_network
+   volumes:
+      - ./docker/containers-configs/app-configs/:/configs
+      - ./.container_data/images/:/images/
+   environment:
+      - BASE_LOCAL_STORAGE_PATH=images/
+   deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+      restart_policy:
+          condition: on-failure
+          delay: 5s
+          max_attempts: 3
+          window: 120s

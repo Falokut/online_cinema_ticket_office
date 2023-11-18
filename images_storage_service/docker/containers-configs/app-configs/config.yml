@@ -1,0 +1,18 @@
+log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
+max_image_size: 25165824 # ~25 MB 
+
+listen:
+  host: 0.0.0.0
+  port: 8080
+  server_mode: "BOTH"
+
+jaeger:
+  service_name: "Image_Storage_Service"
+  address: jaeger:6831
+  log_spans: true
+
+prometheus:
+  service_name: "Image_Storage_Service"
+  server_config:
+    host: 0.0.0.0
+    port: 7000

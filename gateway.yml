@@ -7,7 +7,8 @@ include:
   - tracing_service/tracing_service.yml
   - email_service/email_service.yml
   - kafka-cluster/kafka-cluster.yml
-  - image_storage_service/image_storage_service.yml
+  - images_storage_service/images_storage_service.yml
+  - grpc_gateway.yml
 
 
 services:
@@ -15,17 +16,21 @@ services:
       image: nginx 
       ports:
         - 80:80
+        - 81:81
       networks:
         - profiles_service_network
         - accounts_service_network
-        - tracing_network
+        - images_storage_network
+       # - tracing_network
       volumes:
         - .nginx/configs/nginx.conf:/etc/nginx/nginx.conf
+        - .nginx/configs/services.conf:/etc/nginx/services.conf
+        - .nginx/configs/rules.conf:/etc/nginx/rules.conf
       depends_on:
         - accounts_service
         - profiles_service
         - email_service
-        - image_storage_service
+        - images_storage_service
         - prometheus
         - jaeger
         - node_exporter
