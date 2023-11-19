@@ -59,7 +59,7 @@ func main() {
 		logger.Fatalf("Shutting down, connection to the redis registration cache is not established: %s options: %v",
 			err.Error(), regCacheOpt)
 	}
-	defer registrationCache.ShutDown()
+	defer registrationCache.Shutdown()
 
 	logger.Info("Sessions cache initializing")
 	sessionCacheOpt := appCfg.SessionCacheOptions.ConvertToRedisOptions()
@@ -70,7 +70,7 @@ func main() {
 		logger.Fatalf("Shutting down, connection to the redis token cache is not established: %s options: %v",
 			err.Error(), sessionCacheOpt)
 	}
-	defer sessionsCache.ShutDown()
+	defer sessionsCache.Shutdown()
 
 	logger.Info("Database initializing")
 	database, err := repository.NewPostgreDB(appCfg.DBConfig)
