@@ -9,7 +9,6 @@ RUN  go clean --modcache && go build -mod=readonly -o app/ cmd/server/app.go
 FROM scratch
 
 COPY --from=builder  /email_service/go/app bin/
-COPY --from=builder  /email_service/go/configs configs/
 COPY --from=builder  /email_service/go/templates templates/
 
 EXPOSE 8080

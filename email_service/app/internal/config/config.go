@@ -9,8 +9,8 @@ import (
 )
 
 type Config struct {
-	EnableTLS       bool                   `yaml:"enable_TLS"`
-	LogLevel        string                 `yaml:"log_level"`
+	EnableTLS       bool                   `yaml:"enable_TLS" env:"ENABLE_TLS"`
+	LogLevel        string                 `yaml:"log_level" env:"LOG_LEVEL"`
 	MailSenderCfg   email.MailSenderConfig `yaml:"mail_sender"`
 	MailWorkerCfg   email.MailWorkerConfig `yaml:"mail_worker"`
 	MaxWorkersCount int                    `yaml:"max_workers_count"`
@@ -34,11 +34,6 @@ func GetConfig() *Config {
 
 		logger := logging.GetLogger()
 		if err := cleanenv.ReadConfig(configsPath+"config.yml", instance); err != nil {
-			help, _ := cleanenv.GetDescription(instance, nil)
-			logger.Fatal(help, " ", err)
-		}
-
-		if err := cleanenv.ReadConfig(configsPath+".env", instance); err != nil {
 			help, _ := cleanenv.GetDescription(instance, nil)
 			logger.Fatal(help, " ", err)
 		}

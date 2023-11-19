@@ -54,11 +54,6 @@ func GetConfig() *Config {
 			help, _ := cleanenv.GetDescription(instance, nil)
 			logger.Fatal(help, " ", err)
 		}
-
-		if err := cleanenv.ReadConfig(configsPath+".env", instance); err != nil {
-			help, _ := cleanenv.GetDescription(instance, nil)
-			logger.Fatal(help, " ", err)
-		}
 	})
 	return instance
 }
