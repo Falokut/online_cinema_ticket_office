@@ -65,6 +65,25 @@ func (r *postgreRepository) GetProfilePictureID(ctx context.Context, AccountID s
 
 	return PictureID[0].String, nil
 }
+func (r *postgreRepository) GetEmail(ctx context.Context, AccountID string) (string, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx,
+		"PostgreRepository.GetEmail")
+	defer span.Finish()
+	query := fmt.Sprintf("SELECT email FROM %s WHERE account_id=$1 LIMIT 1;",
+		profilesTableName)
+
+	var Email []sql.NullString
+	err := r.db.Select(&Email, query, AccountID)
+	if err != nil {
+		return "", err
+	}
+
+	if len(Email) == 0 || !Email[0].Valid {
+		return "", nil
+	}
+
+	return Email[0].String, nil
+}
 
 func (r *postgreRepository) Shutdown() error {
 	return r.db.Close()

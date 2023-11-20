@@ -38,9 +38,6 @@ swagger-doc-gen:
 .swagger:	swagger-clear	create-swagger-dir	swagger-doc-gen	
 .protoc:	protoc-clear	protoc-gen	gateway-gen	.swagger
 
-gen-cert:
-	call app/cert/gen.cmd
-
 server:
 	go run app/cmd/server/app.go
 

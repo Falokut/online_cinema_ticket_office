@@ -573,6 +573,53 @@ func (x *TerminateSessionsRequest) GetSessionsToTerminate() []string {
 	return nil
 }
 
+type UserErrorMessage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (x *UserErrorMessage) Reset() {
+	*x = UserErrorMessage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_accounts_service_v1_messages_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserErrorMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserErrorMessage) ProtoMessage() {}
+
+func (x *UserErrorMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_accounts_service_v1_messages_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserErrorMessage.ProtoReflect.Descriptor instead.
+func (*UserErrorMessage) Descriptor() ([]byte, []int) {
+	return file_accounts_service_v1_messages_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UserErrorMessage) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_accounts_service_v1_messages_proto protoreflect.FileDescriptor
 
 var file_accounts_service_v1_messages_proto_rawDesc = []byte{
@@ -646,9 +693,12 @@ var file_accounts_service_v1_messages_proto_rawDesc = []byte{
 	0x12, 0x32, 0x0a, 0x13, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x54, 0x6f, 0x54, 0x65,
 	0x72, 0x6d, 0x69, 0x6e, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x15, 0x73,
 	0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x5f, 0x74, 0x6f, 0x5f, 0x74, 0x65, 0x72, 0x6d, 0x69,
-	0x6e, 0x61, 0x74, 0x65, 0x42, 0x1c, 0x5a, 0x1a, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x73,
-	0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6e, 0x61, 0x74, 0x65, 0x22, 0x2c, 0x0a, 0x10, 0x55, 0x73, 0x65, 0x72, 0x45, 0x72, 0x72, 0x6f,
+	0x72, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73,
+	0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61,
+	0x67, 0x65, 0x42, 0x1c, 0x5a, 0x1a, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x73, 0x5f, 0x73,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -663,7 +713,7 @@ func file_accounts_service_v1_messages_proto_rawDescGZIP() []byte {
 	return file_accounts_service_v1_messages_proto_rawDescData
 }
 
-var file_accounts_service_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_accounts_service_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_accounts_service_v1_messages_proto_goTypes = []interface{}{
 	(*CreateAccountRequest)(nil),       // 0: accounts_service.CreateAccountRequest
 	(*VerificationTokenRequest)(nil),   // 1: accounts_service.VerificationTokenRequest
@@ -675,12 +725,13 @@ var file_accounts_service_v1_messages_proto_goTypes = []interface{}{
 	(*SessionInfo)(nil),                // 7: accounts_service.SessionInfo
 	(*AllSessionsResponce)(nil),        // 8: accounts_service.AllSessionsResponce
 	(*TerminateSessionsRequest)(nil),   // 9: accounts_service.TerminateSessionsRequest
-	nil,                                // 10: accounts_service.AllSessionsResponce.SessionsEntry
-	(*timestamppb.Timestamp)(nil),      // 11: google.protobuf.Timestamp
+	(*UserErrorMessage)(nil),           // 10: accounts_service.UserErrorMessage
+	nil,                                // 11: accounts_service.AllSessionsResponce.SessionsEntry
+	(*timestamppb.Timestamp)(nil),      // 12: google.protobuf.Timestamp
 }
 var file_accounts_service_v1_messages_proto_depIdxs = []int32{
-	11, // 0: accounts_service.SessionInfo.LastActivity:type_name -> google.protobuf.Timestamp
-	10, // 1: accounts_service.AllSessionsResponce.Sessions:type_name -> accounts_service.AllSessionsResponce.SessionsEntry
+	12, // 0: accounts_service.SessionInfo.LastActivity:type_name -> google.protobuf.Timestamp
+	11, // 1: accounts_service.AllSessionsResponce.Sessions:type_name -> accounts_service.AllSessionsResponce.SessionsEntry
 	7,  // 2: accounts_service.AllSessionsResponce.SessionsEntry.value:type_name -> accounts_service.SessionInfo
 	3,  // [3:3] is the sub-list for method output_type
 	3,  // [3:3] is the sub-list for method input_type
@@ -815,6 +866,18 @@ func file_accounts_service_v1_messages_proto_init() {
 				return nil
 			}
 		}
+		file_accounts_service_v1_messages_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserErrorMessage); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -822,7 +885,7 @@ func file_accounts_service_v1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_accounts_service_v1_messages_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

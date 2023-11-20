@@ -61,15 +61,17 @@ func (s *AccountService) CreateAccount(ctx context.Context,
 	var err error
 	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
-	if err := validateSignupInput(in); err != nil {
-		return nil, s.errorHandler.createErrorResponce(err, "")
+	vErr := validateSignupInput(in)
+	if vErr != nil {
+		err = vErr
+		return nil, s.errorHandler.createExtendedErrorResponce(ErrFailedValidation, vErr.DeveloperMessage, vErr.UserMessage)
 	}
 	exist, err := s.repo.IsAccountWithEmailExist(ctx, in.Email)
 	if err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		return nil, s.errorHandler.createExtendedErrorResponce(ErrInternal, err.Error(), "")
 	}
 	if exist {
-		return nil, s.errorHandler.createErrorResponce(ErrAlreadyExist, "a user with this email address already exists. "+
+		return nil, s.errorHandler.createExtendedErrorResponce(ErrAlreadyExist, "", "a user with this email address already exists. "+
 			"please try another one or simple log in")
 	}
 
@@ -78,21 +80,21 @@ func (s *AccountService) CreateAccount(ctx context.Context,
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
 	if inCache {
-		return nil, s.errorHandler.createErrorResponce(ErrAlreadyExist, "a user with this email address already exists. "+
+		return nil, s.errorHandler.createExtendedErrorResponce(ErrAlreadyExist, "", "a user with this email address already exists. "+
 			"please try another one or verify email and log in")
 	}
 
 	s.logger.Info("Generating hash from password")
 	password_hash, err := bcrypt.GenerateFromPassword([]byte(in.Password), config.GetConfig().Crypto.BcryptCost)
 	if err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrInternal, "Can't generate hash")
+		return nil, s.errorHandler.createErrorResponce(ErrInternal, "can't generate hash")
 	}
 
 	err = s.redisRepo.RegistrationCache.CacheAccount(ctx, in.Email,
 		repository.CachedAccount{Username: in.Username, Password: string(password_hash)}, s.nonActivatedAccountTTL)
 
 	if err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error()+" can't cache account")
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -119,9 +121,10 @@ func (s *AccountService) RequestAccountVerificationToken(ctx context.Context,
 		return nil, s.errorHandler.createErrorResponce(ErrAccountAlreadyActivated, "")
 	}
 
-	if err = validateEmail(in.Email); err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrInvalidArgument, err.Error())
-
+	vErr := validateEmail(in.Email)
+	if vErr != nil {
+		err = vErr
+		return nil, s.errorHandler.createExtendedErrorResponce(ErrInvalidArgument, vErr.DeveloperMessage, vErr.UserMessage)
 	}
 
 	inCache, err := s.redisRepo.RegistrationCache.IsAccountInCache(ctx, in.Email)
@@ -130,7 +133,7 @@ func (s *AccountService) RequestAccountVerificationToken(ctx context.Context,
 	}
 	if !inCache {
 		s.metrics.IncCacheMiss("RequestAccountVerificationToken")
-		return nil, s.errorHandler.createErrorResponce(ErrNotFound, "a account with this email address not exist")
+		return nil, s.errorHandler.createExtendedErrorResponce(ErrNotFound, "", "a account with this email address not exist")
 	}
 	s.metrics.IncCacheHits("RequestAccountVerificationToken")
 
@@ -214,14 +217,14 @@ func (s *AccountService) SignIn(ctx context.Context,
 	}
 
 	s.logger.Info("Getting user by email")
-	account, err := s.repo.GetUserByEmail(ctx, in.Email)
+	account, err := s.repo.GetAccountByEmail(ctx, in.Email)
 	if err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrNotFound, err.Error())
+		return nil, s.errorHandler.createExtendedErrorResponce(ErrNotFound, err.Error(), "account not found")
 	}
 
 	s.logger.Info("Password and hash comparison")
 	if err = bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(in.Password)); err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrInvalidArgument, err.Error())
+		return nil, s.errorHandler.createExtendedErrorResponce(ErrInvalidArgument, err.Error(), "invalid login or password")
 	}
 
 	s.logger.Info("Caching session")
@@ -308,7 +311,7 @@ func (s *AccountService) RequestChangePasswordToken(ctx context.Context,
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
 	if !exist {
-		return nil, s.errorHandler.createErrorResponce(ErrNotFound, "a account with this email address not exist")
+		return nil, s.errorHandler.createExtendedErrorResponce(ErrNotFound, "", "a account with this email address not exist")
 	}
 
 	token, err := jwt.GenerateToken(in.Email, s.cfg.JWT.ChangePasswordToken.Secret, s.cfg.JWT.ChangePasswordToken.TTL)
@@ -344,8 +347,10 @@ func (s *AccountService) ChangePassword(ctx context.Context,
 	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
 	s.logger.Info("Validating incoming password")
-	if err := validatePassword(in.NewPassword); err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrInvalidArgument, err.Error())
+	vErr := validatePassword(in.ChangePasswordToken)
+	if vErr != nil {
+		err = vErr
+		return nil, s.errorHandler.createExtendedErrorResponce(ErrInvalidArgument, vErr.DeveloperMessage, vErr.UserMessage)
 	}
 
 	s.logger.Info("Parsing jwt token")
@@ -360,7 +365,7 @@ func (s *AccountService) ChangePassword(ctx context.Context,
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
 	if !exist {
-		return nil, s.errorHandler.createErrorResponce(ErrNotFound, err.Error())
+		return nil, s.errorHandler.createExtendedErrorResponce(ErrNotFound, "", "account not found")
 	}
 
 	GeneratingHashSpan, _ := opentracing.StartSpanFromContext(ctx,
@@ -370,7 +375,7 @@ func (s *AccountService) ChangePassword(ctx context.Context,
 	password_hash, err := bcrypt.GenerateFromPassword([]byte(in.NewPassword), config.GetConfig().Crypto.BcryptCost)
 	if err != nil {
 		GeneratingHashSpan.Finish()
-		return nil, s.errorHandler.createErrorResponce(ErrInternal, "Can't generate hash.")
+		return nil, s.errorHandler.createErrorResponce(ErrInternal, "can't generate hash.")
 	}
 	GeneratingHashSpan.Finish()
 
@@ -433,7 +438,7 @@ func (s *AccountService) TerminateSessions(ctx context.Context,
 
 	s.logger.Info("Terminating sessions")
 	if err = s.redisRepo.SessionsCache.TerminateSessions(ctx, in.SessionsToTerminate, cache.AccountID); err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrNotFound, err.Error())
+		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
 
 	return &emptypb.Empty{}, nil
@@ -469,28 +474,22 @@ func (s *AccountService) checkSession(ctx context.Context) (cache model.SessionC
 	s.logger.Info("Getting session id from ctx")
 	SessionID, err = s.getSessionIDFromCtx(ctx)
 	if err != nil {
-		s.logger.Errorf("getSessionIDFromCtx: %v", err)
 		return
 	}
 
 	s.logger.Info("Getting client ip from ctx")
 	ClientIP, err = s.getClientIPFromCtx(ctx)
 	if err != nil {
-		s.logger.Errorf("getClientIPFromCtx: %v", err)
-		return
-	}
-	if net.ParseIP(ClientIP) == nil {
-		err = s.errorHandler.createErrorResponce(ErrInvalidClientIP, "")
 		return
 	}
 
 	s.logger.Info("Getting session cache")
 	cache, err = s.redisRepo.SessionsCache.GetSessionCache(ctx, SessionID)
 	if err != nil && err != repository.ErrSessionNotFound {
-		s.metrics.IncCacheMiss("checkSession")
-		err = s.errorHandler.createErrorResponce(err, "")
+		err = s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 		return
 	} else if err == repository.ErrSessionNotFound {
+		s.metrics.IncCacheMiss("checkSession")
 		err = s.errorHandler.createErrorResponce(ErrSessisonNotFound, "")
 		return
 	}
@@ -522,12 +521,16 @@ func (s *AccountService) getSessionIDFromCtx(ctx context.Context) (string, error
 func (s *AccountService) getClientIPFromCtx(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", s.errorHandler.createErrorResponce(ErrNoCtxMetaData, "")
+		return "", s.errorHandler.createErrorResponce(ErrNoCtxMetaData, "no context metadata provided")
 	}
 
 	clientIP := md.Get(ClientIpContext)
 	if len(clientIP) == 0 || clientIP[0] == "" {
 		return "", s.errorHandler.createErrorResponce(ErrInvalidClientIP, "no client ip provided")
+	}
+
+	if net.ParseIP(clientIP[0]) == nil {
+		return "", s.errorHandler.createErrorResponce(ErrInvalidClientIP, "invalid client ip address")
 	}
 
 	return clientIP[0], nil

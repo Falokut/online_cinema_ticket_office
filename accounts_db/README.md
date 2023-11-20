@@ -10,7 +10,7 @@ POSTGRES_DB="accounts_db"
 PGDATA=/var/lib/postgresql/data
 ```
 	
-2. Change volume location for data inside accounts_db.yml, left part(after '':'') is PGDATA variable value
+2. Change volume location for data inside accounts_db.yml, right part(after '':'') is PGDATA variable value
 ``` yaml
 /.container_data/database/postgres/data:/var/lib/postgresql/data
 ```

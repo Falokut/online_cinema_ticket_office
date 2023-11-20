@@ -18,6 +18,7 @@ type ProfileRepository interface {
 	GetUserProfile(ctx context.Context, AccountID string) (model.UserProfile, error)
 	GetProfilePictureID(ctx context.Context, AccountID string) (string, error)
 	UpdateProfilePictureID(ctx context.Context, AccountID string, PictureID string) error
+	GetEmail(ctx context.Context, AccountID string) (string, error)
 }
 
 type DBConfig struct {

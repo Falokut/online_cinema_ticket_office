@@ -46,3 +46,5 @@ message ReplaceImageResponce {
   // otherwise this field will be empty
   string image_id = 1;
 }
+
+message UserErrorMessage { string message = 1[json_name = "message"]; }

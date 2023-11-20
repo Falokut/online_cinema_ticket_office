@@ -14,10 +14,10 @@ services:
     hostname: profiles_service
     build: ./
     command: ./bin/app
+    env_file:
+      - ./docker/containers-configs/app-configs/.env
     volumes:
       - ./docker/containers-configs/app-configs/config.yml:/configs/config.yml
-    env-file:
-      - ./docker/containers-configs/app-configs/.env
     # ports:
     #- 8005:8080
     networks:

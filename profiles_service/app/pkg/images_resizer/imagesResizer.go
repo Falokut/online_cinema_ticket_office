@@ -36,6 +36,11 @@ const (
 	Thumbnail ImageResizeType = "Thumbnail"
 )
 
+var (
+	ErrUnsupported = errors.New("unsupported image extension")
+	ErrInternal    = errors.New("internal error")
+)
+
 var supportedContentTypes = map[string]interface{}{"image/png": 0, "image/jpeg": 0, "image/jpg": 0}
 var logger *logrus.Logger
 
@@ -55,13 +60,13 @@ func ResizeImage(imageFile []byte, Width, Height uint,
 
 	_, isSupportedContentType := supportedContentTypes[extension]
 	if !isSupportedContentType {
-		return []byte{}, errors.New("unsupported image extension")
+		return []byte{}, ErrUnsupported
 	}
 
 	logger.Info("Creating reader")
 	f := bytes.NewReader(imageFile)
 	if f == nil {
-		return []byte{}, errors.New("can't create reader")
+		return []byte{}, errors.Join(ErrInternal, errors.New("can't create reader"))
 	}
 
 	logger.Info("Decoding image")
@@ -77,7 +82,7 @@ func ResizeImage(imageFile []byte, Width, Height uint,
 	}
 
 	if err != nil {
-		return []byte{}, errors.New("error while decoding image: " + err.Error())
+		return []byte{}, errors.Join(ErrInternal, errors.New("error while decoding image: "+err.Error()))
 	}
 
 	interpFunction := resize.InterpolationFunction(method)
@@ -103,7 +108,7 @@ func ResizeImage(imageFile []byte, Width, Height uint,
 		err = jpeg.Encode(w, resizedImage, &jpeg.Options{Quality: jpeg.DefaultQuality})
 	}
 	if err != nil {
-		return []byte{}, errors.New("error while encoding image: " + err.Error())
+		return []byte{}, errors.Join(ErrInternal, errors.New("error while encoding image: "+err.Error()))
 	}
 
 	return w.Bytes(), nil

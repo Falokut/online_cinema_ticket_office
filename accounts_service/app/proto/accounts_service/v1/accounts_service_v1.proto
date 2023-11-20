@@ -384,5 +384,4 @@ service accountsServiceV1 {
             }; 
         };
     }
-
 }

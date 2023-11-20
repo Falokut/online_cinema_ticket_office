@@ -1,5 +1,4 @@
-syntax= "proto3";
-
+syntax = "proto3";
 
 package profiles_service;
 import "profiles_service_v1_messages.proto";
@@ -9,59 +8,63 @@ import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/empty.proto";
 
-
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     schemes: HTTP;
-    //schemes: HTTPS;
+    // schemes: HTTPS;
     consumes: "application/json";
     produces: "application/json";
 
     info: {
-        title: "Profiles service";
-        version: "1.0";
+        title:
+            "Profiles service";
+        version:
+            "1.0";
         contact: {
-            name: "Falokut";
-            url: "https://github.com/Falokut";
-            email: "timur.sinelnik@yandex.ru";
+        name:
+            "Falokut";
+        url:
+            "https://github.com/Falokut";
+        email:
+            "timur.sinelnik@yandex.ru";
         };
     }
     responses: {
-        key: "403"
-            value: {
-                description: "Returned when the user does not have permission to access the resource."
-                schema: {
-                    json_schema: {
-                        type: STRING;
-                    }
+    key: "403"
+        value: {
+            description: "Returned when the user does not have permission to access the resource."
+            schema: {
+                json_schema: {
+                type: STRING;
                 }
             }
+        }
     };
     responses: {
-		key: "404";
-		value: {
-			description: "Returned when the resource does not exist.";
-			schema: {
-				json_schema: {
-					ref: "#/definitions/rpcStatus";
-				}
-			}
-		}
-	}
+        key:"404";
+        value: {
+            description: "Returned when the resource does not exist.";
+            schema: {
+                json_schema: {
+                    ref: "#/definitions/rpcStatus";
+                }
+            }
+        }
+    }
     responses: {
-		key: "500";
-		value: {
-			description: "Something went wrong.";
-			schema: {
-				json_schema: {
-					ref: "#/definitions/rpcStatus";
-				}
-			}
-		}
-	}
+        key: "500";
+        value: {
+            description: "Something went wrong.";
+            schema: {
+                json_schema: {
+                    ref: "#/definitions/rpcStatus";
+                }
+            }
+        }
+    }
 };
 
-service profileServiceV1 {
-    rpc GetUserProfile(google.protobuf.Empty) returns(GetUserProfileResponce){
+service profilesServiceV1 {
+    rpc GetUserProfile(google.protobuf.Empty) returns (GetUserProfileResponce) {
         option (google.api.http) = {
             get: "/v1/profile"
         };
@@ -69,20 +72,21 @@ service profileServiceV1 {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
                 key: "404"
-                    value: {
-                        description: "Returned when account with specified id not found."
-                    }
+                value: { description: "Returned when account with specified id not found." }
             };
             parameters: {
                 headers: {
-                    name: "X-Account-Id";
-                    type: STRING;
-                    required: true; 
+                name:
+                    "X-Account-Id";
+                type:
+                    STRING;
+                required:
+                    true;
                 };
-            }; 
-        }; 
+            };
+        };
     };
-    rpc UpdateProfilePicture(UpdateProfilePictureRequest) returns(google.protobuf.Empty){
+    rpc UpdateProfilePicture(UpdateProfilePictureRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             post: "/v1/profile/update-picture"
             body: "*"
@@ -90,41 +94,62 @@ service profileServiceV1 {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
                 key: "404"
-                    value: {
-                        description: "Returned when account with specified id not found."
-                    }
+                value: { description: "Returned when account with specified id not found." }
             };
             parameters: {
                 headers: {
-                    name: "X-Account-Id";
-                    type: STRING;
-                    required: true; 
+                name:
+                    "X-Account-Id";
+                type:
+                    STRING;
+                required:
+                    true;
                 };
-            }; 
+            };
         };
     }
 
-
-    rpc DeleteProfilePicture(google.protobuf.Empty) returns(google.protobuf.Empty) {
+    rpc DeleteProfilePicture(google.protobuf.Empty) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            post: "/v1/profile/delete-picture"
-            body: "*"
+            delete: "/v1/profile/delete-picture"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             responses: {
                 key: "404"
-                    value: {
-                        description: "Returned when account with specified id not found"
-                    }
+                value: { description: "Returned when account with specified id not found" }
             };
             parameters: {
                 headers: {
-                    name: "X-Account-Id";
-                    type: STRING;
-                    required: true; 
+                name:
+                    "X-Account-Id";
+                type:
+                    STRING;
+                required:
+                    true;
                 };
-            }; 
+            };
+        };
+    }
+
+    rpc GetEmail(google.protobuf.Empty) returns (GetEmailResponce) {
+        option (google.api.http) = {
+            delete: "/v1/get-email"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            responses: {
+                key: "404"
+                value: { description: "Returned when account with specified id not found" }
+            };
+            parameters: {
+                headers: {
+                name:
+                    "X-Account-Id";
+                type:
+                    STRING;
+                required:
+                    true;
+                };
+            };
         };
     }
 }
-

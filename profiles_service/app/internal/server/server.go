@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/service"
 	"github.com/Falokut/interceptors"
+	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/service"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/metrics"
 	profiles_service "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/profiles_service/v1/protos"
 	"github.com/sirupsen/logrus"
@@ -78,7 +78,7 @@ func (s *server) RunGRPC(cfg Config, metric metrics.Metrics) {
 		grpcrecovery.UnaryServerInterceptor(),
 	))
 
-	profiles_service.RegisterProfileServiceV1Server(s.grpcServer, s.service)
+	profiles_service.RegisterProfilesServiceV1Server(s.grpcServer, s.service)
 	go func() {
 		grpcL := s.mux.Match(cmux.HTTP2HeaderField("content-type", "application/grpc"))
 		if err := s.grpcServer.Serve(grpcL); err != nil {
@@ -98,7 +98,7 @@ func (s *server) RunRestAPI(cfg Config, metric metrics.Metrics) {
 		runtime.WithIncomingHeaderMatcher(s.headerMatcherFunc),
 	)
 
-	if err := profiles_service.RegisterProfileServiceV1HandlerServer(context.Background(),
+	if err := profiles_service.RegisterProfilesServiceV1HandlerServer(context.Background(),
 		mux, s.service); err != nil {
 		s.logger.Fatalf("REST server error while registering handler server: %v", err)
 	}

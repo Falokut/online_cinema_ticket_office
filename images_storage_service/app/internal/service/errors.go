@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Falokut/grpc_errors"
+	img_storage_serv "github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/images_storage_service/v1/protos"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -44,16 +45,38 @@ func newErrorHandler(logger *logrus.Logger) errorHandler {
 	}
 }
 
-func (e *errorHandler) createErrorResponce(err error, errorMessage string) error {
+func (e *errorHandler) createErrorResponce(err error, developerMessage string) error {
 	var msg string
-	if errorMessage == "" {
+	if len(developerMessage) == 0 {
 		msg = err.Error()
 	} else {
-		msg = fmt.Sprintf("%s. error: %v", errorMessage, err)
+		msg = fmt.Sprintf("%s. error: %v", developerMessage, err)
 	}
 
-	e.logger.Error(status.Error(grpc_errors.GetGrpcCode(err), msg))
-	return status.Error(grpc_errors.GetGrpcCode(err), err.Error())
+	err = status.Error(grpc_errors.GetGrpcCode(err), msg)
+	e.logger.Error(err)
+	return err
+}
+
+func (e *errorHandler) createExtendedErrorResponce(err error, DeveloperMessage, UserMessage string) error {
+	var msg string
+	if DeveloperMessage == "" {
+		msg = err.Error()
+	} else {
+		msg = fmt.Sprintf("%s. error: %v", DeveloperMessage, err)
+	}
+
+	extErr := status.New(grpc_errors.GetGrpcCode(err), msg)
+	if len(UserMessage) > 0 {
+		extErr, _ = extErr.WithDetails(&img_storage_serv.UserErrorMessage{Message: UserMessage})
+		if extErr == nil {
+			e.logger.Error(err)
+			return err
+		}
+	}
+
+	e.logger.Error(extErr)
+	return extErr.Err()
 }
 
 func init() {

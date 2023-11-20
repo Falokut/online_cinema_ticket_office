@@ -19,158 +19,194 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// ProfileServiceV1Client is the client API for ProfileServiceV1 service.
+// ProfilesServiceV1Client is the client API for ProfilesServiceV1 service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ProfileServiceV1Client interface {
+type ProfilesServiceV1Client interface {
 	GetUserProfile(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetUserProfileResponce, error)
 	UpdateProfilePicture(ctx context.Context, in *UpdateProfilePictureRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteProfilePicture(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetEmail(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetEmailResponce, error)
 }
 
-type profileServiceV1Client struct {
+type profilesServiceV1Client struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewProfileServiceV1Client(cc grpc.ClientConnInterface) ProfileServiceV1Client {
-	return &profileServiceV1Client{cc}
+func NewProfilesServiceV1Client(cc grpc.ClientConnInterface) ProfilesServiceV1Client {
+	return &profilesServiceV1Client{cc}
 }
 
-func (c *profileServiceV1Client) GetUserProfile(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetUserProfileResponce, error) {
+func (c *profilesServiceV1Client) GetUserProfile(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetUserProfileResponce, error) {
 	out := new(GetUserProfileResponce)
-	err := c.cc.Invoke(ctx, "/profiles_service.profileServiceV1/GetUserProfile", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/profiles_service.profilesServiceV1/GetUserProfile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *profileServiceV1Client) UpdateProfilePicture(ctx context.Context, in *UpdateProfilePictureRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *profilesServiceV1Client) UpdateProfilePicture(ctx context.Context, in *UpdateProfilePictureRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/profiles_service.profileServiceV1/UpdateProfilePicture", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/profiles_service.profilesServiceV1/UpdateProfilePicture", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *profileServiceV1Client) DeleteProfilePicture(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *profilesServiceV1Client) DeleteProfilePicture(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/profiles_service.profileServiceV1/DeleteProfilePicture", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/profiles_service.profilesServiceV1/DeleteProfilePicture", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ProfileServiceV1Server is the server API for ProfileServiceV1 service.
-// All implementations must embed UnimplementedProfileServiceV1Server
+func (c *profilesServiceV1Client) GetEmail(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetEmailResponce, error) {
+	out := new(GetEmailResponce)
+	err := c.cc.Invoke(ctx, "/profiles_service.profilesServiceV1/GetEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ProfilesServiceV1Server is the server API for ProfilesServiceV1 service.
+// All implementations must embed UnimplementedProfilesServiceV1Server
 // for forward compatibility
-type ProfileServiceV1Server interface {
+type ProfilesServiceV1Server interface {
 	GetUserProfile(context.Context, *emptypb.Empty) (*GetUserProfileResponce, error)
 	UpdateProfilePicture(context.Context, *UpdateProfilePictureRequest) (*emptypb.Empty, error)
 	DeleteProfilePicture(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
-	mustEmbedUnimplementedProfileServiceV1Server()
+	GetEmail(context.Context, *emptypb.Empty) (*GetEmailResponce, error)
+	mustEmbedUnimplementedProfilesServiceV1Server()
 }
 
-// UnimplementedProfileServiceV1Server must be embedded to have forward compatible implementations.
-type UnimplementedProfileServiceV1Server struct {
+// UnimplementedProfilesServiceV1Server must be embedded to have forward compatible implementations.
+type UnimplementedProfilesServiceV1Server struct {
 }
 
-func (UnimplementedProfileServiceV1Server) GetUserProfile(context.Context, *emptypb.Empty) (*GetUserProfileResponce, error) {
+func (UnimplementedProfilesServiceV1Server) GetUserProfile(context.Context, *emptypb.Empty) (*GetUserProfileResponce, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserProfile not implemented")
 }
-func (UnimplementedProfileServiceV1Server) UpdateProfilePicture(context.Context, *UpdateProfilePictureRequest) (*emptypb.Empty, error) {
+func (UnimplementedProfilesServiceV1Server) UpdateProfilePicture(context.Context, *UpdateProfilePictureRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateProfilePicture not implemented")
 }
-func (UnimplementedProfileServiceV1Server) DeleteProfilePicture(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+func (UnimplementedProfilesServiceV1Server) DeleteProfilePicture(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProfilePicture not implemented")
 }
-func (UnimplementedProfileServiceV1Server) mustEmbedUnimplementedProfileServiceV1Server() {}
+func (UnimplementedProfilesServiceV1Server) GetEmail(context.Context, *emptypb.Empty) (*GetEmailResponce, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEmail not implemented")
+}
+func (UnimplementedProfilesServiceV1Server) mustEmbedUnimplementedProfilesServiceV1Server() {}
 
-// UnsafeProfileServiceV1Server may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ProfileServiceV1Server will
+// UnsafeProfilesServiceV1Server may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ProfilesServiceV1Server will
 // result in compilation errors.
-type UnsafeProfileServiceV1Server interface {
-	mustEmbedUnimplementedProfileServiceV1Server()
+type UnsafeProfilesServiceV1Server interface {
+	mustEmbedUnimplementedProfilesServiceV1Server()
 }
 
-func RegisterProfileServiceV1Server(s grpc.ServiceRegistrar, srv ProfileServiceV1Server) {
-	s.RegisterService(&ProfileServiceV1_ServiceDesc, srv)
+func RegisterProfilesServiceV1Server(s grpc.ServiceRegistrar, srv ProfilesServiceV1Server) {
+	s.RegisterService(&ProfilesServiceV1_ServiceDesc, srv)
 }
 
-func _ProfileServiceV1_GetUserProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ProfilesServiceV1_GetUserProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProfileServiceV1Server).GetUserProfile(ctx, in)
+		return srv.(ProfilesServiceV1Server).GetUserProfile(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/profiles_service.profileServiceV1/GetUserProfile",
+		FullMethod: "/profiles_service.profilesServiceV1/GetUserProfile",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceV1Server).GetUserProfile(ctx, req.(*emptypb.Empty))
+		return srv.(ProfilesServiceV1Server).GetUserProfile(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProfileServiceV1_UpdateProfilePicture_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ProfilesServiceV1_UpdateProfilePicture_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateProfilePictureRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProfileServiceV1Server).UpdateProfilePicture(ctx, in)
+		return srv.(ProfilesServiceV1Server).UpdateProfilePicture(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/profiles_service.profileServiceV1/UpdateProfilePicture",
+		FullMethod: "/profiles_service.profilesServiceV1/UpdateProfilePicture",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceV1Server).UpdateProfilePicture(ctx, req.(*UpdateProfilePictureRequest))
+		return srv.(ProfilesServiceV1Server).UpdateProfilePicture(ctx, req.(*UpdateProfilePictureRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProfileServiceV1_DeleteProfilePicture_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ProfilesServiceV1_DeleteProfilePicture_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProfileServiceV1Server).DeleteProfilePicture(ctx, in)
+		return srv.(ProfilesServiceV1Server).DeleteProfilePicture(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/profiles_service.profileServiceV1/DeleteProfilePicture",
+		FullMethod: "/profiles_service.profilesServiceV1/DeleteProfilePicture",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceV1Server).DeleteProfilePicture(ctx, req.(*emptypb.Empty))
+		return srv.(ProfilesServiceV1Server).DeleteProfilePicture(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ProfileServiceV1_ServiceDesc is the grpc.ServiceDesc for ProfileServiceV1 service.
+func _ProfilesServiceV1_GetEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfilesServiceV1Server).GetEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/profiles_service.profilesServiceV1/GetEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfilesServiceV1Server).GetEmail(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ProfilesServiceV1_ServiceDesc is the grpc.ServiceDesc for ProfilesServiceV1 service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ProfileServiceV1_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "profiles_service.profileServiceV1",
-	HandlerType: (*ProfileServiceV1Server)(nil),
+var ProfilesServiceV1_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "profiles_service.profilesServiceV1",
+	HandlerType: (*ProfilesServiceV1Server)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetUserProfile",
-			Handler:    _ProfileServiceV1_GetUserProfile_Handler,
+			Handler:    _ProfilesServiceV1_GetUserProfile_Handler,
 		},
 		{
 			MethodName: "UpdateProfilePicture",
-			Handler:    _ProfileServiceV1_UpdateProfilePicture_Handler,
+			Handler:    _ProfilesServiceV1_UpdateProfilePicture_Handler,
 		},
 		{
 			MethodName: "DeleteProfilePicture",
-			Handler:    _ProfileServiceV1_DeleteProfilePicture_Handler,
+			Handler:    _ProfilesServiceV1_DeleteProfilePicture_Handler,
+		},
+		{
+			MethodName: "GetEmail",
+			Handler:    _ProfilesServiceV1_GetEmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

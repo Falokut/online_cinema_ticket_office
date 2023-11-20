@@ -140,6 +140,100 @@ func (x *UpdateProfilePictureRequest) GetImage() []byte {
 	return nil
 }
 
+type GetEmailResponce struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Email string `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+}
+
+func (x *GetEmailResponce) Reset() {
+	*x = GetEmailResponce{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_profiles_service_v1_messages_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetEmailResponce) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetEmailResponce) ProtoMessage() {}
+
+func (x *GetEmailResponce) ProtoReflect() protoreflect.Message {
+	mi := &file_profiles_service_v1_messages_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetEmailResponce.ProtoReflect.Descriptor instead.
+func (*GetEmailResponce) Descriptor() ([]byte, []int) {
+	return file_profiles_service_v1_messages_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetEmailResponce) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+type UserErrorMessage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (x *UserErrorMessage) Reset() {
+	*x = UserErrorMessage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_profiles_service_v1_messages_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserErrorMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserErrorMessage) ProtoMessage() {}
+
+func (x *UserErrorMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_profiles_service_v1_messages_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserErrorMessage.ProtoReflect.Descriptor instead.
+func (*UserErrorMessage) Descriptor() ([]byte, []int) {
+	return file_profiles_service_v1_messages_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *UserErrorMessage) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_profiles_service_v1_messages_proto protoreflect.FileDescriptor
 
 var file_profiles_service_v1_messages_proto_rawDesc = []byte{
@@ -164,9 +258,14 @@ var file_profiles_service_v1_messages_proto_rawDesc = []byte{
 	0x1b, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x50, 0x69,
 	0x63, 0x74, 0x75, 0x72, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05,
 	0x69, 0x6d, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x69, 0x6d, 0x61,
-	0x67, 0x65, 0x42, 0x1c, 0x5a, 0x1a, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x73, 0x5f, 0x73,
-	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x67, 0x65, 0x22, 0x28, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x63, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x22, 0x2c, 0x0a, 0x10,
+	0x55, 0x73, 0x65, 0x72, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x42, 0x1c, 0x5a, 0x1a, 0x70, 0x72,
+	0x6f, 0x66, 0x69, 0x6c, 0x65, 0x73, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x76,
+	0x31, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -181,14 +280,16 @@ func file_profiles_service_v1_messages_proto_rawDescGZIP() []byte {
 	return file_profiles_service_v1_messages_proto_rawDescData
 }
 
-var file_profiles_service_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_profiles_service_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_profiles_service_v1_messages_proto_goTypes = []interface{}{
 	(*GetUserProfileResponce)(nil),      // 0: profiles_service.GetUserProfileResponce
 	(*UpdateProfilePictureRequest)(nil), // 1: profiles_service.UpdateProfilePictureRequest
-	(*timestamppb.Timestamp)(nil),       // 2: google.protobuf.Timestamp
+	(*GetEmailResponce)(nil),            // 2: profiles_service.GetEmailResponce
+	(*UserErrorMessage)(nil),            // 3: profiles_service.UserErrorMessage
+	(*timestamppb.Timestamp)(nil),       // 4: google.protobuf.Timestamp
 }
 var file_profiles_service_v1_messages_proto_depIdxs = []int32{
-	2, // 0: profiles_service.GetUserProfileResponce.RegistrationDate:type_name -> google.protobuf.Timestamp
+	4, // 0: profiles_service.GetUserProfileResponce.RegistrationDate:type_name -> google.protobuf.Timestamp
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -226,6 +327,30 @@ func file_profiles_service_v1_messages_proto_init() {
 				return nil
 			}
 		}
+		file_profiles_service_v1_messages_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetEmailResponce); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_profiles_service_v1_messages_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserErrorMessage); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -233,7 +358,7 @@ func file_profiles_service_v1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_profiles_service_v1_messages_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

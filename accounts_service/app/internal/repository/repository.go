@@ -16,8 +16,8 @@ type AccountRepository interface {
 	// IsAccountWithEmailExist checks if an account with the given email exists in the database.
 	IsAccountWithEmailExist(ctx context.Context, email string) (bool, error)
 
-	// GetUserByEmail retrieves an account from the database using the email.
-	GetUserByEmail(ctx context.Context, email string) (model.Account, error)
+	// GetAccountByEmail retrieves an account from the database using the email.
+	GetAccountByEmail(ctx context.Context, email string) (model.Account, error)
 
 	// ChangePassword updates the password hash of an account with the given email in the database.
 	ChangePassword(ctx context.Context, email string, passwordHash string) error

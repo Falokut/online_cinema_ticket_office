@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Falokut/grpc_errors"
+	accounts_service "github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/accounts_service/v1/protos"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/logging"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc/codes"
@@ -21,6 +22,7 @@ var (
 	ErrInternal                = errors.New("internal error")
 	ErrAccountAlreadyActivated = errors.New("account already activated")
 	ErrInvalidArgument         = errors.New("invalid input data")
+	ErrFailedValidation        = errors.New("validation failed")
 	ErrSessisonNotFound        = errors.New("session with specified id not found")
 )
 
@@ -32,6 +34,7 @@ var errorCodes = map[error]codes.Code{
 	ErrSessisonNotFound:        codes.Unauthenticated,
 	ErrAlreadyExist:            codes.AlreadyExists,
 	ErrInvalidClientIP:         codes.InvalidArgument,
+	ErrFailedValidation:        codes.InvalidArgument,
 	ErrAccessDenied:            codes.PermissionDenied,
 	ErrInternal:                codes.Internal,
 	ErrAccountAlreadyActivated: codes.AlreadyExists,
@@ -47,16 +50,38 @@ func newErrorHandler(logger logging.Logger) errorHandler {
 	}
 }
 
-func (e *errorHandler) createErrorResponce(err error, errorMessage string) error {
+func (e *errorHandler) createErrorResponce(err error, developerMessage string) error {
 	var msg string
-	if errorMessage == "" {
+	if len(developerMessage) == 0 {
 		msg = err.Error()
 	} else {
-		msg = fmt.Sprintf("%s. error: %v", errorMessage, err)
+		msg = fmt.Sprintf("%s. error: %v", developerMessage, err)
 	}
 
-	e.logger.Error(status.Error(grpc_errors.GetGrpcCode(err), msg))
-	return status.Error(grpc_errors.GetGrpcCode(err), err.Error())
+	err = status.Error(grpc_errors.GetGrpcCode(err), msg)
+	e.logger.Error(err)
+	return err
+}
+
+func (e *errorHandler) createExtendedErrorResponce(err error, DeveloperMessage, UserMessage string) error {
+	var msg string
+	if DeveloperMessage == "" {
+		msg = err.Error()
+	} else {
+		msg = fmt.Sprintf("%s. error: %v", DeveloperMessage, err)
+	}
+
+	extErr := status.New(grpc_errors.GetGrpcCode(err), msg)
+	if len(UserMessage) > 0 {
+		extErr, _ = extErr.WithDetails(&accounts_service.UserErrorMessage{Message: UserMessage})
+		if extErr == nil {
+			e.logger.Error(err)
+			return err
+		}
+	}
+
+	e.logger.Error(extErr)
+	return extErr.Err()
 }
 
 func init() {

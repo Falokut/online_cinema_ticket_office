@@ -84,8 +84,9 @@ func (s *ImagesStorageService) checkImage(ctx context.Context, Image []byte) err
 		return err
 	}
 	if len(Image) > int(s.cfg.MaxImageSize) {
-		err = s.errHandler.createErrorResponce(
+		err = s.errHandler.createExtendedErrorResponce(
 			ErrImageTooLarge,
+			"",
 			fmt.Sprintf("max image size: %d, file size: %d",
 				s.cfg.MaxImageSize, s.cfg.MaxImageSize),
 		)
@@ -94,7 +95,7 @@ func (s *ImagesStorageService) checkImage(ctx context.Context, Image []byte) err
 
 	s.logger.Info("Checking filetype")
 	if fileType := s.detectFileType(&Image); fileType != "image" {
-		err = s.errHandler.createErrorResponce(ErrUnsupportedFileType, "")
+		err = s.errHandler.createExtendedErrorResponce(ErrUnsupportedFileType, "", "unsupported file type")
 		return err
 	}
 
@@ -224,7 +225,7 @@ func (s *ImagesStorageService) DeleteImage(ctx context.Context,
 
 	err = s.imageStorage.DeleteImage(ctx, in.ImageId, in.Category)
 	if errors.Is(err, repository.ErrNotExist) {
-		return nil, s.errHandler.createErrorResponce(ErrCantFindImageByID, "")
+		return nil, s.errHandler.createExtendedErrorResponce(ErrCantFindImageByID, "", "image not found")
 	}
 	if err != nil {
 		return nil, s.errHandler.createErrorResponce(ErrCantDeleteImage, err.Error())

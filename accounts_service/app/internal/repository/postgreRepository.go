@@ -95,9 +95,9 @@ func (r *postgreRepository) IsAccountWithEmailExist(ctx context.Context, email s
 	return true, nil // If no error occurred, the account exists.
 }
 
-// GetUserByEmail retrieves a user account from the database based on the provided email.
+// GetAccountByEmail retrieves a account from the database based on the provided email.
 // It returns the retrieved account and an error, if any.
-func (r *postgreRepository) GetUserByEmail(ctx context.Context, email string) (model.Account, error) {
+func (r *postgreRepository) GetAccountByEmail(ctx context.Context, email string) (model.Account, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "PostgreRepository.GetUserByEmail")
 	span.SetTag("database", "postgre")
 	defer span.Finish()

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"net/url"
 	"runtime"
 
@@ -80,8 +81,10 @@ func (s *Service) CompressImage(ctx context.Context, image []byte) ([]byte, erro
 	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
 	s.logger.Info("Resizing image")
-	return images_resizer.ResizeImage(image, s.cfg.ImageWidth,
+	resized, err := images_resizer.ResizeImage(image, s.cfg.ImageWidth,
 		s.cfg.ImageHeight, s.cfg.ImageResizeType, s.cfg.ImageResizeMethod)
+
+	return resized, err
 }
 
 func (s *Service) UploadImage(ctx context.Context, image []byte) (string, error) {
@@ -121,14 +124,14 @@ func (s *Service) UploadImage(ctx context.Context, image []byte) (string, error)
 			Data:     chunk,
 		})
 		if err != nil {
-			return "", err
+			return "", errors.Join(err, errors.New("error while sending streaming message"))
 		}
 	}
 
 	s.logger.Info("Closing stream")
 	res, err := stream.CloseAndRecv()
 	if err != nil {
-		return "", err
+		return "", errors.Join(err, errors.New("error while sending close"))
 	}
 	return res.ImageId, nil
 }

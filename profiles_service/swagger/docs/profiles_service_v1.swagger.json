@@ -11,7 +11,7 @@
   },
   "tags": [
     {
-      "name": "profileServiceV1"
+      "name": "profilesServiceV1"
     }
   ],
   "schemes": [
@@ -24,9 +24,56 @@
     "application/json"
   ],
   "paths": {
+    "/v1/get-email": {
+      "delete": {
+        "operationId": "profilesServiceV1_GetEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profiles_serviceGetEmailResponce"
+            }
+          },
+          "403": {
+            "description": "Returned when the user does not have permission to access the resource.",
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          "404": {
+            "description": "Returned when account with specified id not found",
+            "schema": {}
+          },
+          "500": {
+            "description": "Something went wrong.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-Account-Id",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "profilesServiceV1"
+        ]
+      }
+    },
     "/v1/profile": {
       "get": {
-        "operationId": "profileServiceV1_GetUserProfile",
+        "operationId": "profilesServiceV1_GetUserProfile",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -67,13 +114,13 @@
           }
         ],
         "tags": [
-          "profileServiceV1"
+          "profilesServiceV1"
         ]
       }
     },
     "/v1/profile/delete-picture": {
-      "post": {
-        "operationId": "profileServiceV1_DeleteProfilePicture",
+      "delete": {
+        "operationId": "profilesServiceV1_DeleteProfilePicture",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -108,15 +155,6 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
-          },
-          {
             "name": "X-Account-Id",
             "in": "header",
             "required": true,
@@ -124,13 +162,13 @@
           }
         ],
         "tags": [
-          "profileServiceV1"
+          "profilesServiceV1"
         ]
       }
     },
     "/v1/profile/update-picture": {
       "post": {
-        "operationId": "profileServiceV1_UpdateProfilePicture",
+        "operationId": "profilesServiceV1_UpdateProfilePicture",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -180,12 +218,20 @@
           }
         ],
         "tags": [
-          "profileServiceV1"
+          "profilesServiceV1"
         ]
       }
     }
   },
   "definitions": {
+    "profiles_serviceGetEmailResponce": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
     "profiles_serviceGetUserProfileResponce": {
       "type": "object",
       "properties": {

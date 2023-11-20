@@ -44,7 +44,6 @@ gen-cert:
 server:
 	go run app/cmd/server/app.go
 
-
 .docker-build:
 	docker build -t $(project_name) .
 

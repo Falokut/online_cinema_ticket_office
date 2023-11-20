@@ -16,7 +16,7 @@ import (
 )
 
 type ProfilesService struct {
-	profiles_service.UnimplementedProfileServiceV1Server
+	profiles_service.UnimplementedProfilesServiceV1Server
 	repo          repository.ProfileRepository
 	logger        *logrus.Logger
 	metrics       metrics.Metrics
@@ -49,10 +49,11 @@ func (s *ProfilesService) GetUserProfile(ctx context.Context,
 
 	Profile, err := s.repo.GetUserProfile(ctx, accountID)
 	if err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		err = s.errorHandler.createExtendedErrorResponce(ErrInternal, err.Error(), "")
+		return nil, err
 	} else if err == repository.ErrProfileNotFound {
-		return nil, s.errorHandler.createErrorResponce(ErrProfileNotFound, "")
-
+		err = s.errorHandler.createExtendedErrorResponce(ErrProfileNotFound, "", ErrProfileNotFound.Error())
+		return nil, err
 	}
 
 	return s.convertUserProfileProtoFromModel(ctx, Profile), nil
@@ -74,13 +75,13 @@ func (s *ProfilesService) UpdateProfilePicture(ctx context.Context,
 	}
 
 	s.logger.Info("Getting current picture id")
-	CurrentPictureID, err := s.repo.GetProfilePictureID(ctx, accountID)
+	CurrentPictureID, err := s.getCurrentProfileID(ctx, accountID)
 	if err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		return nil, err
 	}
 
 	var PictureID string
-	if CurrentPictureID == "" {
+	if len(CurrentPictureID) == 0 {
 		s.logger.Info("Uploading image")
 		PictureID, err = s.imagesService.UploadImage(ctx, in.Image)
 	} else {
@@ -96,11 +97,35 @@ func (s *ProfilesService) UpdateProfilePicture(ctx context.Context,
 		s.logger.Info("Updating PictureID")
 		err = s.repo.UpdateProfilePictureID(ctx, accountID, PictureID)
 		if err != nil {
-			return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+			return nil, s.errorHandler.createExtendedErrorResponce(ErrInternal, err.Error(), "error while updating picture")
 		}
 	}
 
 	return &emptypb.Empty{}, nil
+}
+
+func (s *ProfilesService) GetEmail(ctx context.Context, in *emptypb.Empty) (*profiles_service.GetEmailResponce, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "ProfilesService.GetUserProfile")
+	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
+
+	accountID, err := s.getAccountId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	email, err := s.repo.GetEmail(ctx, accountID)
+	if err != nil {
+		err = s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		return nil, err
+	}
+	if len(email) < 1 {
+		err = s.errorHandler.createErrorResponce(ErrInternal, "")
+		return nil, err
+	}
+
+	return &profiles_service.GetEmailResponce{Email: email}, nil
 }
 
 const (
@@ -110,8 +135,9 @@ const (
 func (s *ProfilesService) getAccountId(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", s.errorHandler.createErrorResponce(ErrNoCtxMetaData, "")
+		return "", s.errorHandler.createErrorResponce(ErrNoCtxMetaData, "no context metadata provided")
 	}
+
 	accountId := md.Get(AccountIdContext)
 	if len(accountId) == 0 || accountId[0] == "" {
 		return "", s.errorHandler.createErrorResponce(ErrInvalidAccountId, "no account id provided")
@@ -134,9 +160,9 @@ func (s *ProfilesService) DeleteProfilePicture(ctx context.Context, in *emptypb.
 		return nil, err
 	}
 
-	CurrentPictureID, err := s.repo.GetProfilePictureID(ctx, accountID)
+	CurrentPictureID, err := s.getCurrentProfileID(ctx, accountID)
 	if err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		return nil, err
 	}
 
 	if CurrentPictureID == "" {
@@ -168,4 +194,13 @@ func (s *ProfilesService) convertUserProfileProtoFromModel(ctx context.Context, 
 		ProfilePictureURL: ProfilePictureURL,
 		RegistrationDate:  timestamppb.New(from.RegistrationDate),
 	}
+}
+
+func (s *ProfilesService) getCurrentProfileID(ctx context.Context, accountID string) (string, error) {
+	CurrentPictureID, err := s.repo.GetProfilePictureID(ctx, accountID)
+	if err != nil {
+		return "", s.errorHandler.createExtendedErrorResponce(ErrInternal, err.Error(), "can't get current profile picture")
+	}
+
+	return CurrentPictureID, nil
 }
