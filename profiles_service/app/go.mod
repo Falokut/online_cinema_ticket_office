@@ -4,7 +4,7 @@ go 1.21.4
 
 require (
 	github.com/Falokut/grpc_errors v1.0.0
-	github.com/Falokut/interceptors v0.0.0-20231118101928-701e970c4260
+	github.com/Falokut/interceptors v1.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0
@@ -29,6 +29,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/joho/godotenv v1.5.1 // indirect

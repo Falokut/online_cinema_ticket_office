@@ -4,10 +4,10 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak=
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/Falokut/grpc_errors v0.0.0-20231118095935-ec0969a606f9 h1:4Vujy4wvs9B64TXyEO32TvwJjm1niVadaYzbKXokb94=
-github.com/Falokut/grpc_errors v0.0.0-20231118095935-ec0969a606f9/go.mod h1:JgsE3XET9nqPhyWdhjXkdbrF66+TZVKBguE8QwrWd1I=
-github.com/Falokut/interceptors v0.0.0-20231118101928-701e970c4260 h1:Da0wJ3qlVJAZ73/SF//GWTqCiSJpKdBD5oY1+0v+6i0=
-github.com/Falokut/interceptors v0.0.0-20231118101928-701e970c4260/go.mod h1:y28G6Y/WNPp0Put1qKeb/yj0/QLp7QlMsG0Hui2nDTs=
+github.com/Falokut/grpc_errors v1.0.0 h1:S07x3O6g2KWP7Kw82IpmJYPdH1kq38ih4NOBJ29gKCU=
+github.com/Falokut/grpc_errors v1.0.0/go.mod h1:y/tt/Zlpux2xCjqUtoqrMY1OeYxTKNUc+An0rIZiHwk=
+github.com/Falokut/interceptors v1.0.0 h1:V2cI/sFdVjyXhLDuhEJb5JeGydQl6Wu6bzyrhvgFfH8=
+github.com/Falokut/interceptors v1.0.0/go.mod h1:y28G6Y/WNPp0Put1qKeb/yj0/QLp7QlMsG0Hui2nDTs=
 github.com/HdrHistogram/hdrhistogram-go v1.1.2 h1:5IcZpTvzydCQeHzK4Ef/D5rrSqwxob0t8PQPMybUNFM=
 github.com/HdrHistogram/hdrhistogram-go v1.1.2/go.mod h1:yDgFjdqOqDEKOvasDdhWNXYg9BVp4O+o5f6V/ehm6Oo=
 github.com/ajstarks/svgo v0.0.0-20180226025133-644b8db467af/go.mod h1:K08gAheRH3/J6wwsYMMT4xOr94bZjxIelGM0+d/wbFw=
@@ -70,6 +70,8 @@ github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 h1:Ovs26xHkKqVztRpIrF/92Bcuy
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0/go.mod h1:8NvIoxWQoOIhqOTXgfV/d3M/q6VIi02HzZEHgUlZvzk=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0 h1:RtRsiaGvWxcwd8y3BiRZxsylPT8hLWZ5SPcfI+3IDNk=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0/go.mod h1:TzP6duP4Py2pHLVPPQp42aoYI92+PCrVotyR5e8Vqlk=
+github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645 h1:MJG/KsmcqMwFAkh8mTnAwhyKoB+sTAnY4CACC110tbU=
+github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645/go.mod h1:6iZfnjpejD4L/4DwD7NryNaJyCQdzwWwH2MWhCA90Kw=
 github.com/ilyakaznacheev/cleanenv v1.5.0 h1:0VNZXggJE2OYdXE87bfSSwGxeiGt9moSR2lOrsHHvr4=
 github.com/ilyakaznacheev/cleanenv v1.5.0/go.mod h1:a5aDzaJrLCQZsazHol1w8InnDcOX0OColm64SlIi6gk=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=

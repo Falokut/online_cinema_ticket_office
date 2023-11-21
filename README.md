@@ -6,7 +6,11 @@ This repository has the code for an online cinema ticket office. You can buy mov
 
 ## Installation and Running
 
-To install and run the service, follow these steps:
+**Prerequisites**:
+- Docker installed on your system.
+- Docker Compose installed on your system.
+
+### Instructions to run the Gateway:
 
 1. Clone the repository to your local machine using the following command:
    ```shell
@@ -20,6 +24,7 @@ To install and run the service, follow these steps:
    * [Setup profiles_service](/profiles_service/README.md#SETUP)
 
 3. Start the gateway by running the following command:
+
    ```shell
    docker-compose -f gateway.yml up --build gateway
    ```
@@ -29,7 +34,54 @@ To install and run the service, follow these steps:
    ```
 
 4. Once the gateway is successfully started, you can access the RestAPI endpoint at `http://localhost:80` and the gRPC endpoint at `http://localhost:81`.
-     
+
+---
+
+Please note that these instructions assume that Docker and Docker Compose are already installed on your system. If you haven't installed them yet, please refer to the Docker documentation for the appropriate installation steps for your operating system.
+
+### Checking and updating Docker compose version
+To check the version of Docker Compose, you can use the following command:
+
+```shell
+docker-compose --version
+```
+This will display the version number of Docker Compose installed on your system.
+
+If you need to update Docker Compose to a newer version, follow these instuctions:
+Sure! Here are the additional instructions for Windows and macOS:
+
+**Instructions for Windows:**
+
+1. Download the latest binary of Docker Compose by visiting the official GitHub release page: [https://github.com/docker/compose/releases](https://github.com/docker/compose/releases).
+
+2. Scroll down to the "Assets" section and find the binary that matches your system architecture, typically the one ending with `.exe` (e.g., `docker-compose-Windows-x86_64.exe`).
+
+3. Click on the binary to download it.
+
+4. Move the downloaded binary to a directory in your system's `PATH` environment variable. This allows you to run Docker Compose from anywhere.
+
+**Instructions for Linux and macOS:**
+
+1. Open a terminal.
+
+2. Download the latest binary of Docker Compose using the following command:
+   ```shell
+   sudo curl -L "https://github.com/docker/compose/releases/download/{VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+   ```
+   Replace `{VERSION}` with the actual version number you want to install.
+
+3. Apply executable permissions to the Docker Compose binary:
+   ```shell
+   sudo chmod +x /usr/local/bin/docker-compose
+   ```
+
+4. Verify that Docker Compose has been updated successfully by running:
+   ```shell
+   docker-compose --version
+   ```
+   It should display the newly installed version.
+---
+
 ## Metrics and Monitoring
 
 We use Grafana, Prometheus, and Jaeger to collect and visualize application metrics. You can track the performance of the application using these tools.

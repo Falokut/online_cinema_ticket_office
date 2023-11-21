@@ -11,6 +11,7 @@ import (
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/service"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/metrics"
 	profiles_service "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/profiles_service/v1/protos"
+	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
 	"github.com/soheilhy/cmux"
 
@@ -18,7 +19,7 @@ import (
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	"google.golang.org/grpc"
 )
 
@@ -73,6 +74,7 @@ func (s *server) RunGRPC(cfg Config, metric metrics.Metrics) {
 	s.logger.Info("GRPC server initializing")
 
 	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(s.im.Logger), grpc.ChainUnaryInterceptor(
+		otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
 		grpc_ctxtags.UnaryServerInterceptor(),
 		s.im.Metrics,
 		grpcrecovery.UnaryServerInterceptor(),

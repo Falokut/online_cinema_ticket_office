@@ -21,10 +21,12 @@ var (
 	ErrReceivedNilRequest  = errors.New("the received request is nil")
 	ErrCantSaveImage       = errors.New("сan't save image to the storage")
 	ErrCantDeleteImage     = errors.New("can't delete image")
+	ErrInternal            = errors.New("internal error")
 )
 
 var errorCodes = map[error]codes.Code{
 	ErrCantFindImageByID:   codes.NotFound,
+	ErrInternal:            codes.Internal,
 	ErrCantDeleteImage:     codes.Internal,
 	ErrCantSaveImage:       codes.Internal,
 	ErrUnsupportedFileType: codes.InvalidArgument,

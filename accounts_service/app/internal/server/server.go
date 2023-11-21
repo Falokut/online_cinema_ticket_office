@@ -16,6 +16,8 @@ import (
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
+	"github.com/opentracing/opentracing-go"
 	"github.com/soheilhy/cmux"
 	"google.golang.org/grpc"
 )
@@ -73,6 +75,7 @@ func (s *server) RunGRPC(cfg Config, metric metrics.Metrics) {
 	s.logger.Info("GRPC server initializing")
 
 	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(s.im.Logger), grpc.ChainUnaryInterceptor(
+		otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
 		grpc_ctxtags.UnaryServerInterceptor(),
 		s.im.Metrics,
 		grpcrecovery.UnaryServerInterceptor(),

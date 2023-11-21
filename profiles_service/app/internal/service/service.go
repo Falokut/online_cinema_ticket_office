@@ -86,7 +86,7 @@ func (s *ProfilesService) UpdateProfilePicture(ctx context.Context,
 		PictureID, err = s.imagesService.UploadImage(ctx, in.Image)
 	} else {
 		s.logger.Info("Replacing image")
-		PictureID, err = s.imagesService.ReplaceImage(ctx, in.Image, CurrentPictureID, false)
+		PictureID, err = s.imagesService.ReplaceImage(ctx, in.Image, CurrentPictureID, true)
 	}
 
 	if err != nil {
@@ -147,9 +147,8 @@ func (s *ProfilesService) getAccountId(ctx context.Context) (string, error) {
 }
 
 func (s *ProfilesService) DeleteProfilePicture(ctx context.Context, in *emptypb.Empty) (*emptypb.Empty, error) {
-
 	span, ctx := opentracing.StartSpanFromContext(ctx,
-		"ProfilesService.UpdateProfilePicture")
+		"ProfilesService.DeleteProfilePicture")
 	defer span.Finish()
 	var err error
 	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))

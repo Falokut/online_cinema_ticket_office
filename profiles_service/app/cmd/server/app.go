@@ -14,6 +14,7 @@ import (
 	jaegerTracer "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/jaeger"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/metrics"
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -91,6 +92,10 @@ func main() {
 func getImageStorageConnection(cfg *config.Config) (*grpc.ClientConn, error) {
 	return grpc.Dial(cfg.ImageService.StorageAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(
+			otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
+		grpc.WithStreamInterceptor(
+			otgrpc.OpenTracingStreamClientInterceptor(opentracing.GlobalTracer())),
 	)
 }
 

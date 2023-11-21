@@ -49,7 +49,11 @@ func NewImageService(cfg ImageServiceConfig, logger logging.Logger,
 // Returns profile picture url for GET request, or
 // returns empty string if there are error or picture unreachable
 func (s *Service) GetProfilePictureUrl(ctx context.Context, PictureID string) string {
-	u, err := url.Parse(s.cfg.BaseProfilePictureUrl + "/" + PictureID)
+	if PictureID == "" {
+		return ""
+	}
+
+	u, err := url.Parse(s.cfg.BaseProfilePictureUrl)
 	if err != nil {
 		s.logger.Errorf("can't parse url. error: %s", err.Error())
 		return ""
@@ -68,6 +72,7 @@ func (s *Service) GetProfilePictureUrl(ctx context.Context, PictureID string) st
 	}
 
 	q := u.Query()
+	q.Add("image_id", PictureID)
 	q.Add("category", s.cfg.ProfilePictureCategory)
 	u.RawQuery = q.Encode()
 	return u.String()

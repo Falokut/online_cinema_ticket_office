@@ -76,12 +76,8 @@ func (s *LocalImageStorage) IsImageExist(ctx context.Context, filename string, r
 	span, _ := opentracing.StartSpanFromContext(ctx, "LocalImageStorage.IsImageExist")
 	defer span.Finish()
 	relativePath = filepath.Clean(fmt.Sprintf("%s/%s/%s", s.basePath, relativePath, filename))
-
-	if _, err := os.Stat(relativePath); errors.Is(err, os.ErrNotExist) {
-		return false
-	}
-
-	return true
+	_, err := os.Stat(relativePath)
+	return !errors.Is(err, os.ErrNotExist)
 }
 
 func (s *LocalImageStorage) DeleteImage(ctx context.Context, filename string, relativePath string) error {

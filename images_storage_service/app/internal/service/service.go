@@ -18,7 +18,6 @@ import (
 	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/genproto/googleapis/api/httpbody"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -209,11 +208,11 @@ func (s *ImagesStorageService) IsImageExist(ctx context.Context,
 	span, ctx := opentracing.StartSpanFromContext(ctx,
 		"ImagesStorageService.IsImageExist")
 	defer span.Finish()
-	defer span.SetTag("grpc.status", codes.OK)
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
-	exist := s.imageStorage.IsImageExist(ctx, in.ImageId, in.Category)
-
-	return &img_storage_serv.ImageExistResponce{ImageExist: exist}, nil
+	imageExist := s.imageStorage.IsImageExist(ctx, in.ImageId, in.Category)
+	return &img_storage_serv.ImageExistResponce{ImageExist: imageExist}, nil
 }
 
 func (s *ImagesStorageService) DeleteImage(ctx context.Context,

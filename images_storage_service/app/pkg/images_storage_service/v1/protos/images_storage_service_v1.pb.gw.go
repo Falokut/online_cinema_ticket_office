@@ -66,29 +66,12 @@ func local_request_ImagesStorageServiceV1_UploadImage_0(ctx context.Context, mar
 }
 
 var (
-	filter_ImagesStorageServiceV1_GetImage_0 = &utilities.DoubleArray{Encoding: map[string]int{"image_id": 0, "imageId": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_ImagesStorageServiceV1_GetImage_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
 func request_ImagesStorageServiceV1_GetImage_0(ctx context.Context, marshaler runtime.Marshaler, client ImagesStorageServiceV1Client, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ImageRequest
 	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["image_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "image_id")
-	}
-
-	protoReq.ImageId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "image_id", err)
-	}
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -105,23 +88,6 @@ func request_ImagesStorageServiceV1_GetImage_0(ctx context.Context, marshaler ru
 func local_request_ImagesStorageServiceV1_GetImage_0(ctx context.Context, marshaler runtime.Marshaler, server ImagesStorageServiceV1Server, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ImageRequest
 	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["image_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "image_id")
-	}
-
-	protoReq.ImageId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "image_id", err)
-	}
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -280,7 +246,7 @@ func RegisterImagesStorageServiceV1HandlerServer(ctx context.Context, mux *runti
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/images_storage_service.ImagesStorageServiceV1/GetImage", runtime.WithHTTPPathPattern("/v1/image/{image_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/images_storage_service.ImagesStorageServiceV1/GetImage", runtime.WithHTTPPathPattern("/v1/image"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -441,7 +407,7 @@ func RegisterImagesStorageServiceV1HandlerClient(ctx context.Context, mux *runti
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/images_storage_service.ImagesStorageServiceV1/GetImage", runtime.WithHTTPPathPattern("/v1/image/{image_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/images_storage_service.ImagesStorageServiceV1/GetImage", runtime.WithHTTPPathPattern("/v1/image"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -529,7 +495,7 @@ func RegisterImagesStorageServiceV1HandlerClient(ctx context.Context, mux *runti
 var (
 	pattern_ImagesStorageServiceV1_UploadImage_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "upload-image"}, ""))
 
-	pattern_ImagesStorageServiceV1_GetImage_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "image", "image_id"}, ""))
+	pattern_ImagesStorageServiceV1_GetImage_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "image"}, ""))
 
 	pattern_ImagesStorageServiceV1_IsImageExist_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "check-image-existing"}, ""))
 

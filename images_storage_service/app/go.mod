@@ -3,8 +3,8 @@ module github.com/Falokut/online_cinema_ticket_office/images_storage_service
 go 1.21.4
 
 require (
-	github.com/Falokut/grpc_errors v0.0.0-20231118095935-ec0969a606f9
-	github.com/Falokut/interceptors v0.0.0-20231118101928-701e970c4260
+	github.com/Falokut/grpc_errors v1.0.0
+	github.com/Falokut/interceptors v1.0.0
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
@@ -30,6 +30,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

@@ -135,7 +135,7 @@
         ]
       }
     },
-    "/v1/image/{imageId}": {
+    "/v1/image": {
       "get": {
         "operationId": "ImagesStorageServiceV1_GetImage",
         "responses": {
@@ -173,13 +173,13 @@
         },
         "parameters": [
           {
-            "name": "imageId",
-            "in": "path",
-            "required": true,
+            "name": "category",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
-            "name": "category",
+            "name": "imageId",
             "in": "query",
             "required": false,
             "type": "string"

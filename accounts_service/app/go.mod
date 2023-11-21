@@ -23,9 +23,11 @@ require (
 	google.golang.org/protobuf v1.31.0
 )
 
+require github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645
+
 require (
-	github.com/Falokut/grpc_errors v0.0.0-20231118095935-ec0969a606f9
-	github.com/Falokut/interceptors v0.0.0-20231118101928-701e970c4260
+	github.com/Falokut/grpc_errors v1.0.0
+	github.com/Falokut/interceptors v1.0.0
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 )
 
