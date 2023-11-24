@@ -1,39 +1,62 @@
 version: '3.8'
 
 include:
-  - accounts_db/accounts_db.yml
+  #-----------------databases-----------------
+  - databases/accounts_db/accounts_db.yml
+  - databases/movies_db/movies_db.yml
+  - databases/profiles_db/profiles_db.yml
+
+  #-----------------servises-----------------
   - accounts_service/accounts_service.yml
   - profiles_service/profiles_service.yml
-  - tracing_service/tracing_service.yml
   - email_service/email_service.yml
-  - kafka-cluster/kafka-cluster.yml
   - images_storage_service/images_storage_service.yml
 
+  #-----------------brokers-----------------
+  - kafka-cluster/kafka-cluster.yml
+
+  - tracing_service/tracing_service.yml
+
+networks:
+  gateway_network:
 
 services:
-    gateway:
-      image: nginx 
-      ports:
-        - 80:80
-        - 81:81
-      networks:
-        - profiles_service_network
-        - accounts_service_network
-        - images_storage_network
-      volumes:
-        - .nginx/configs/nginx.conf:/etc/nginx/nginx.conf
-        - .nginx/configs/services.conf:/etc/nginx/services.conf
-        - .nginx/configs/rules.conf:/etc/nginx/rules.conf
-      depends_on:
-        - accounts_service
-        - profiles_service
-        - email_service
-        - images_storage_service
-        - prometheus
-        - jaeger
-        - node_exporter
-        - grafana
-
+  gateway:
+    image: nginx 
+    hostname: gateway
+    ports:
+      - 80:80
+      - 81:81
+    networks:
+      - profiles_service_network
+      - accounts_service_network
+      - images_storage_network
+      - gateway_network
+    volumes:
+      - .nginx/configs/:/etc/nginx/
+    depends_on:
+      #-----------------services-----------------
+      accounts_service:
+        condition: service_healthy
+      profiles_service:
+        condition: service_healthy
+      email_service:
+        condition: service_started
+      images_storage_service:
+        condition: service_started
+      #------------------------------------------
+      profiles_db:
+        condition: service_started
+      prometheus:
+        condition: service_started
+      jaeger:
+        condition: service_started
+      node_exporter:
+        condition: service_started
+      grafana:
+        condition: service_started
+      kafka-ui:
+        condition: service_started
 
 
         

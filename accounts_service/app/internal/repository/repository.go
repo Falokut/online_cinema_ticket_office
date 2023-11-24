@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"time"
 
@@ -10,8 +11,8 @@ import (
 
 // AccountRepository provides methods to interact with user accounts in the database.
 type AccountRepository interface {
-	// CreateAccountAndProfile creates a new account and profile in the database.
-	CreateAccountAndProfile(ctx context.Context, account model.CreateAccountAndProfile) error
+	// CreateAccount creates a new account in the database.
+	CreateAccount(ctx context.Context, account model.Account) (*sql.Tx, string, error)
 
 	// IsAccountWithEmailExist checks if an account with the given email exists in the database.
 	IsAccountWithEmailExist(ctx context.Context, email string) (bool, error)
@@ -23,7 +24,7 @@ type AccountRepository interface {
 	ChangePassword(ctx context.Context, email string, passwordHash string) error
 
 	// DeleteAccount removes the account with the given ID from the database.
-	DeleteAccount(ctx context.Context, id string) error
+	DeleteAccount(ctx context.Context, id string) (*sql.Tx, error)
 
 	// Shutdown performs cleanup and shuts down the repository.
 	Shutdown() error
@@ -51,6 +52,8 @@ type RegistrationCacheRepository interface {
 	// GetCachedAccount retrieves the cached account data using the email.
 	GetCachedAccount(ctx context.Context, email string) (CachedAccount, error)
 
+	PingContext(ctx context.Context) error
+
 	// Shutdown performs cleanup and shuts down the registration cache repository.
 	Shutdown() error
 }
@@ -74,7 +77,12 @@ type SessionsCacheRepository interface {
 	GetSessionCache(ctx context.Context, sessionID string) (model.SessionCache, error)
 
 	// GetSessionsForAccount fetches the sessions associated with a particular account ID.
-	GetSessionsForAccount(ctx context.Context, accountID string) (map[string]sessionInfo, error)
+	GetSessionsForAccount(ctx context.Context, accountID string) (map[string]SessionInfo, error)
+
+	// GetSessionsForAccount fetches the sessions associated with a particular account ID.
+	GetSessionsList(ctx context.Context, accountID string) ([]string, error)
+
+	PingContext(ctx context.Context) error
 
 	// Shutdown stops the cache operations.
 	Shutdown() error

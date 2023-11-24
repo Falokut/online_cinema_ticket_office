@@ -15,6 +15,8 @@ var (
 )
 
 type ProfileRepository interface {
+	CreateUserProfile(ctx context.Context, profile model.UserProfile) error
+	DeleteUserProfile(ctx context.Context, AccountID string) error
 	GetUserProfile(ctx context.Context, AccountID string) (model.UserProfile, error)
 	GetProfilePictureID(ctx context.Context, AccountID string) (string, error)
 	UpdateProfilePictureID(ctx context.Context, AccountID string, PictureID string) error

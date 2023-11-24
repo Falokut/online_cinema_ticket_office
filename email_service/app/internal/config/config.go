@@ -9,12 +9,11 @@ import (
 )
 
 type Config struct {
-	EnableTLS       bool                   `yaml:"enable_TLS" env:"ENABLE_TLS"`
-	LogLevel        string                 `yaml:"log_level" env:"LOG_LEVEL"`
-	MailSenderCfg   email.MailSenderConfig `yaml:"mail_sender"`
-	MailWorkerCfg   email.MailWorkerConfig `yaml:"mail_worker"`
-	MaxWorkersCount int                    `yaml:"max_workers_count"`
-	KafkaConfig     struct {
+	EnableTLS     bool                   `yaml:"enable_TLS" env:"ENABLE_TLS"`
+	LogLevel      string                 `yaml:"log_level" env:"LOG_LEVEL"`
+	MailSenderCfg email.MailSenderConfig `yaml:"mail_sender"`
+	MailWorkerCfg email.MailWorkerConfig `yaml:"mail_worker"`
+	KafkaConfig   struct {
 		Brokers       []string `yaml:"brokers"`
 		GroupID       string   `yaml:"group_id"`
 		Topic         string   `yaml:"topic"`

@@ -1,17 +1,22 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"os"
 	"os/signal"
 	"syscall"
 
+	server "github.com/Falokut/grpc_rest_server"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/internal/config"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/internal/repository"
-	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/internal/server"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/internal/service"
+	img_storage_serv "github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/images_storage_service/v1/protos"
 	jaegerTracer "github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/jaeger"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/metrics"
+
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/sirupsen/logrus"
 
 	"github.com/opentracing/opentracing-go"
@@ -61,7 +66,7 @@ func main() {
 
 	logger.Info("Server initializing")
 	s := server.NewServer(logger.Logger, service)
-	s.Run(getListenServerConfig(appCfg), metric)
+	s.Run(getListenServerConfig(appCfg), metric, nil, nil)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGHUP, syscall.SIGTERM)
@@ -72,9 +77,18 @@ func main() {
 
 func getListenServerConfig(cfg *config.Config) server.Config {
 	return server.Config{
+		Mode:           cfg.Listen.Mode,
 		Host:           cfg.Listen.Host,
 		Port:           cfg.Listen.Port,
 		AllowedHeaders: cfg.Listen.AllowedHeaders,
-		Mode:           cfg.Listen.Mode,
+		ServiceDesc:    &img_storage_serv.ImagesStorageServiceV1_ServiceDesc,
+		RegisterRestHandlerServer: func(ctx context.Context, mux *runtime.ServeMux, service any) error {
+			serv, ok := service.(img_storage_serv.ImagesStorageServiceV1Server)
+			if !ok {
+				return errors.New("can't convert")
+			}
+			return img_storage_serv.RegisterImagesStorageServiceV1HandlerServer(context.Background(),
+				mux, serv)
+		},
 	}
 }

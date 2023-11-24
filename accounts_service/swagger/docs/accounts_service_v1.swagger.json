@@ -436,14 +436,12 @@
         },
         "parameters": [
           {
-            "name": "sessions_to_terminate",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/accounts_serviceTerminateSessionsRequest"
+            }
           },
           {
             "name": "X-Session-Id",
@@ -779,6 +777,17 @@
         },
         "session_info": {
           "type": "string"
+        }
+      }
+    },
+    "accounts_serviceTerminateSessionsRequest": {
+      "type": "object",
+      "properties": {
+        "sessions_to_terminate": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

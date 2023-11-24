@@ -6,6 +6,7 @@ import (
 )
 
 type UserProfile struct {
+	AccountID        string         `db:"account_id"`
 	Username         string         `db:"username"`
 	Email            string         `db:"email"`
 	ProfilePictureID sql.NullString `db:"profile_picture_id"`

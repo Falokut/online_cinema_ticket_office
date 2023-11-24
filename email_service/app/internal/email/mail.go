@@ -68,6 +68,7 @@ func (s *MailSender) SendEmail(data *EmailData, EmailTo string, templateName str
 
 	s.logger.Infoln("Sending message.")
 	if err := sender.Send(s.EmailAddress, []string{EmailTo}, m); err != nil {
+		s.logger.Debug(EmailTo)
 		s.logger.Error(err.Error())
 		return nil
 	}

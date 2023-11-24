@@ -1,6 +1,6 @@
-## SETUP
+## Configuration
 
-1. Create .env inside docker/containers-configs/app-configs and provide EMAIL_PASSWORD  
+1. Create .env in root dir and provide EMAIL_PASSWORD  
 Example .env
 ```env
 EMAIL_PASSWORD="passwordOrAPIKEY_ForEmail"

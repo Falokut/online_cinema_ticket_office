@@ -309,7 +309,10 @@ service accountsServiceV1 {
     };     
 
     rpc TerminateSessions(TerminateSessionsRequest) returns(google.protobuf.Empty){
-        option (google.api.http) = { post: "/v1/sessions/terminate" };
+        option (google.api.http) = {
+            post: "/v1/sessions/terminate"
+            body: "*"
+         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             parameters: {
                 headers: {

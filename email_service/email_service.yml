@@ -13,9 +13,11 @@ services:
       - ./docker/containers-configs/app-configs/config.yml:/configs/config.yml
     depends_on:
       - kafka
-    env_file:
-      - ./docker/containers-configs/app-configs/.env
+    environment:
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
     deploy:
+      mode: replicated
+      replicas: 2
       restart_policy:
         condition: on-failure
         delay: 5s

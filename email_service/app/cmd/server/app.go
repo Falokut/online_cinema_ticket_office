@@ -16,7 +16,7 @@ import (
 
 func main() {
 	logger := logging.GetLogger()
-	termChan := make(chan os.Signal)
+	termChan := make(chan os.Signal, 1)
 	signal.Notify(termChan, syscall.SIGTERM, syscall.SIGINT)
 
 	appCfg := config.GetConfig()
@@ -33,13 +33,13 @@ func main() {
 	kafkaReader := NewKafkaReader(*appCfg)
 
 	logger.Infoln("worker initializing")
-	mailWorker := email.NewMailWorker(mailSender, logger, appCfg.MailWorkerCfg, kafkaReader, appCfg.MaxWorkersCount)
+	mailWorker := email.NewMailWorker(mailSender, logger, appCfg.MailWorkerCfg, kafkaReader)
 	go func() {
 		mailWorker.Run()
 	}()
 
 	var wg sync.WaitGroup
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGHUP, syscall.SIGTERM)
 
 	<-quit
@@ -55,11 +55,10 @@ func NewKafkaReader(appCfg config.Config) *kafka.Reader {
 		Topic:          appCfg.KafkaConfig.Topic,
 		MaxBytes:       appCfg.KafkaConfig.MaxBytes,
 		Logger:         logging.GetLogger(),
-		MaxAttempts:    4,
-		MaxWait:        time.Minute,
-		ReadBackoffMax: time.Millisecond * 100,
+		MaxAttempts:    2,
 		StartOffset:    kafka.LastOffset,
 		QueueCapacity:  appCfg.KafkaConfig.QueueCapacity,
+		CommitInterval: time.Millisecond * 10,
 	})
 	return r
 }

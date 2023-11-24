@@ -40,9 +40,10 @@ func (r redisOptions) ConvertToRedisOptions() *redis.Options {
 }
 
 type Config struct {
-	LogLevel string `yaml:"log_level" env:"LOG_LEVEL"`
-
-	Listen struct {
+	LogLevel            string `yaml:"log_level" env:"LOG_LEVEL"`
+	ProfilesServiceAddr string `yaml:"profiles_service_addr" env:"PROFILES_SERVICE_ADDR"`
+	HealthcheckPort     string `yaml:"healthcheck_port" env:"HEALTHCHECK_PORT"`
+	Listen              struct {
 		Host                   string            `yaml:"host" env:"HOST"`
 		Port                   string            `yaml:"port" env:"PORT"`
 		Mode                   string            `yaml:"server_mode" env:"SERVER_MODE"` // support GRPC, REST, BOTH

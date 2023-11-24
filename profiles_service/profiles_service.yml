@@ -1,8 +1,7 @@
 version: "3.8"
 
 include:
-  - ../accounts_db/accounts_db.yml
-  - ../images_storage_service/images_storage_service.yml
+  - ../databases/profiles_db/profiles_db.yml
 
 networks:
   profiles_service_network:
@@ -14,20 +13,25 @@ services:
     hostname: profiles_service
     build: ./
     command: ./bin/app
-    env_file:
-      - ./docker/containers-configs/app-configs/.env
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
     volumes:
       - ./docker/containers-configs/app-configs/config.yml:/configs/config.yml
     # ports:
     #- 8005:8080
     networks:
       - profiles_service_network
-      - accounts_db_network
+      - profiles_db_network
       - tracing_network
-      - images_storage_network
     depends_on:
-      - accounts_db
-      - images_storage_service
+      profiles_db:
+        condition: service_healthy
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider 'http://localhost:7001/healthcheck' || exit 1
+      interval: 40s
+      timeout: 20s
+      retries: 3
+      start_period: 20s
     deploy:
       mode: replicated
       replicas: 3

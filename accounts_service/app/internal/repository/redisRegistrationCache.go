@@ -17,6 +17,14 @@ type redisRegistrationCache struct {
 	logger logging.Logger
 }
 
+func (r *redisRegistrationCache) PingContext(ctx context.Context) error {
+	if err := r.rdb.Ping(ctx).Err(); err != nil {
+		return fmt.Errorf("error while pinging registration cache: %w", err)
+	}
+
+	return nil
+}
+
 // NewRedisRegistrationCache initializes a new instance of redisRegistrationCache with the provided options and logger.
 func NewRedisRegistrationCache(opt *redis.Options, logger logging.Logger) (*redisRegistrationCache, error) {
 	logger.Info("Creating registration cache client")
@@ -43,7 +51,6 @@ func (r *redisRegistrationCache) Shutdown() error {
 // IsAccountInCache checks if the provided email account is present in the cache.
 func (r redisRegistrationCache) IsAccountInCache(ctx context.Context, email string) (bool, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsCache.UpdateSessionsForAccount")
-	span.SetTag("database", "redis cache")
 	defer span.Finish()
 
 	num, err := r.rdb.Exists(ctx, email).Result()
@@ -60,7 +67,6 @@ func (r *redisRegistrationCache) CacheAccount(ctx context.Context,
 	email string, account CachedAccount, NonActivatedAccountTTL time.Duration) error {
 	// Start a new span for caching the account information
 	span, ctx := opentracing.StartSpanFromContext(ctx, "RegistrationCache.CacheAccount")
-	span.SetTag("database", "redis cache")
 	defer span.Finish()
 
 	// Log the marshalling of data
@@ -84,7 +90,6 @@ func (r *redisRegistrationCache) CacheAccount(ctx context.Context,
 func (r redisRegistrationCache) GetCachedAccount(ctx context.Context, email string) (CachedAccount, error) {
 	// Start a new span for retrieving the cached account information
 	span, ctx := opentracing.StartSpanFromContext(ctx, "RegistrationCache.GetCachedAccount")
-	span.SetTag("database", "redis cache")
 	defer span.Finish()
 
 	// Log the retrieval of account with the specified email
@@ -105,7 +110,6 @@ func (r redisRegistrationCache) GetCachedAccount(ctx context.Context, email stri
 func (r *redisRegistrationCache) DeleteAccountFromCache(ctx context.Context, email string) error {
 	// Start a new span for deleting the account information from the cache
 	span, ctx := opentracing.StartSpanFromContext(ctx, "RegistrationCache.DeleteAccountFromCache")
-	span.SetTag("database", "redis cache")
 	defer span.Finish()
 
 	// Delete the account information from the Redis cache

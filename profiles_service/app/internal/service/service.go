@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Falokut/grpc_errors"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/model"
@@ -48,11 +49,12 @@ func (s *ProfilesService) GetUserProfile(ctx context.Context,
 	}
 
 	Profile, err := s.repo.GetUserProfile(ctx, accountID)
+	if errors.Is(err, repository.ErrProfileNotFound) {
+		err = s.errorHandler.createExtendedErrorResponce(ErrProfileNotFound, "", ErrProfileNotFound.Error())
+		return nil, err
+	}
 	if err != nil {
 		err = s.errorHandler.createExtendedErrorResponce(ErrInternal, err.Error(), "")
-		return nil, err
-	} else if err == repository.ErrProfileNotFound {
-		err = s.errorHandler.createExtendedErrorResponce(ErrProfileNotFound, "", ErrProfileNotFound.Error())
 		return nil, err
 	}
 
@@ -90,7 +92,7 @@ func (s *ProfilesService) UpdateProfilePicture(ctx context.Context,
 	}
 
 	if err != nil {
-		return nil, s.errorHandler.createErrorResponce(err, "")
+		return nil, err
 	}
 
 	if PictureID != CurrentPictureID {
@@ -105,7 +107,7 @@ func (s *ProfilesService) UpdateProfilePicture(ctx context.Context,
 }
 
 func (s *ProfilesService) GetEmail(ctx context.Context, in *emptypb.Empty) (*profiles_service.GetEmailResponce, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "ProfilesService.GetUserProfile")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "ProfilesService.GetEmail")
 	defer span.Finish()
 	var err error
 	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
@@ -126,6 +128,36 @@ func (s *ProfilesService) GetEmail(ctx context.Context, in *emptypb.Empty) (*pro
 	}
 
 	return &profiles_service.GetEmailResponce{Email: email}, nil
+}
+
+func (s *ProfilesService) CreateProfile(ctx context.Context, in *profiles_service.CreateProfileRequest) (*emptypb.Empty, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "ProfilesService.CreateProfile")
+	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
+
+	err = s.repo.CreateUserProfile(ctx, convertUserProfileModelFromProto(in))
+	if err != nil {
+		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+	}
+	return &emptypb.Empty{}, nil
+}
+func (s *ProfilesService) DeleteProfile(ctx context.Context, in *profiles_service.DeleteProfileRequest) (*emptypb.Empty, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "ProfilesService.DeleteProfile")
+	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
+	err = s.repo.DeleteUserProfile(ctx, in.AccountID)
+	if errors.Is(err, repository.ErrProfileNotFound) {
+		err = s.errorHandler.createExtendedErrorResponce(ErrProfileNotFound, "", ErrProfileNotFound.Error())
+		return nil, err
+	}
+	if err != nil {
+		err = s.errorHandler.createExtendedErrorResponce(ErrInternal, err.Error(), "")
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }
 
 const (
@@ -170,7 +202,7 @@ func (s *ProfilesService) DeleteProfilePicture(ctx context.Context, in *emptypb.
 
 	err = s.imagesService.DeleteImage(ctx, CurrentPictureID)
 	if err != nil {
-		return nil, s.errorHandler.createErrorResponce(err, "")
+		return nil, err
 	}
 
 	err = s.repo.UpdateProfilePictureID(ctx, accountID, "")
@@ -192,6 +224,15 @@ func (s *ProfilesService) convertUserProfileProtoFromModel(ctx context.Context, 
 		Email:             from.Email,
 		ProfilePictureURL: ProfilePictureURL,
 		RegistrationDate:  timestamppb.New(from.RegistrationDate),
+	}
+}
+
+func convertUserProfileModelFromProto(from *profiles_service.CreateProfileRequest) model.UserProfile {
+	return model.UserProfile{
+		AccountID:        from.AccountID,
+		Username:         from.Username,
+		Email:            from.Email,
+		RegistrationDate: from.RegistrationDate.AsTime(),
 	}
 }
 

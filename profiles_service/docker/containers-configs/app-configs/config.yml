@@ -1,4 +1,5 @@
 log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
+healthcheck_port: 7001
 
 listen:
   host: 0.0.0.0
@@ -8,10 +9,10 @@ listen:
     - X-Account-Id
   
 db_config: 
-  host: "accounts_db"
+  host: "profiles_db"
   port: "5432"
   username: "profiles_service"
-  db_name: "accounts_db"
+  db_name: "profiles_db"
   ssl_mode: "disable"
 
 jaeger:
@@ -26,10 +27,14 @@ prometheus:
     port: 7000
 
 image_service:
-  storage_addr: "gateway:81"
+  storage_addr: "gateway:82"
   image_width: 400
   image_height: 400
   image_resize_type: Default
-  image_resize_method: MitchellNetravali
+  image_resize_method: Bilinear
   base_profile_picture_url: "http://localhost:80/image"
   profile_picture_category: "profiles-pictures"
+  max_image_width: 800
+  max_image_height: 800
+  min_image_width: 200
+  min_image_height: 200

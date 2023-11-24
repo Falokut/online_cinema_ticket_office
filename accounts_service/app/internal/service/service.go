@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/jwt"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/metrics"
+	profiles_service "github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/profiles_service/v1/protos"
 	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
 	"github.com/redis/go-redis/v9"
@@ -36,11 +38,13 @@ type AccountService struct {
 	cfg                    *config.Config
 	metrics                metrics.Metrics
 	errorHandler           errorHandler
+	profilesService        profiles_service.ProfilesServiceV1Client
 }
 
 func NewAccountService(repo repository.AccountRepository, logger logging.Logger,
 	redisRepo repository.CacheRepo, emailWriter *kafka.Writer,
-	cfg *config.Config, metrics metrics.Metrics) *AccountService {
+	cfg *config.Config, metrics metrics.Metrics,
+	profilesService profiles_service.ProfilesServiceV1Client) *AccountService {
 
 	errorHandler := newErrorHandler(logger)
 	return &AccountService{repo: repo,
@@ -51,6 +55,7 @@ func NewAccountService(repo repository.AccountRepository, logger logging.Logger,
 		cfg:                    cfg,
 		metrics:                metrics,
 		errorHandler:           errorHandler,
+		profilesService:        profilesService,
 	}
 }
 
@@ -100,6 +105,7 @@ func (s *AccountService) CreateAccount(ctx context.Context,
 }
 
 type emailData struct {
+	Email    string  `json:"email"`
 	URL      string  `json:"url"`
 	MailType string  `json:"mail_type"`
 	LinkTTL  float64 `json:"link_TTL"`
@@ -145,7 +151,7 @@ func (s *AccountService) RequestAccountVerificationToken(ctx context.Context,
 
 	URL := fmt.Sprintf("%s/%s", in.URL, token)
 	LinkTTL := cfg.JWT.VerifyAccountToken.TTL.Seconds()
-	body, err := json.Marshal(emailData{URL: URL, MailType: "account/activation", LinkTTL: LinkTTL})
+	body, err := json.Marshal(emailData{Email: in.Email, URL: URL, MailType: "account/activation", LinkTTL: LinkTTL})
 	if err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
@@ -175,32 +181,57 @@ func (s *AccountService) VerifyAccount(ctx context.Context,
 	if err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInvalidArgument, err.Error())
 	}
+	err = s.createAccountAndProfile(ctx, email)
+	return &emptypb.Empty{}, err
+}
 
+func (s *AccountService) createAccountAndProfile(ctx context.Context, email string) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "AccountService.createAccountAndProfile")
+	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 	s.logger.Info("Checking account existing in cache")
 	acc, err := s.redisRepo.RegistrationCache.GetCachedAccount(ctx, email)
-	if err != nil {
-		s.metrics.IncCacheMiss("VerifyAccount")
-		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+	if errors.Is(err, redis.Nil) {
+		s.metrics.IncCacheMiss("createAccountAndProfile")
+		return s.errorHandler.createErrorResponce(ErrNotFound, err.Error())
 	}
-	s.metrics.IncCacheHits("VerifyAccount")
+	if err != nil {
+		s.metrics.IncCacheMiss("createAccountAndProfile")
+		return s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+	}
+	s.metrics.IncCacheHits("createAccountAndProfile")
 
-	account := model.CreateAccountAndProfile{
+	account := model.Account{
+		Email:            email,
+		Password:         string(acc.Password),
+		RegistrationDate: time.Now().In(time.UTC).In(time.UTC),
+	}
+
+	s.logger.Info("Creating account")
+	tx, accountID, err := s.repo.CreateAccount(ctx, account)
+	if err != nil {
+		return s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+	}
+	defer tx.Rollback()
+	profile := &profiles_service.CreateProfileRequest{
+		AccountID:        accountID,
 		Email:            email,
 		Username:         acc.Username,
-		Password:         string(acc.Password),
-		RegistrationDate: time.Now(),
+		RegistrationDate: timestamppb.New(account.RegistrationDate),
 	}
-
-	s.logger.Info("Creating accound and profile")
-	if err = s.repo.CreateAccountAndProfile(ctx, account); err != nil {
-		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+	_, err = s.profilesService.CreateProfile(ctx, profile)
+	if err != nil {
+		s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
+	tx.Commit()
 
 	//The error is not critical, the data will still be deleted from the cache.
 	if err = s.redisRepo.RegistrationCache.DeleteAccountFromCache(ctx, email); err != nil {
-		s.logger.Warning("Can't delete account from registration cache: ", err.Error())
+		s.logger.Warning("can't delete account from registration cache: ", err.Error())
 	}
-	return &emptypb.Empty{}, nil
+
+	return nil
 }
 
 func (s *AccountService) SignIn(ctx context.Context,
@@ -230,7 +261,7 @@ func (s *AccountService) SignIn(ctx context.Context,
 	s.logger.Info("Caching session")
 	SessionID := uuid.NewString()
 	if err = s.redisRepo.SessionsCache.CacheSession(ctx, model.SessionCache{SessionID: SessionID,
-		AccountID: account.UUID, ClientIP: ClientIP, SessionInfo: in.SessionInfo, LastActivity: time.Now()}); err != nil {
+		AccountID: account.UUID, ClientIP: ClientIP, SessionInfo: in.SessionInfo, LastActivity: time.Now().In(time.UTC)}); err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
 
@@ -264,7 +295,7 @@ func (s *AccountService) GetAccountID(ctx context.Context,
 			"AccountService.GetAccountID.UpdateLastActivityForSession")
 		defer span.Finish()
 
-		err := s.redisRepo.SessionsCache.UpdateLastActivityForSession(ctx, cache, SessionID, time.Now())
+		err := s.redisRepo.SessionsCache.UpdateLastActivityForSession(ctx, cache, SessionID, time.Now().In(time.UTC))
 		if err != nil {
 			s.logger.Warning("Session last activity not updated, error: ", err.Error())
 		}
@@ -321,7 +352,7 @@ func (s *AccountService) RequestChangePasswordToken(ctx context.Context,
 
 	URL := fmt.Sprintf("%s/%s", in.URL, token)
 	LinkTTL := s.cfg.JWT.ChangePasswordToken.TTL.Seconds()
-	body, err := json.Marshal(emailData{URL: URL, MailType: "account/forget-password", LinkTTL: LinkTTL})
+	body, err := json.Marshal(emailData{Email: in.Email, URL: URL, MailType: "account/forget-password", LinkTTL: LinkTTL})
 	if err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
@@ -458,10 +489,16 @@ func (s *AccountService) DeleteAccount(ctx context.Context,
 		return nil, err
 	}
 
-	err = s.repo.DeleteAccount(ctx, cache.AccountID)
+	tx, err := s.repo.DeleteAccount(ctx, cache.AccountID)
 	if err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
+	defer tx.Rollback()
+	_, err = s.profilesService.DeleteProfile(ctx, &profiles_service.DeleteProfileRequest{AccountID: cache.AccountID})
+	if err != nil {
+		return nil, err
+	}
+	tx.Commit()
 
 	return &emptypb.Empty{}, nil
 }

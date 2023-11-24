@@ -1,5 +1,7 @@
 log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
 sessions_ttl: 336h
+profiles_service_addr: "gateway:82"
+healthcheck_port: "7001"
 
 listen:
   host: 0.0.0.0

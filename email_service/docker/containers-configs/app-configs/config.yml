@@ -1,21 +1,21 @@
 log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
-max_workers_count: 10
 
 mail_sender:
-  email_port: 465                                 
+  email_port: 465
   email_host: "smtp.yandex.ru"
   email_address: "CinemaParadise@yandex.ru"
   email_login: "CinemaParadise"
   enable_TLS: false
   templates_origin: "templates"
 mail_worker:
-  mail_types: 
+  max_mail_workers_count: 3
+  mail_types:
     - "account/activation"
     - "account/forget-password"
   mail_subjects_by_type:
     "account/activation": "ActivateAccount"
     "account/forget-password": "Forget password?"
-  templates_names: 
+  templates_names:
     "account/activation": "accountActivation.html"
     "account/forget-password": "forgetPassword.html"
 
@@ -25,6 +25,4 @@ kafka_config:
   group_id: "email_senders"
   topic: "emails"
   max_bytes: 10e6
-  queque_capacity: 100
-    
-
+  queque_capacity: 1

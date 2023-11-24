@@ -37,18 +37,3 @@ swagger-doc-gen:
 
 .swagger:	swagger-clear	create-swagger-dir	swagger-doc-gen	
 .protoc:	protoc-clear	protoc-gen	gateway-gen	.swagger
-
-gen-cert:
-	call app/cert/gen.cmd
-
-server:
-	go run app/cmd/server/app.go
-
-.docker-build:
-	docker build -t $(project_name) .
-
-.docker-compose:
-	docker-compose -f $(project_name).yml -p $(project_name) up --build $(project_name)
-	
-.docker-compose-up:
-	docker-compose -f $(project_name).yml up $(project_name)

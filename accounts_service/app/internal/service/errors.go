@@ -29,6 +29,7 @@ var (
 var errorCodes = map[error]codes.Code{
 	redis.Nil:                  codes.NotFound,
 	ErrNotFound:                codes.NotFound,
+	ErrInvalidArgument:         codes.InvalidArgument,
 	ErrNoCtxMetaData:           codes.Unauthenticated,
 	ErrInvalidSessionId:        codes.Unauthenticated,
 	ErrSessisonNotFound:        codes.Unauthenticated,

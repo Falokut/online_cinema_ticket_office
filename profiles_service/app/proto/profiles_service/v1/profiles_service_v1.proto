@@ -152,4 +152,7 @@ service profilesServiceV1 {
             };
         };
     }
+
+    rpc CreateProfile(CreateProfileRequest) returns (google.protobuf.Empty){}
+    rpc DeleteProfile(DeleteProfileRequest) returns (google.protobuf.Empty){}
 }

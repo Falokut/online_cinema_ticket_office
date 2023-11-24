@@ -12,7 +12,12 @@ swagger-doc-gen:
 .swagger:	create-swagger-dir	swagger-doc-gen	
 
 .docker-compose:
-	docker-compose -f $(project_name).yml -p $(project_name) up --build $(project_name)
-	
+	docker-compose --parallel -1 -f $(project_name).yml -p $(project_name) up --build $(project_name) -d --remove-orphans
+
 .docker-compose-up:
-	docker-compose -f $(project_name).yml up $(project_name)
+	docker-compose --parallel -f $(project_name).yml up $(project_name) -d
+
+.clear-images:
+	docker image prune -f
+
+.run:	.docker-compose		.clear-images

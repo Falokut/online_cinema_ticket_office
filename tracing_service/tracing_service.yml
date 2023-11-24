@@ -7,7 +7,6 @@ networks:
 
 services:
   prometheus:
-    container_name: prometheus_container
     image: prom/prometheus
     hostname: prometheus
     volumes:
@@ -25,11 +24,11 @@ services:
       - tracing_network
     depends_on:
       - node_exporter
+      - cadvisor
     labels:
       org.label-schema.group: "monitoring"
 
   jaeger:
-    container_name: jaeger_container
     image: jaegertracing/all-in-one:1.21
     hostname: jaeger
     environment:
@@ -63,12 +62,23 @@ services:
       - 9100
     networks:
       - tracing_network
-    # network_mode: host
     labels:
       org.label-schema.group: "monitoring"
-
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+    - 8080:8080
+    networks:
+      - tracing_network
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+    labels:
+      org.label-schema.group: "monitoring"
   grafana:
-    container_name: grafana_container
     image: grafana/grafana
     restart: unless-stopped
     environment:

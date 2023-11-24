@@ -11,7 +11,7 @@ type Account struct {
 	RegistrationDate time.Time `db:"registration_date"`
 }
 
-type CreateAccountAndProfile struct {
+type UserProfile struct {
 	Username         string    `db:"username"`
 	Email            string    `db:"email"`
 	Password         string    `db:"password_hash"`

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/model"
@@ -30,8 +31,10 @@ func (r *postgreRepository) GetUserProfile(ctx context.Context, AccountID string
 	query := fmt.Sprintf("SELECT username, email, profile_picture_id, registration_date FROM %s WHERE account_id=$1 LIMIT 1;",
 		profilesTableName)
 	var Profile model.UserProfile
-	err := r.db.Get(&Profile, query, AccountID)
-
+	err := r.db.GetContext(ctx, &Profile, query, AccountID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return model.UserProfile{}, ErrProfileNotFound
+	}
 	return Profile, err
 }
 
@@ -42,7 +45,7 @@ func (r *postgreRepository) UpdateProfilePictureID(ctx context.Context, AccountI
 	query := fmt.Sprintf("UPDATE %s SET profile_picture_id=$1 WHERE account_id=$2;",
 		profilesTableName)
 
-	_, err := r.db.Exec(query, PictureID, AccountID)
+	_, err := r.db.ExecContext(ctx, query, PictureID, AccountID)
 	return err
 }
 
@@ -54,7 +57,7 @@ func (r *postgreRepository) GetProfilePictureID(ctx context.Context, AccountID s
 		profilesTableName)
 
 	var PictureID []sql.NullString
-	err := r.db.Select(&PictureID, query, AccountID)
+	err := r.db.SelectContext(ctx, &PictureID, query, AccountID)
 	if err != nil {
 		return "", err
 	}
@@ -73,7 +76,7 @@ func (r *postgreRepository) GetEmail(ctx context.Context, AccountID string) (str
 		profilesTableName)
 
 	var Email []sql.NullString
-	err := r.db.Select(&Email, query, AccountID)
+	err := r.db.SelectContext(ctx, &Email, query, AccountID)
 	if err != nil {
 		return "", err
 	}
@@ -83,6 +86,29 @@ func (r *postgreRepository) GetEmail(ctx context.Context, AccountID string) (str
 	}
 
 	return Email[0].String, nil
+}
+
+func (r *postgreRepository) CreateUserProfile(ctx context.Context, profile model.UserProfile) error {
+	span, _ := opentracing.StartSpanFromContext(ctx,
+		"PostgreRepository.CreateUserProfile")
+	defer span.Finish()
+	query := fmt.Sprintf("INSERT INTO %s (account_id, email, username, registration_date) VALUES ($1, $2, $3, $4)",
+		profilesTableName)
+
+	_, err := r.db.QueryContext(ctx, query, profile.AccountID, profile.Email, profile.Username, profile.RegistrationDate)
+	return err
+}
+
+func (r *postgreRepository) DeleteUserProfile(ctx context.Context, AccountID string) error {
+	span, _ := opentracing.StartSpanFromContext(ctx,
+		"PostgreRepository.DeleteUserProfile")
+	defer span.Finish()
+	query := fmt.Sprintf("DELETE FROM %s WHERE account_id=$1", profilesTableName)
+	_, err := r.db.ExecContext(ctx, query, AccountID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return ErrProfileNotFound
+	}
+	return err
 }
 
 func (r *postgreRepository) Shutdown() error {
