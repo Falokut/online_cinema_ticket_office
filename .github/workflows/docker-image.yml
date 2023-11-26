@@ -1,0 +1,159 @@
+name: Build and Publish Docker Images
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  check:
+    name: Check changed files
+    outputs:
+      accounts_service: ${{ steps.check_files.outputs.accounts_service }}
+      profiles_service: ${{ steps.check_files.outputs.profiles_service }}
+      email_service: ${{ steps.check_files.outputs.email_service }}
+      images_storage_service: ${{ steps.check_files.outputs.images_storage_service }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: check modified files
+        id: check_files
+        run: |
+            echo "=============== list modified files ==============="
+            git diff --name-only HEAD^ HEAD
+
+            echo "========== check paths of modified files =========="
+            git diff --name-only HEAD^ HEAD > files.txt
+            while IFS= read -r file; do
+              echo $file
+              if [[ $file == accounts_service/app/* ]]; then
+                echo "::set-output name=accounts_service::true"
+              elif [[ $file == profiles_service/app/* ]]; then
+                echo "::set-output name=profiles_service::true"
+              elif [[ $file == email_service/app/* ]]; then
+                echo "::set-output name=email_service::true"
+              elif [[ $file == images_storage_service/app/* ]]; then
+                echo "::set-output name=images_storage_service::true"
+              else
+                echo "file does not belong to any service"
+              fi
+            done < files.txt
+
+  accounts_service:
+    needs: check
+    if: needs.check.outputs.accounts_service == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: falokut/online_cinema_ticket_office.accounts_service
+          
+      - name: Build and push Docker image
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: .
+          file: ./accounts_service/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+   
+  profiles_service:
+      needs: check
+      if: needs.check.outputs.profiles_service == 'true'
+      runs-on: ubuntu-latest
+      steps:
+        - name: Check out the repo
+          uses: actions/checkout@v4
+        
+        - name: Log in to Docker Hub
+          uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+        
+        - name: Extract metadata (tags, labels) for Docker
+          id: meta
+          uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+          with:
+            images: falokut/online_cinema_ticket_office.profiles_service
+            
+        - name: Build and push Docker image
+          uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+          with:
+            context: .
+            file: ./profiles_service/Dockerfile
+            push: true
+            tags: ${{ steps.meta.outputs.tags }}
+            labels: ${{ steps.meta.outputs.labels }}
+          
+  email_service:
+      needs: check
+      if: needs.check.outputs.email_service == 'true'
+      runs-on: ubuntu-latest
+      steps:
+        - name: Check out the repo
+          uses: actions/checkout@v4
+        
+        - name: Log in to Docker Hub
+          uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+        
+        - name: Extract metadata (tags, labels) for Docker
+          id: meta
+          uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+          with:
+            images: falokut/online_cinema_ticket_office.email_service
+            
+        - name: Build and push Docker image
+          uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+          with:
+            context: .
+            file: ./email_service/Dockerfile
+            push: true
+            tags: ${{ steps.meta.outputs.tags }}
+            labels: ${{ steps.meta.outputs.labels }}
+
+  images_storage_service:
+      needs: check
+      if: needs.check.outputs.images_storage_service == 'true'
+      runs-on: ubuntu-latest
+      steps:
+        - name: Check out the repo
+          uses: actions/checkout@v4
+        
+        - name: Log in to Docker Hub
+          uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+        
+        - name: Extract metadata (tags, labels) for Docker
+          id: meta
+          uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+          with:
+            images: falokut/online_cinema_ticket_office.images_storage_service
+            
+        - name: Build and push Docker image
+          uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+          with:
+            context: .
+            file: ./images_storage_service/Dockerfile
+            push: true
+            tags: ${{ steps.meta.outputs.tags }}
+            labels: ${{ steps.meta.outputs.labels }}
