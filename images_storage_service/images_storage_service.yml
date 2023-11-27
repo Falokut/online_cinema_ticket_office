@@ -6,11 +6,10 @@ networks:
 
 services:
    images_storage_service:
-      hostname: images_storage_service
       build: ./
       command: ./bin/app
       # ports:
-      #    - 8011:8080
+      #    - 8080
       networks:
          - images_storage_network
          - tracing_network
@@ -30,10 +29,7 @@ services:
          replicas: 3
          endpoint_mode: dnsrr
          restart_policy:
-            condition: on-failure
-            delay: 5s
-            max_attempts: 3
-            window: 120s
+          condition: unless-stopped
       labels:
          servicename: "images_storage_service"
          org.label-schema.group: "monitoring"

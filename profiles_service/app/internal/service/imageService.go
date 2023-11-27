@@ -6,7 +6,7 @@ import (
 	"runtime"
 
 	"github.com/Falokut/grpc_errors"
-	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/images_resizer"
+	image_processing_service "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/image_processing_service/v1/protos"
 	image_storage_service "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/images_storage_service/v1/protos"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/logging"
 	"github.com/opentracing/opentracing-go"
@@ -21,48 +21,38 @@ type ImagesService interface {
 }
 
 type ImageServiceConfig struct {
-	ImageWidth        uint
-	ImageHeight       uint
-	ImageResizeType   images_resizer.ImageResizeType
-	ImageResizeMethod images_resizer.ResizeMethod
+	ImageWidth        int32
+	ImageHeight       int32
+	ImageResizeMethod image_processing_service.ResampleFilter
 
 	BaseProfilePictureUrl  string
 	ProfilePictureCategory string
 
-	MaxImageWidth  uint
-	MaxImageHeight uint
-	MinImageWidth  uint
-	MinImageHeight uint
+	AllowedTypes   []string
+	MaxImageWidth  int32
+	MaxImageHeight int32
+	MinImageWidth  int32
+	MinImageHeight int32
 }
 
 type imageService struct {
-	cfg                 ImageServiceConfig
-	logger              logging.Logger
-	imageStorageService image_storage_service.ImagesStorageServiceV1Client
-	errorHandler        errorHandler
-
-	resizeConfig images_resizer.ResizeParams
+	cfg                    ImageServiceConfig
+	logger                 logging.Logger
+	imageStorageService    image_storage_service.ImagesStorageServiceV1Client
+	imageProcessingService image_processing_service.ImageProcessingServiceV1Client
+	errorHandler           errorHandler
 }
 
 func NewImageService(cfg ImageServiceConfig, logger logging.Logger,
-	imageStorageService image_storage_service.ImagesStorageServiceV1Client) *imageService {
+	imageStorageService image_storage_service.ImagesStorageServiceV1Client,
+	imageProcessingService image_processing_service.ImageProcessingServiceV1Client) *imageService {
 	errorHandler := newErrorHandler(logger.Logger)
-	resizeConfig := images_resizer.ResizeParams{
-		Width:      cfg.ImageWidth,
-		Height:     cfg.ImageHeight,
-		ResizeType: cfg.ImageResizeType,
-		Method:     cfg.ImageResizeMethod,
-		MaxWidth:   cfg.ImageWidth,
-		MaxHeight:  cfg.MaxImageHeight,
-		MinWidth:   cfg.MinImageWidth,
-		MinHeight:  cfg.MinImageHeight,
-	}
 	return &imageService{
-		cfg:                 cfg,
-		logger:              logger,
-		imageStorageService: imageStorageService,
-		errorHandler:        errorHandler,
-		resizeConfig:        resizeConfig,
+		cfg:                    cfg,
+		logger:                 logger,
+		imageStorageService:    imageStorageService,
+		errorHandler:           errorHandler,
+		imageProcessingService: imageProcessingService,
 	}
 }
 
@@ -98,25 +88,59 @@ func (s *imageService) GetProfilePictureUrl(ctx context.Context, PictureID strin
 	return u.String()
 }
 
+// returns error if image not valid
+func (s *imageService) checkImage(ctx context.Context, image []byte) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx,
+		"ImagesService.checkImage")
+	defer span.Finish()
+	var err error
+	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
+
+	img := &image_processing_service.Image{Image: image}
+	res, err := s.imageProcessingService.Validate(ctx, &image_processing_service.ValidateRequest{
+		Image:          img,
+		SupportedTypes: s.cfg.AllowedTypes,
+		MaxWidth:       &s.cfg.MaxImageWidth,
+		MaxHeight:      &s.cfg.MaxImageHeight,
+		MinHeight:      &s.cfg.MinImageHeight,
+		MinWidth:       &s.cfg.MinImageWidth,
+	})
+
+	if err != nil {
+		err = s.errorHandler.createExtendedErrorResponce(ErrInvalidImage, err.Error(), res.GetDetails())
+		return err
+	}
+	if !res.ImageValid {
+		err = s.errorHandler.createExtendedErrorResponce(ErrInvalidImage, "", res.GetDetails())
+		return err
+	}
+
+	return nil
+}
 func (s *imageService) ResizeImage(ctx context.Context, image []byte) ([]byte, error) {
-	span, _ := opentracing.StartSpanFromContext(ctx,
+	span, ctx := opentracing.StartSpanFromContext(ctx,
 		"ImagesService.ResizeImage")
 	defer span.Finish()
 	var err error
 	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
-	s.logger.Info("Resizing image")
-	resized, err := images_resizer.ResizeImage(image, s.resizeConfig)
-	switch err {
-	case images_resizer.ErrImageTooSmall:
-		return []byte{}, s.errorHandler.createExtendedErrorResponce(ErrImageTooSmall, "", err.Error())
-	case images_resizer.ErrImageTooLarge:
-		return []byte{}, s.errorHandler.createExtendedErrorResponce(ErrImageTooSmall, "", err.Error())
-	}
+	resized, err := s.imageProcessingService.Resize(ctx, &image_processing_service.ResizeRequest{
+		Image:          &image_processing_service.Image{Image: image},
+		ResampleFilter: s.cfg.ImageResizeMethod,
+		Width:          s.cfg.ImageWidth,
+		Height:         s.cfg.ImageHeight,
+	})
+
 	if err != nil {
-		return []byte{}, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		err = s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		return []byte{}, err
 	}
-	return resized, nil
+	if resized == nil {
+		err = s.errorHandler.createErrorResponce(ErrInternal, "can't resize image")
+		return []byte{}, err
+	}
+
+	return resized.Data, nil
 }
 
 func (s *imageService) UploadImage(ctx context.Context, image []byte) (string, error) {
@@ -126,19 +150,23 @@ func (s *imageService) UploadImage(ctx context.Context, image []byte) (string, e
 	var err error
 	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
-	uncompressedSize := len(image)
+	if err = s.checkImage(ctx, image); err != nil {
+		return "", err
+	}
+	imageSizeWithoutResize := len(image)
 	s.logger.Info("Resizing image")
 	image, err = s.ResizeImage(ctx, image)
 	if err != nil {
 		return "", err
 	}
 
-	s.logger.Debugf("image size before resizing: %d resized: %d", uncompressedSize, len(image))
+	s.logger.Debugf("image size before resizing: %d resized: %d", imageSizeWithoutResize, len(image))
 
 	s.logger.Info("Creating stream")
 	stream, err := s.imageStorageService.StreamingUploadImage(ctx)
 	if err != nil {
-		return "", s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		err = s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		return "", err
 	}
 
 	chunkSize := (len(image) + runtime.NumCPU() - 1) / runtime.NumCPU()
@@ -156,14 +184,16 @@ func (s *imageService) UploadImage(ctx context.Context, image []byte) (string, e
 			Data:     chunk,
 		})
 		if err != nil {
-			return "", s.errorHandler.createErrorResponce(ErrInternal, err.Error()+"error while sending streaming message")
+			err = s.errorHandler.createErrorResponce(ErrInternal, err.Error()+"error while sending streaming message")
+			return "", err
 		}
 	}
 
 	s.logger.Info("Closing stream")
 	res, err := stream.CloseAndRecv()
 	if err != nil {
-		return "", s.errorHandler.createErrorResponce(ErrInternal, err.Error()+"error while sending close")
+		err = s.errorHandler.createErrorResponce(ErrInternal, err.Error()+"error while sending close")
+		return "", err
 	}
 	return res.ImageId, nil
 }
@@ -181,7 +211,8 @@ func (s *imageService) DeleteImage(ctx context.Context, PictureID string) error 
 		ImageId:  PictureID,
 	})
 	if err != nil {
-		return s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		err = s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		return err
 	}
 	return nil
 }
@@ -194,6 +225,10 @@ func (s *imageService) ReplaceImage(ctx context.Context, image []byte,
 	var err error
 	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
+	if err = s.checkImage(ctx, image); err != nil {
+		return "", err
+	}
+
 	uncompressedSize := len(image)
 	s.logger.Info("Compressing image")
 	image, err = s.ResizeImage(ctx, image)
@@ -202,7 +237,7 @@ func (s *imageService) ReplaceImage(ctx context.Context, image []byte,
 	}
 	s.logger.Debugf("image size before resizing: %d resized: %d", uncompressedSize, len(image))
 
-	res, err := s.imageStorageService.ReplaceImage(ctx,
+	resp, err := s.imageStorageService.ReplaceImage(ctx,
 		&image_storage_service.ReplaceImageRequest{
 			Category:         s.cfg.ProfilePictureCategory,
 			ImageId:          PictureID,
@@ -210,7 +245,8 @@ func (s *imageService) ReplaceImage(ctx context.Context, image []byte,
 			CreateIfNotExist: createIfNotExist,
 		})
 	if err != nil {
-		return "", s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		err = s.errorHandler.createErrorResponce(ErrInternal, err.Error())
+		return "", err
 	}
-	return res.ImageId, nil
+	return resp.ImageId, nil
 }

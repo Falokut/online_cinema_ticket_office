@@ -5,15 +5,15 @@ import (
 	"errors"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	server "github.com/Falokut/grpc_rest_server"
 	"github.com/Falokut/healthcheck"
-
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/config"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/repository"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/service"
-	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/images_resizer"
+	image_processing_service "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/image_processing_service/v1/protos"
 	image_storage_service "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/images_storage_service/v1/protos"
 	jaegerTracer "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/jaeger"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/logging"
@@ -31,7 +31,6 @@ import (
 func main() {
 	logging.NewEntry(logging.FileAndConsoleOutput)
 	logger := logging.GetLogger()
-
 	appCfg := config.GetConfig()
 	log_level, err := logrus.ParseLevel(appCfg.LogLevel)
 	if err != nil {
@@ -76,7 +75,15 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
+
 	imageStorageService := image_storage_service.NewImagesStorageServiceV1Client(conn)
+
+	conn, err = getImageProcessingServiceConnection(appCfg)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	imageProcessingService := image_processing_service.NewImageProcessingServiceV1Client(conn)
 	logger.Info("Healthcheck initializing")
 	healthcheckManager := healthcheck.NewHealthManager(logger.Logger,
 		[]healthcheck.HealthcheckResource{database}, appCfg.HealthcheckPort, nil)
@@ -86,11 +93,11 @@ func main() {
 			logger.Fatalf("Shutting down, can't run healthcheck endpoint %s", err.Error())
 		}
 	}()
-	logger.Info("Service initializing")
-	images_resizer.SetLogger(logging.GetLogger().Logger)
-	imagesService := service.NewImageService(getImageStorageConfig(appCfg),
-		logger, imageStorageService)
 
+	imagesService := service.NewImageService(getImageServiceConfig(appCfg),
+		logger, imageStorageService, imageProcessingService)
+
+	logger.Info("Service initializing")
 	service := service.NewProfilesService(repo, logger.Logger, metric, imagesService)
 
 	logger.Info("Server initializing")
@@ -104,7 +111,7 @@ func main() {
 	s.Shutdown()
 }
 func getImageStorageConnection(cfg *config.Config) (*grpc.ClientConn, error) {
-	return grpc.Dial(cfg.ImageService.StorageAddr,
+	return grpc.Dial(cfg.ImageStorageService.StorageAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(
 			otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
@@ -112,19 +119,27 @@ func getImageStorageConnection(cfg *config.Config) (*grpc.ClientConn, error) {
 			otgrpc.OpenTracingStreamClientInterceptor(opentracing.GlobalTracer())),
 	)
 }
-
-func getImageStorageConfig(cfg *config.Config) service.ImageServiceConfig {
+func getImageProcessingServiceConnection(cfg *config.Config) (*grpc.ClientConn, error) {
+	return grpc.Dial(cfg.ImageProcessingService.Addr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(
+			otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
+		grpc.WithStreamInterceptor(
+			otgrpc.OpenTracingStreamClientInterceptor(opentracing.GlobalTracer())),
+	)
+}
+func getImageServiceConfig(cfg *config.Config) service.ImageServiceConfig {
 	return service.ImageServiceConfig{
-		ImageWidth:             cfg.ImageService.ImageWidth,
-		ImageHeight:            cfg.ImageService.ImageHeight,
-		ImageResizeType:        cfg.ImageService.ImageResizeType,
-		ImageResizeMethod:      images_resizer.ResolveResizeMethod(cfg.ImageService.ImageResizeMethod),
-		BaseProfilePictureUrl:  cfg.ImageService.BaseProfilePictureUrl,
-		ProfilePictureCategory: cfg.ImageService.ProfilePictureCategory,
-		MaxImageWidth:          cfg.ImageService.MaxImageWidth,
-		MaxImageHeight:         cfg.ImageService.MaxImageHeight,
-		MinImageWidth:          cfg.ImageService.MinImageWidth,
-		MinImageHeight:         cfg.ImageService.MinImageHeight,
+		ImageWidth:             cfg.ImageProcessingService.ProfilePictureWidth,
+		ImageHeight:            cfg.ImageProcessingService.ProfilePictureHeight,
+		ImageResizeMethod:      ConvertResizeType(cfg.ImageProcessingService.ImageResizeMethod),
+		BaseProfilePictureUrl:  cfg.ImageStorageService.BaseProfilePictureUrl,
+		ProfilePictureCategory: cfg.ImageStorageService.ProfilePictureCategory,
+		AllowedTypes:           cfg.ImageProcessingService.AllowedTypes,
+		MaxImageWidth:          cfg.ImageProcessingService.MaxImageWidth,
+		MaxImageHeight:         cfg.ImageProcessingService.MaxImageHeight,
+		MinImageWidth:          cfg.ImageProcessingService.MinImageWidth,
+		MinImageHeight:         cfg.ImageProcessingService.MinImageHeight,
 	}
 }
 
@@ -143,5 +158,23 @@ func getListenServerConfig(cfg *config.Config) server.Config {
 			return profiles_service.RegisterProfilesServiceV1HandlerServer(context.Background(),
 				mux, serv)
 		},
+	}
+}
+
+func ConvertResizeType(Type string) image_processing_service.ResampleFilter {
+	Type = strings.ToTitle(Type)
+	switch Type {
+	case "Box":
+		return image_processing_service.ResampleFilter_Box
+	case "CatmullRom":
+		return image_processing_service.ResampleFilter_CatmullRom
+	case "Lanczos":
+		return image_processing_service.ResampleFilter_Lanczos
+	case "Linear":
+		return image_processing_service.ResampleFilter_Linear
+	case "MitchellNetravali":
+		return image_processing_service.ResampleFilter_MitchellNetravali
+	default:
+		return image_processing_service.ResampleFilter_NearestNeighbor
 	}
 }

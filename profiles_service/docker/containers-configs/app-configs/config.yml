@@ -26,15 +26,19 @@ prometheus:
     host: 0.0.0.0
     port: 7000
 
-image_service:
+image_storage_service:
   storage_addr: "gateway:82"
-  image_width: 400
-  image_height: 400
-  image_resize_type: Default
-  image_resize_method: Bilinear
   base_profile_picture_url: "http://localhost:80/image"
   profile_picture_category: "profiles-pictures"
+
+
+image_processing_service:
+  addr: "gateway:82"
   max_image_width: 800
   max_image_height: 800
   min_image_width: 200
   min_image_height: 200
+  profile_picture_width: 400
+  profile_picture_height: 400
+  image_resize_method: Linear
+  allowed_types: ["image/png", "image/jpeg"]

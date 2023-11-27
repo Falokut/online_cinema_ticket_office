@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/repository"
-	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/images_resizer"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/jaeger"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/metrics"
@@ -26,20 +25,22 @@ type Config struct {
 		ServerConfig metrics.MetricsServerConfig `yaml:"server_config"`
 	} `yaml:"prometheus"`
 
-	ImageService struct {
-		StorageAddr            string                         `yaml:"storage_addr" env:"IMAGE_STORAGE_ADDRESS"`
-		ImageResizeType        images_resizer.ImageResizeType `yaml:"image_resize_type" env:"IMAGE RESIZE_TYPE"`
-		ImageResizeMethod      string                         `yaml:"image_resize_method" env:"IMAGE_RESIZE_METHOD"`
-		BaseProfilePictureUrl  string                         `yaml:"base_profile_picture_url" env:"BASE_PROFILE_PICTURE_URL"`
-		ProfilePictureCategory string                         `yaml:"profile_picture_category" env:"PROFILE_PICTURE_CATEGORY"`
-
-		ImageWidth     uint `yaml:"image_width" env:"IMAGE_WIDTH"`
-		ImageHeight    uint `yaml:"image_height" env:"IMAGE_HEIGHT"`
-		MaxImageWidth  uint `yaml:"max_image_width" env:"MAX_IMAGE_WIDTH"`
-		MaxImageHeight uint `yaml:"max_image_height" env:"MAX_IMAGE_HEIGHT"`
-		MinImageWidth  uint `yaml:"min_image_width" env:"MIN_IMAGE_WIDTH"`
-		MinImageHeight uint `yaml:"min_image_height" env:"MIN_IMAGE_HEIGHT"`
-	} `yaml:"image_service"`
+	ImageStorageService struct {
+		StorageAddr            string `yaml:"storage_addr" env:"IMAGE_STORAGE_ADDRESS"`
+		BaseProfilePictureUrl  string `yaml:"base_profile_picture_url" env:"BASE_PROFILE_PICTURE_URL"`
+		ProfilePictureCategory string `yaml:"profile_picture_category" env:"PROFILE_PICTURE_CATEGORY"`
+	} `yaml:"image_storage_service"`
+	ImageProcessingService struct {
+		Addr                 string   `yaml:"addr" env:"IMAGE_PROCESSING_ADDRESS"`
+		ImageResizeMethod    string   `yaml:"resize_type" env:"RESIZE_TYPE"`
+		ProfilePictureHeight int32    `yaml:"profile_picture_height" env:"PROFILE_PICTURE_HEIGHT"`
+		ProfilePictureWidth  int32    `yaml:"profile_picture_width" env:"PROFILE_PICTURE_WIDTH"`
+		AllowedTypes         []string `yaml:"allowed_types"`
+		MaxImageWidth        int32    `yaml:"max_image_width" env:"MAX_IMAGE_WIDTH"`
+		MaxImageHeight       int32    `yaml:"max_image_height" env:"MAX_IMAGE_HEIGHT"`
+		MinImageWidth        int32    `yaml:"min_image_width" env:"MIN_IMAGE_WIDTH"`
+		MinImageHeight       int32    `yaml:"min_image_height" env:"MIN_IMAGE_HEIGHT"`
+	} `yaml:"image_processing_service"`
 
 	DBConfig     repository.DBConfig `yaml:"db_config"`
 	JaegerConfig jaeger.Config       `yaml:"jaeger"`

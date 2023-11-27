@@ -11,6 +11,7 @@ include:
   - profiles_service/profiles_service.yml
   - email_service/email_service.yml
   - images_storage_service/images_storage_service.yml
+  - image_processing_service/image_processing_service.yml
 
   #-----------------brokers-----------------
   - kafka-cluster/kafka-cluster.yml
@@ -31,9 +32,13 @@ services:
       - profiles_service_network
       - accounts_service_network
       - images_storage_network
+      - image_processing_service_network
       - gateway_network
     volumes:
       - .nginx/configs/:/etc/nginx/
+    deploy:
+      restart_policy:
+          condition: unless-stopped
     depends_on:
       #-----------------services-----------------
       accounts_service:
@@ -43,6 +48,8 @@ services:
       email_service:
         condition: service_started
       images_storage_service:
+        condition: service_started
+      image_processing_service:
         condition: service_started
       #------------------------------------------
       profiles_db:

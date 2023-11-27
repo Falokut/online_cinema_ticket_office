@@ -1,21 +1,12 @@
-project_name = gateway
+project_name = online_cinema_ticket_office
+service_to_up = gateway
 api_version = v1
-
-swagger-docs-dir = swagger/docs
-		
-create-swagger-dir:
-	IF NOT EXIST "$(swagger-docs-dir)" ( MD "$(swagger-docs-dir)" )
-
-swagger-doc-gen:
-	echo("Hello")
-
-.swagger:	create-swagger-dir	swagger-doc-gen	
-
+	
 .docker-compose:
-	docker-compose --parallel -1 -f $(project_name).yml -p $(project_name) up --build $(project_name) -d --remove-orphans
+	docker-compose --parallel -1 -f $(service_to_up).yml -p $(project_name) up --build $(service_to_up) -d --remove-orphans
 
 .docker-compose-up:
-	docker-compose --parallel -f $(project_name).yml up $(project_name) -d
+	docker-compose --parallel -1 -f $(service_to_up).yml up $(service_to_up) -d
 
 .clear-images:
 	docker image prune -f

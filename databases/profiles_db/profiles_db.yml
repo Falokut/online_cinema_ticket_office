@@ -8,7 +8,6 @@ services:
   profiles_db:
     restart: unless-stopped
     image: postgres:16.0-alpine3.18
-    hostname: profiles_db
     volumes:
       - ./.container_data/database/postgres/data:/var/lib/postgresql/data
       - ./db/init-up.sql:/docker-entrypoint-initdb.d/init.up.sql
@@ -27,4 +26,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+    deploy:
+      restart_policy:
+          condition: unless-stopped

@@ -10,6 +10,7 @@
 # ignore volumes
 **/.container_data/
 **/container_logs/
+**/.nginx/configs/cache/
 
 # ignore all vscode-settings
 **/.vscode

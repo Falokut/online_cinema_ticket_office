@@ -93,7 +93,9 @@ Sure! Here are the additional instructions for Windows and macOS:
 # Services
    + [Accounts service](/accounts_service/README.md)
    + [Profiles service](/profiles_service/README.md)
-   + [Images storage service](/images_storage_service/README.md)
+   + [Images storage service](/images_storage_service/README.md)  
+   + [Image processing service](https://github.com/Falokut/image_processing_service)
+   
 # Endpoints  
 * Grafana endpoint  http://localhost:3000  
 * Prometheus endpoint  http://localhost:9090

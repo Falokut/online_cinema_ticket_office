@@ -37,3 +37,10 @@ scrape_configs:
           - images_storage_service
         type: A
         port: 7000
+
+  - job_name: images_processing_service
+    dns_sd_configs:
+      - names:
+          - images_processing_service
+        type: A
+        port: 7000

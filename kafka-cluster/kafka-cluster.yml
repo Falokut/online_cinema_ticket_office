@@ -8,17 +8,13 @@ networks:
 services:
   zookeeper:
     image: wurstmeister/zookeeper
-    container_name: zookeeper
     ports:
       - 2181:2181
     networks:
       - kafka_network
     deploy:
       restart_policy:
-          condition: on-failure
-          delay: 5s
-          max_attempts: 3
-          window: 120s
+          condition: unless-stopped
     healthcheck:
       test: nc -z localhost 2181 || exit -1
       interval: 10s
@@ -28,13 +24,12 @@ services:
 
   kafka:
     image: wurstmeister/kafka
-    hostname: kafka
     ports:
       - 29092:29092
     networks:
       - kafka_network
     volumes:
-      - .container_data/kafka/:/kafka
+      - ./.container_data/kafka/:/kafka
     environment:
       KAFKA_BROKER_ID: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
@@ -61,16 +56,13 @@ services:
       start_period: 10s
     deploy:
       restart_policy:
-          condition: on-failure
-          delay: 5s
-          max_attempts: 3
-          window: 120s
+          condition: unless-stopped
 
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
     volumes:
-      - .containers-data/kafka-ui/:/etc/kafkaui
+      - ./.container_data/kafka-ui/:/etc/kafkaui
     ports:
       - 18082:8080
     networks:

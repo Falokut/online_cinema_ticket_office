@@ -10,7 +10,6 @@ networks:
 
 services:
   profiles_service:
-    hostname: profiles_service
     build: ./
     command: ./bin/app
     environment:
@@ -18,7 +17,7 @@ services:
     volumes:
       - ./docker/containers-configs/app-configs/config.yml:/configs/config.yml
     # ports:
-    #- 8005:8080
+    # - 8080
     networks:
       - profiles_service_network
       - profiles_db_network

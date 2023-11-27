@@ -17,8 +17,7 @@ var (
 	ErrInternal                 = errors.New("internal")
 	ErrNoCtxMetaData            = errors.New("no context metadata")
 	ErrInvalidAccountId         = errors.New("invalid account id")
-	ErrImageTooLarge            = errors.New("image too large")
-	ErrImageTooSmall            = errors.New("image too small")
+	ErrInvalidImage             = errors.New("invalid image")
 )
 
 var errorCodes = map[error]codes.Code{
@@ -27,8 +26,7 @@ var errorCodes = map[error]codes.Code{
 	ErrInvalidAccountId:         codes.Unauthenticated,
 	ErrCantUpdateProfilePicture: codes.Internal,
 	ErrInternal:                 codes.Internal,
-	ErrImageTooLarge:            codes.InvalidArgument,
-	ErrImageTooSmall:            codes.InvalidArgument,
+	ErrInvalidImage:             codes.InvalidArgument,
 }
 
 type errorHandler struct {

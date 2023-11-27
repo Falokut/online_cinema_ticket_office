@@ -9,7 +9,6 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/prometheus/client_golang v1.17.0
 	github.com/sirupsen/logrus v1.9.3
