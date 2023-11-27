@@ -30,7 +30,7 @@ import (
 func main() {
 	logging.NewEntry(logging.FileAndConsoleOutput)
 	logger := logging.GetLogger()
-
+	// Test
 	appCfg := config.GetConfig()
 	log_level, err := logrus.ParseLevel(appCfg.LogLevel)
 	if err != nil {

@@ -1,9 +1,11 @@
-name: Build and Publish Docker Images
+name: Docker Image CI
 
 on:
   push:
-    branches: [ main ]
-
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+    
 jobs:
   check:
     name: Check changed files
@@ -29,13 +31,13 @@ jobs:
             git diff --name-only HEAD^ HEAD > files.txt
             while IFS= read -r file; do
               echo $file
-              if [[ $file == accounts_service/app/* ]]; then
+              if [[ $file == accounts_service/* ]]; then
                 echo "::set-output name=accounts_service::true"
-              elif [[ $file == profiles_service/app/* ]]; then
+              elif [[ $file == profiles_service/* ]]; then
                 echo "::set-output name=profiles_service::true"
-              elif [[ $file == email_service/app/* ]]; then
+              elif [[ $file == email_service/* ]]; then
                 echo "::set-output name=email_service::true"
-              elif [[ $file == images_storage_service/app/* ]]; then
+              elif [[ $file == images_storage_service/* ]]; then
                 echo "::set-output name=images_storage_service::true"
               else
                 echo "file does not belong to any service"
@@ -55,21 +57,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+
+      - name: Publish to Registry
+        uses: docker/build-push-action@v5
         with:
-          images: falokut/online_cinema_ticket_office.accounts_service
-          tags: latest
-      - name: Build and push Docker image
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-        with:
-          context: .
-          file: ./accounts_service/Dockerfile
+          context: "{{defaultContext}}:accounts_service"
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: falokut/online_cinema_ticket_office.accounts_service:latest
+          labels: ${{ steps.meta.outputs.labels }}   
    
   profiles_service:
       needs: check
@@ -85,21 +80,13 @@ jobs:
             username: ${{ secrets.DOCKER_USERNAME }}
             password: ${{ secrets.DOCKER_PASSWORD }}
         
-        - name: Extract metadata (tags, labels) for Docker
-          id: meta
-          uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        - name: Publish to Registry
+          uses: docker/build-push-action@v5
           with:
-            images: falokut/online_cinema_ticket_office.profiles_service
-            tags: latest
-
-        - name: Build and push Docker image
-          uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-          with:
-            context: .
-            file: ./profiles_service/Dockerfile
+            context: "{{defaultContext}}:profiles_service"
             push: true
-            tags: ${{ steps.meta.outputs.tags }}
-            labels: ${{ steps.meta.outputs.labels }}
+            tags: falokut/online_cinema_ticket_office.profiles_service:latest
+            labels: ${{ steps.meta.outputs.labels }}     
           
   email_service:
       needs: check
@@ -115,21 +102,13 @@ jobs:
             username: ${{ secrets.DOCKER_USERNAME }}
             password: ${{ secrets.DOCKER_PASSWORD }}
         
-        - name: Extract metadata (tags, labels) for Docker
-          id: meta
-          uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        - name: Publish to RegistryQ
+          uses: docker/build-push-action@v5
           with:
-            images: falokut/online_cinema_ticket_office.email_service
-            tags: latest
-
-        - name: Build and push Docker image
-          uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-          with:
-            context: .
-            file: ./email_service/Dockerfile
+            context: "{{defaultContext}}:email_service"
             push: true
-            tags: ${{ steps.meta.outputs.tags }}
-            labels: ${{ steps.meta.outputs.labels }}
+            tags: falokut/online_cinema_ticket_office.email_service:latest
+            labels: ${{ steps.meta.outputs.labels }}    
 
   images_storage_service:
       needs: check
@@ -144,19 +123,11 @@ jobs:
           with:
             username: ${{ secrets.DOCKER_USERNAME }}
             password: ${{ secrets.DOCKER_PASSWORD }}
-        
-        - name: Extract metadata (tags, labels) for Docker
-          id: meta
-          uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-          with:
-            images: falokut/online_cinema_ticket_office.images_storage_service
-            tags: latest
 
-        - name: Build and push Docker image
-          uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        - name: Publish to RegistryQ
+          uses: docker/build-push-action@v5
           with:
-            context: .
-            file: ./images_storage_service/Dockerfile
+            context: "{{defaultContext}}:images_storage_service"
             push: true
-            tags: ${{ steps.meta.outputs.tags }}
-            labels: ${{ steps.meta.outputs.labels }}
+            tags: falokut/online_cinema_ticket_office.images_storage_service:latest
+            labels: ${{ steps.meta.outputs.labels }}    
