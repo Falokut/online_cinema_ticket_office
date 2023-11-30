@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 include:
   #-----------------databases-----------------
@@ -7,23 +7,24 @@ include:
   - databases/profiles_db/profiles_db.yml
 
   #-----------------servises-----------------
-  - accounts_service/accounts_service.yml
-  - profiles_service/profiles_service.yml
-  - email_service/email_service.yml
-  - images_storage_service/images_storage_service.yml
-  - image_processing_service/image_processing_service.yml
+  - services-composes/accounts_service/accounts_service.yml
+  - services-composes/profiles_service/profiles_service.yml
+  - services-composes/email_service/email_service.yml
+  - services-composes/images_storage_service/images_storage_service.yml
+  - services-composes/image_processing_service/image_processing_service.yml
 
   #-----------------brokers-----------------
-  - kafka-cluster/kafka-cluster.yml
+  - services-composes/kafka-cluster/kafka-cluster.yml
 
-  - tracing_service/tracing_service.yml
+  #-----------------metrics-----------------
+  - services-composes/tracing_service/tracing_service.yml
 
 networks:
   gateway_network:
 
 services:
   gateway:
-    image: nginx 
+    image: nginx
     hostname: gateway
     ports:
       - 80:80
@@ -38,7 +39,7 @@ services:
       - .nginx/configs/:/etc/nginx/
     deploy:
       restart_policy:
-          condition: unless-stopped
+        condition: unless-stopped
     depends_on:
       #-----------------services-----------------
       accounts_service:
@@ -64,6 +65,3 @@ services:
         condition: service_started
       kafka-ui:
         condition: service_started
-
-
-        

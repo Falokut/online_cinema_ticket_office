@@ -28,9 +28,12 @@ This repository has the code for an online cinema ticket office. You can buy mov
    ```
 
 2. Configure the required services. Each service has its own setup instructions:
-   * [Configure accounts service](/accounts_service/README.md#Configure)
-   * [Configure email service](/email_service/README.md#Configure)
-   * [Configure profiles service](/profiles_service/README.md#Configure)
+
+   * [Configure accounts service](https://github.com/Falokut/accounts_service/blob/master/README.md#Configure)
+   * [Configure email service](https://github.com/Falokut/email_service/blob/master/README.md#Configure)
+   * [Configure profiles service](https://github.com/Falokut/profiles_service/blob/master/README.md#Configure)
+   * Configure databases inside databases folder
+    
 3. Start the gateway by running the following command:
 
    ```shell
@@ -91,11 +94,12 @@ Sure! Here are the additional instructions for Windows and macOS:
 ---
 
 # Services
-   + [Accounts service](/accounts_service/README.md)
-   + [Profiles service](/profiles_service/README.md)
-   + [Images storage service](/images_storage_service/README.md)  
+   + [Accounts service](https://github.com/Falokut/accounts_service)
+   + [Profiles service](https://github.com/Falokut/profiles_service)
+   + [Images storage service](https://github.com/Falokut/images_storage_service)  
    + [Image processing service](https://github.com/Falokut/image_processing_service)
-   
+   + [Email service](https://github.com/Falokut/email_service)
+
 # Endpoints  
 * Grafana endpoint  http://localhost:3000  
 * Prometheus endpoint  http://localhost:9090

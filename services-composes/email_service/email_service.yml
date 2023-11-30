@@ -1,0 +1,22 @@
+version: "3.8"
+
+include:
+  - ../kafka-cluster/kafka-cluster.yml
+
+services:
+  email_service:
+    image: falokut/email_service
+    networks:
+      - kafka_network
+    volumes:
+      - ./docker/containers-configs/:/configs
+      - ./templates/:/templates
+    depends_on:
+      - kafka
+    environment:
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: unless-stopped
