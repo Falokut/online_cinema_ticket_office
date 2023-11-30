@@ -6,8 +6,8 @@ import (
 
 	"github.com/Falokut/grpc_errors"
 	accounts_service "github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/accounts_service/v1/protos"
-	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/logging"
 	"github.com/redis/go-redis/v9"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -17,6 +17,7 @@ var (
 	ErrNoCtxMetaData           = errors.New("no context metadata")
 	ErrInvalidSessionId        = errors.New("invalid session id")
 	ErrAlreadyExist            = errors.New("already exist")
+	ErrInvalidMachineID        = errors.New("invalid machine id")
 	ErrInvalidClientIP         = errors.New("invalid client ip")
 	ErrAccessDenied            = errors.New("access denied. Invalid session or client ip")
 	ErrInternal                = errors.New("internal error")
@@ -34,6 +35,7 @@ var errorCodes = map[error]codes.Code{
 	ErrInvalidSessionId:        codes.Unauthenticated,
 	ErrSessisonNotFound:        codes.Unauthenticated,
 	ErrAlreadyExist:            codes.AlreadyExists,
+	ErrInvalidMachineID:        codes.InvalidArgument,
 	ErrInvalidClientIP:         codes.InvalidArgument,
 	ErrFailedValidation:        codes.InvalidArgument,
 	ErrAccessDenied:            codes.PermissionDenied,
@@ -42,10 +44,10 @@ var errorCodes = map[error]codes.Code{
 }
 
 type errorHandler struct {
-	logger logging.Logger
+	logger *logrus.Logger
 }
 
-func newErrorHandler(logger logging.Logger) errorHandler {
+func newErrorHandler(logger *logrus.Logger) errorHandler {
 	return errorHandler{
 		logger: logger,
 	}

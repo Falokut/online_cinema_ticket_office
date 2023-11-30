@@ -9,12 +9,12 @@ import (
 
 	server "github.com/Falokut/grpc_rest_server"
 	"github.com/Falokut/healthcheck"
+	logging "github.com/Falokut/online_cinema_ticket_office.loggerwrapper"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/config"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/repository"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/service"
 	accounts_service "github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/accounts_service/v1/protos"
 	jaegerTracer "github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/jaeger"
-	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/metrics"
 	profiles_service "github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/profiles_service/v1/protos"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -30,7 +30,6 @@ import (
 func main() {
 	logging.NewEntry(logging.FileAndConsoleOutput)
 	logger := logging.GetLogger()
-	// Test
 	appCfg := config.GetConfig()
 	log_level, err := logrus.ParseLevel(appCfg.LogLevel)
 	if err != nil {
@@ -63,7 +62,7 @@ func main() {
 
 	logger.Info("Registration cache initializing")
 	regCacheOpt := appCfg.RegistrationCacheOptions.ConvertToRedisOptions()
-	registrationCache, err := repository.NewRedisRegistrationCache(regCacheOpt, logger)
+	registrationCache, err := repository.NewRedisRegistrationCache(regCacheOpt, logger.Logger)
 	if err != nil {
 		logger.Fatalf("Shutting down, connection to the redis registration cache is not established: %s options: %v",
 			err.Error(), regCacheOpt)
@@ -74,7 +73,7 @@ func main() {
 	sessionCacheOpt := appCfg.SessionCacheOptions.ConvertToRedisOptions()
 	accountSessionCacheOpt := appCfg.AccountSessionsCacheOptions.ConvertToRedisOptions()
 	sessionsCache, err := repository.NewSessionCache(sessionCacheOpt,
-		accountSessionCacheOpt, logger, appCfg.SessionsTTL)
+		accountSessionCacheOpt, logger.Logger, appCfg.SessionsTTL)
 	if err != nil {
 		logger.Fatalf("Shutting down, connection to the redis token cache is not established: %s options: %v",
 			err.Error(), sessionCacheOpt)
@@ -114,7 +113,7 @@ func main() {
 	profilesService := profiles_service.NewProfilesServiceV1Client(cc)
 	logger.Info("Service initializing")
 	service := service.NewAccountService(repo,
-		logger, redisRepo, kafkaWriter, appCfg, metric, profilesService)
+		logger.Logger, redisRepo, kafkaWriter, appCfg, metric, profilesService)
 
 	logger.Info("Server initializing")
 	s := server.NewServer(logger.Logger, service)

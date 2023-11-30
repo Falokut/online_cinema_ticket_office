@@ -9,7 +9,7 @@ listen:
   server_mode: "BOTH"
   allowed_headers:
   - X-Session-Id
-  - X-Client-Ip
+  - X-Machine-Id
   allowed_outgoing_header:
     X-Account-Id: x-account-id
 

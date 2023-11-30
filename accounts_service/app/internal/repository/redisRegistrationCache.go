@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/logging"
 	"github.com/opentracing/opentracing-go"
 	"github.com/redis/go-redis/v9"
+	"github.com/sirupsen/logrus"
 )
 
 type redisRegistrationCache struct {
 	rdb    *redis.Client
-	logger logging.Logger
+	logger *logrus.Logger
 }
 
 func (r *redisRegistrationCache) PingContext(ctx context.Context) error {
@@ -26,7 +26,7 @@ func (r *redisRegistrationCache) PingContext(ctx context.Context) error {
 }
 
 // NewRedisRegistrationCache initializes a new instance of redisRegistrationCache with the provided options and logger.
-func NewRedisRegistrationCache(opt *redis.Options, logger logging.Logger) (*redisRegistrationCache, error) {
+func NewRedisRegistrationCache(opt *redis.Options, logger *logrus.Logger) (*redisRegistrationCache, error) {
 	logger.Info("Creating registration cache client")
 	rdb := redis.NewClient(opt)
 	if rdb == nil {

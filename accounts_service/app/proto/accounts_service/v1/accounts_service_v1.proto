@@ -133,8 +133,8 @@ service accountsServiceV1 {
             };
             parameters: {
                 headers: {
-                    name: "X-Client-Ip";
-                    description: "IP address of the user's client.";
+                    name: "X-Machine-Id";
+                    description: "Unique identifier of the client machine";
                     type: STRING;
                     required: true; 
                 };
@@ -153,8 +153,8 @@ service accountsServiceV1 {
                     required: true; 
                 };
                 headers: {
-                    name: "X-Client-Ip";
-                    description: "IP address of the user's client";
+                    name: "X-Machine-Id";
+                    description: "Unique identifier of the client machine";
                     type: STRING;
                     required: true; 
                 };
@@ -205,8 +205,8 @@ service accountsServiceV1 {
                     required: true; 
                 };
                 headers: {
-                    name: "X-Client-Ip";
-                    description: "IP address of the user's client";
+                    name: "X-Machine-Id";
+                    description: "Unique identifier of the client machine";
                     type: STRING;
                     required: true; 
                 };
@@ -281,8 +281,8 @@ service accountsServiceV1 {
                     required: true; 
                 };
                 headers: {
-                    name: "X-Client-Ip";
-                    description: "IP address of the user's client.";
+                    name: "X-Machine-Id";
+                    description: "Unique identifier of the client machine";
                     type: STRING;
                     required: true; 
                 };
@@ -322,8 +322,8 @@ service accountsServiceV1 {
                     required: true; 
                 };
                 headers: {
-                    name: "X-Client-Ip";
-                    description: "IP address of the user's client";
+                    name: "X-Machine-Id";
+                    description: "Unique identifier of the client machine";
                     type: STRING;
                     required: true; 
                 };
@@ -361,8 +361,8 @@ service accountsServiceV1 {
                     required: true; 
                 };
                 headers: {
-                    name: "X-Client-Ip";
-                    description: "IP address of the user's client";
+                    name: "X-Machine-Id";
+                    description: "Unique identifier of the client machine";
                     type: STRING;
                     required: true; 
                 };

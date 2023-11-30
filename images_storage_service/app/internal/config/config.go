@@ -5,7 +5,7 @@ import (
 
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/jaeger"
 
-	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/logging"
+	logging "github.com/Falokut/online_cinema_ticket_office.loggerwrapper"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/metrics"
 	"github.com/ilyakaznacheev/cleanenv"
 )

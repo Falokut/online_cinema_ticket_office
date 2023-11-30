@@ -8,8 +8,8 @@ import (
 	"github.com/Falokut/grpc_errors"
 	image_processing_service "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/image_processing_service/v1/protos"
 	image_storage_service "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/images_storage_service/v1/protos"
-	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/logging"
 	"github.com/opentracing/opentracing-go"
+	"github.com/sirupsen/logrus"
 )
 
 type ImagesService interface {
@@ -37,16 +37,16 @@ type ImageServiceConfig struct {
 
 type imageService struct {
 	cfg                    ImageServiceConfig
-	logger                 logging.Logger
+	logger                 *logrus.Logger
 	imageStorageService    image_storage_service.ImagesStorageServiceV1Client
 	imageProcessingService image_processing_service.ImageProcessingServiceV1Client
 	errorHandler           errorHandler
 }
 
-func NewImageService(cfg ImageServiceConfig, logger logging.Logger,
+func NewImageService(cfg ImageServiceConfig, logger *logrus.Logger,
 	imageStorageService image_storage_service.ImagesStorageServiceV1Client,
 	imageProcessingService image_processing_service.ImageProcessingServiceV1Client) *imageService {
-	errorHandler := newErrorHandler(logger.Logger)
+	errorHandler := newErrorHandler(logger)
 	return &imageService{
 		cfg:                    cfg,
 		logger:                 logger,

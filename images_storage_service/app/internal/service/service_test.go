@@ -12,10 +12,10 @@ import (
 	"testing"
 	"time"
 
+	logging "github.com/Falokut/online_cinema_ticket_office.loggerwrapper"
 	mock_repository "github.com/Falokut/online_cinema_ticket_office/images_storage_service/internal/repository/mocks"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/internal/service"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/images_storage_service/v1/protos"
-	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/metrics"
 	mock_metrics "github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/metrics/mocks"
 	"github.com/sirupsen/logrus"

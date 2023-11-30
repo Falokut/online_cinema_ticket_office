@@ -27,7 +27,10 @@ require github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8
 
 require github.com/Falokut/healthcheck v0.0.0-20231124155013-bff54f9bc002
 
-require github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
+require (
+	github.com/Falokut/online_cinema_ticket_office.loggerwrapper v0.0.0-20231130151717-09aa21496f83 // indirect
+	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
+)
 
 require (
 	github.com/Falokut/grpc_errors v1.0.0

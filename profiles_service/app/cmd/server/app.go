@@ -10,22 +10,21 @@ import (
 
 	server "github.com/Falokut/grpc_rest_server"
 	"github.com/Falokut/healthcheck"
+	logging "github.com/Falokut/online_cinema_ticket_office.loggerwrapper"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/config"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/repository"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/service"
 	image_processing_service "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/image_processing_service/v1/protos"
 	image_storage_service "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/images_storage_service/v1/protos"
 	jaegerTracer "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/jaeger"
-	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/metrics"
 	profiles_service "github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/profiles_service/v1/protos"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	"github.com/opentracing/opentracing-go"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -95,7 +94,7 @@ func main() {
 	}()
 
 	imagesService := service.NewImageService(getImageServiceConfig(appCfg),
-		logger, imageStorageService, imageProcessingService)
+		logger.Logger, imageStorageService, imageProcessingService)
 
 	logger.Info("Service initializing")
 	service := service.NewProfilesService(repo, logger.Logger, metric, imagesService)

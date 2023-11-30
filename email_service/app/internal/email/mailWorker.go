@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/Falokut/online_cinema_ticket_office/email_service/internal/utils"
-	"github.com/Falokut/online_cinema_ticket_office/email_service/pkg/logging"
 	"github.com/segmentio/kafka-go"
+	"github.com/sirupsen/logrus"
 )
 
 type MailWorkerConfig struct {
@@ -21,14 +21,14 @@ type MailWorkerConfig struct {
 
 type MailWorker struct {
 	mailSender  *MailSender
-	logger      logging.Logger
+	logger      *logrus.Logger
 	cfg         MailWorkerConfig
 	kafkaReader *kafka.Reader
 
 	shutDownCtx context.CancelFunc
 }
 
-func NewMailWorker(mailSender *MailSender, logger logging.Logger, cfg MailWorkerConfig, kafkaReader *kafka.Reader) *MailWorker {
+func NewMailWorker(mailSender *MailSender, logger *logrus.Logger, cfg MailWorkerConfig, kafkaReader *kafka.Reader) *MailWorker {
 	w := MailWorker{mailSender: mailSender, logger: logger, cfg: cfg, kafkaReader: kafkaReader}
 	return &w
 }

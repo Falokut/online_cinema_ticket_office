@@ -7,9 +7,9 @@ import (
 	"syscall"
 	"time"
 
+	logging "github.com/Falokut/online_cinema_ticket_office.loggerwrapper"
 	"github.com/Falokut/online_cinema_ticket_office/email_service/internal/config"
 	"github.com/Falokut/online_cinema_ticket_office/email_service/internal/email"
-	"github.com/Falokut/online_cinema_ticket_office/email_service/pkg/logging"
 	"github.com/segmentio/kafka-go"
 	"github.com/sirupsen/logrus"
 )
@@ -27,13 +27,13 @@ func main() {
 
 	logger.Logger.SetLevel(log_level)
 
-	mailSender := email.NewMailSender(appCfg.MailSenderCfg, logger)
+	mailSender := email.NewMailSender(appCfg.MailSenderCfg, logger.Logger)
 
 	logger.Infoln("kafka consumer initializing")
 	kafkaReader := NewKafkaReader(*appCfg)
 
 	logger.Infoln("worker initializing")
-	mailWorker := email.NewMailWorker(mailSender, logger, appCfg.MailWorkerCfg, kafkaReader)
+	mailWorker := email.NewMailWorker(mailSender, logger.Logger, appCfg.MailWorkerCfg, kafkaReader)
 	go func() {
 		mailWorker.Run()
 	}()

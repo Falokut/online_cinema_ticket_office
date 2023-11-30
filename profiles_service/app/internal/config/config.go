@@ -3,9 +3,9 @@ package config
 import (
 	"sync"
 
+	logging "github.com/Falokut/online_cinema_ticket_office.loggerwrapper"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/repository"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/jaeger"
-	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/metrics"
 	"github.com/ilyakaznacheev/cleanenv"
 )

@@ -8,12 +8,12 @@ import (
 	"syscall"
 
 	server "github.com/Falokut/grpc_rest_server"
+	logging "github.com/Falokut/online_cinema_ticket_office.loggerwrapper"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/internal/config"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/internal/repository"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/internal/service"
 	img_storage_serv "github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/images_storage_service/v1/protos"
 	jaegerTracer "github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/jaeger"
-	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/images_storage_service/pkg/metrics"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"

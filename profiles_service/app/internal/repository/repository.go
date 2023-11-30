@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/Falokut/online_cinema_ticket_office/profiles_service/internal/model"
-	"github.com/Falokut/online_cinema_ticket_office/profiles_service/pkg/logging"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -38,7 +37,6 @@ func NewPostgreDB(cfg DBConfig) (*sqlx.DB, error) {
 	db, err := sqlx.Connect("pgx", conStr)
 
 	if err != nil {
-		logging.GetLogger().Error(conStr)
 		return nil, err
 	}
 

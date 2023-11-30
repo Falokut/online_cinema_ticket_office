@@ -14,13 +14,13 @@ import (
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/repository"
 	accounts_service "github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/accounts_service/v1/protos"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/jwt"
-	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/logging"
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/metrics"
 	profiles_service "github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/profiles_service/v1/protos"
 	"github.com/google/uuid"
 	"github.com/opentracing/opentracing-go"
 	"github.com/redis/go-redis/v9"
 	"github.com/segmentio/kafka-go"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -32,7 +32,7 @@ type AccountService struct {
 	accounts_service.UnimplementedAccountsServiceV1Server
 	repo                   repository.AccountRepository
 	redisRepo              repository.CacheRepo
-	logger                 logging.Logger
+	logger                 *logrus.Logger
 	nonActivatedAccountTTL time.Duration
 	emailWriter            *kafka.Writer
 	cfg                    *config.Config
@@ -41,7 +41,7 @@ type AccountService struct {
 	profilesService        profiles_service.ProfilesServiceV1Client
 }
 
-func NewAccountService(repo repository.AccountRepository, logger logging.Logger,
+func NewAccountService(repo repository.AccountRepository, logger *logrus.Logger,
 	redisRepo repository.CacheRepo, emailWriter *kafka.Writer,
 	cfg *config.Config, metrics metrics.Metrics,
 	profilesService profiles_service.ProfilesServiceV1Client) *AccountService {
@@ -241,9 +241,13 @@ func (s *AccountService) SignIn(ctx context.Context,
 	var err error
 	defer span.SetTag("grpc.status", grpc_errors.GetGrpcCode(err))
 
-	ClientIP, err := s.getClientIPFromCtx(ctx)
+	if net.ParseIP(in.ClientIP) == nil {
+		err = s.errorHandler.createErrorResponce(ErrInvalidClientIP, "invalid client ip address")
+		return nil, err
+	}
+
+	MachineID, err := s.getMachineIDFromCtx(ctx)
 	if err != nil {
-		s.logger.Errorf("getClientIPFromCtx: %v", err)
 		return nil, err
 	}
 
@@ -261,7 +265,7 @@ func (s *AccountService) SignIn(ctx context.Context,
 	s.logger.Info("Caching session")
 	SessionID := uuid.NewString()
 	if err = s.redisRepo.SessionsCache.CacheSession(ctx, model.SessionCache{SessionID: SessionID,
-		AccountID: account.UUID, ClientIP: ClientIP, SessionInfo: in.SessionInfo, LastActivity: time.Now().In(time.UTC)}); err != nil {
+		AccountID: account.UUID, MachineID: MachineID, ClientIP: in.ClientIP, LastActivity: time.Now().In(time.UTC)}); err != nil {
 		return nil, s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 	}
 
@@ -272,7 +276,7 @@ func (s *AccountService) SignIn(ctx context.Context,
 const (
 	AccountIdContext = "X-Account-Id"
 	SessionIdContext = "X-Session-Id"
-	ClientIpContext  = "X-Client-Ip"
+	MachineIdContext = "X-Machine-Id"
 )
 
 //-----------------------------------------------------
@@ -445,7 +449,7 @@ func (s *AccountService) GetAllSessions(ctx context.Context,
 	for key, session := range sessions {
 		sessionsInfo[key] = &accounts_service.SessionInfo{
 			ClientIP:     session.ClientIP,
-			SessionInfo:  session.SessionInfo,
+			MachineID:    session.MachineID,
 			LastActivity: timestamppb.New(session.LastActivity),
 		}
 	}
@@ -515,25 +519,25 @@ func (s *AccountService) checkSession(ctx context.Context) (cache model.SessionC
 	}
 
 	s.logger.Info("Getting client ip from ctx")
-	ClientIP, err = s.getClientIPFromCtx(ctx)
+	MachineID, err := s.getMachineIDFromCtx(ctx)
 	if err != nil {
 		return
 	}
 
 	s.logger.Info("Getting session cache")
 	cache, err = s.redisRepo.SessionsCache.GetSessionCache(ctx, SessionID)
-	if err != nil && err != repository.ErrSessionNotFound {
-		err = s.errorHandler.createErrorResponce(ErrInternal, err.Error())
-		return
-	} else if err == repository.ErrSessionNotFound {
+	if errors.Is(err, repository.ErrSessionNotFound) {
 		s.metrics.IncCacheMiss("checkSession")
 		err = s.errorHandler.createErrorResponce(ErrSessisonNotFound, "")
+		return
+	} else if err != nil {
+		err = s.errorHandler.createErrorResponce(ErrInternal, err.Error())
 		return
 	}
 
 	s.metrics.IncCacheHits("checkSession")
 
-	if ClientIP != cache.ClientIP {
+	if MachineID != cache.MachineID {
 		err = s.errorHandler.createErrorResponce(ErrAccessDenied, "")
 		return
 	}
@@ -555,20 +559,34 @@ func (s *AccountService) getSessionIDFromCtx(ctx context.Context) (string, error
 	return sessionID[0], nil
 }
 
-func (s *AccountService) getClientIPFromCtx(ctx context.Context) (string, error) {
+// func (s *AccountService) getClientIPFromCtx(ctx context.Context) (string, error) {
+// 	md, ok := metadata.FromIncomingContext(ctx)
+// 	if !ok {
+// 		return "", s.errorHandler.createErrorResponce(ErrNoCtxMetaData, "no context metadata provided")
+// 	}
+
+// 	clientIP := md.Get(ClientIpContext)
+// 	if len(clientIP) == 0 || clientIP[0] == "" {
+// 		return "", s.errorHandler.createErrorResponce(ErrInvalidClientIP, "no client ip provided")
+// 	}
+
+// 	if net.ParseIP(clientIP[0]) == nil {
+// 		return "", s.errorHandler.createErrorResponce(ErrInvalidClientIP, "invalid client ip address")
+// 	}
+
+// 	return clientIP[0], nil
+// }
+
+func (s *AccountService) getMachineIDFromCtx(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return "", s.errorHandler.createErrorResponce(ErrNoCtxMetaData, "no context metadata provided")
 	}
 
-	clientIP := md.Get(ClientIpContext)
-	if len(clientIP) == 0 || clientIP[0] == "" {
-		return "", s.errorHandler.createErrorResponce(ErrInvalidClientIP, "no client ip provided")
+	MachineID := md.Get(MachineIdContext)
+	if len(MachineID) == 0 || MachineID[0] == "" {
+		return "", s.errorHandler.createErrorResponce(ErrInvalidMachineID, "no client ip provided")
 	}
 
-	if net.ParseIP(clientIP[0]) == nil {
-		return "", s.errorHandler.createErrorResponce(ErrInvalidClientIP, "invalid client ip address")
-	}
-
-	return clientIP[0], nil
+	return MachineID[0], nil
 }

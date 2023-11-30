@@ -8,21 +8,21 @@ import (
 	"time"
 
 	"github.com/Falokut/online_cinema_ticket_office/accounts_service/internal/model"
-	"github.com/Falokut/online_cinema_ticket_office/accounts_service/pkg/logging"
 	"github.com/opentracing/opentracing-go"
 	"github.com/redis/go-redis/v9"
+	"github.com/sirupsen/logrus"
 )
 
 type redisSessionsCache struct {
 	sessions_rdb         *redis.Client
 	account_sessions_rdb *redis.Client
-	logger               logging.Logger
+	logger               *logrus.Logger
 	SessionTTL           time.Duration
 }
 
 // NewSessionCache creates a new session cache using the provided Redis options, logger, and session TTL.
 // It initializes two Redis clients for session and account session caching, and verifies the connection to each Redis instance.
-func NewSessionCache(sessionCacheOpt *redis.Options, accountSessionsOpt *redis.Options, logger logging.Logger, SessionTTL time.Duration) (*redisSessionsCache, error) {
+func NewSessionCache(sessionCacheOpt *redis.Options, accountSessionsOpt *redis.Options, logger *logrus.Logger, SessionTTL time.Duration) (*redisSessionsCache, error) {
 	logger.Infoln("Creating session cache client")
 
 	// Initialize a Redis client for session caching
@@ -223,7 +223,7 @@ func (r *redisSessionsCache) UpdateLastActivityForSession(ctx context.Context,
 
 type SessionInfo struct {
 	ClientIP     string    `json:"client_ip"`
-	SessionInfo  string    `json:"session_info"` // like device or browser
+	MachineID    string    `json:"machine_id"`
 	LastActivity time.Time `json:"last_activity"`
 }
 
@@ -264,7 +264,7 @@ func (r *redisSessionsCache) GetSessionsForAccount(ctx context.Context, accountI
 
 		SessionsInfo.Sessions[sessions.Sessions[i]] = SessionInfo{
 			ClientIP:     cache.ClientIP,
-			SessionInfo:  cache.SessionInfo,
+			MachineID:    cache.MachineID,
 			LastActivity: cache.LastActivity,
 		}
 	}

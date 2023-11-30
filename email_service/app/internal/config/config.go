@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/Falokut/online_cinema_ticket_office/email_service/internal/email"
-	"github.com/Falokut/online_cinema_ticket_office/email_service/pkg/logging"
+	logging "github.com/Falokut/online_cinema_ticket_office.loggerwrapper"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 

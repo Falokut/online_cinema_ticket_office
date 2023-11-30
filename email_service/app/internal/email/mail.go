@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"html/template"
 
-	"github.com/Falokut/online_cinema_ticket_office/email_service/pkg/logging"
 	"github.com/k3a/html2text"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/gomail.v2"
 )
 
 type MailSender struct {
-	logger       logging.Logger
+	logger       *logrus.Logger
 	dialler      *gomail.Dialer
 	temp         *template.Template
 	EmailAddress string
@@ -28,7 +28,7 @@ type MailSenderConfig struct {
 	TemplatesOrigin string `yaml:"templates_origin"`
 }
 
-func NewMailSender(cfg MailSenderConfig, logger logging.Logger) *MailSender {
+func NewMailSender(cfg MailSenderConfig, logger *logrus.Logger) *MailSender {
 	temp := template.Must(template.ParseGlob(fmt.Sprintf("%s/*.html", cfg.TemplatesOrigin)))
 
 	s := MailSender{logger: logger, EmailAddress: cfg.EmailAddress, temp: temp}

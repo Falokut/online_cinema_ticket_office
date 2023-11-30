@@ -76,8 +76,8 @@
             "type": "string"
           },
           {
-            "name": "X-Client-Ip",
-            "description": "IP address of the user's client",
+            "name": "X-Machine-Id",
+            "description": "Unique identifier of the client machine",
             "in": "header",
             "required": true,
             "type": "string"
@@ -145,8 +145,8 @@
             "type": "string"
           },
           {
-            "name": "X-Client-Ip",
-            "description": "IP address of the user's client",
+            "name": "X-Machine-Id",
+            "description": "Unique identifier of the client machine",
             "in": "header",
             "required": true,
             "type": "string"
@@ -316,8 +316,8 @@
             "type": "string"
           },
           {
-            "name": "X-Client-Ip",
-            "description": "IP address of the user's client",
+            "name": "X-Machine-Id",
+            "description": "Unique identifier of the client machine",
             "in": "header",
             "required": true,
             "type": "string"
@@ -379,8 +379,8 @@
             "type": "string"
           },
           {
-            "name": "X-Client-Ip",
-            "description": "IP address of the user's client.",
+            "name": "X-Machine-Id",
+            "description": "Unique identifier of the client machine",
             "in": "header",
             "required": true,
             "type": "string"
@@ -451,8 +451,8 @@
             "type": "string"
           },
           {
-            "name": "X-Client-Ip",
-            "description": "IP address of the user's client",
+            "name": "X-Machine-Id",
+            "description": "Unique identifier of the client machine",
             "in": "header",
             "required": true,
             "type": "string"
@@ -511,8 +511,8 @@
             }
           },
           {
-            "name": "X-Client-Ip",
-            "description": "IP address of the user's client.",
+            "name": "X-Machine-Id",
+            "description": "Unique identifier of the client machine",
             "in": "header",
             "required": true,
             "type": "string"
@@ -756,9 +756,8 @@
           "type": "string",
           "title": "IP address of the user's client"
         },
-        "session_info": {
-          "type": "string",
-          "title": "Session info, is may be device or browser info"
+        "machine_id": {
+          "type": "string"
         },
         "last_activity": {
           "type": "string",
@@ -776,6 +775,9 @@
           "type": "string"
         },
         "session_info": {
+          "type": "string"
+        },
+        "client_ip": {
           "type": "string"
         }
       }
