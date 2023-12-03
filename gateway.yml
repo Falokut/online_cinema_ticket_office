@@ -59,9 +59,20 @@ services:
         condition: service_started
       jaeger:
         condition: service_started
-      node_exporter:
-        condition: service_started
       grafana:
         condition: service_started
       kafka-ui:
         condition: service_started
+      #------------------------------------------
+      watchtower:
+        condition: service_started
+
+  watchtower:
+    image: containrrr/watchtower
+    command: --interval 600
+    environment:
+      WATCHTOWER_LIFE_CYCLE_HOOKS: 1
+      WATCHTOWER_NOTIFICATION: shoutrrr
+      WATCHTOWER_NOTIFICATION_URL: ${NOTIFICATION_URL}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
