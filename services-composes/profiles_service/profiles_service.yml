@@ -10,6 +10,7 @@ networks:
 
 services:
   profiles_service:
+    hostname: profiles_service
     image: falokut/profiles_service
     environment:
       DB_PASSWORD: ${DB_PASSWORD}
@@ -21,6 +22,7 @@ services:
       - profiles_service_network
       - profiles_db_network
       - tracing_network
+      - gateway_network
     depends_on:
       profiles_db:
         condition: service_healthy
@@ -32,7 +34,7 @@ services:
       start_period: 20s
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 1
       endpoint_mode: dnsrr
       restart_policy:
         condition: unless-stopped

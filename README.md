@@ -28,11 +28,15 @@ This repository has the code for an online cinema ticket office. You can buy mov
    ```
 
 2. Configure the required services. Each service has its own setup instructions:
-
+   * Configure databases inside databases folder (and skip first item on service configuration, doesn't need configure databases twise)
    * [Configure accounts service](https://github.com/Falokut/accounts_service/blob/master/README.md#Configure)
    * [Configure email service](https://github.com/Falokut/email_service/blob/master/README.md#Configure)
    * [Configure profiles service](https://github.com/Falokut/profiles_service/blob/master/README.md#Configure)
-   * Configure databases inside databases folder
+   * [Configure movies service](https://github.com/Falokut/movies_service/blob/master/README.md#Configure)
+   * [Configure genres service](https://github.com/Falokut/genres_service/blob/master/README.md#Configure)
+   * [Configure geo service](https://github.com/Falokut/geo_service/blob/master/README.md#Configure)
+   * [Configure  movies people service](https://github.com/Falokut/movies_people_service/blob/master/README.md#Configure)
+   * [Configure  casts service](https://github.com/Falokut/casts_service/blob/master/README.md#Configure)
     
 3. Start the gateway by running the following command:
 
@@ -41,7 +45,7 @@ This repository has the code for an online cinema ticket office. You can buy mov
    ```
    If you have the `make` utility installed, you can also use the following command:
    ```shell
-   make .run
+   make .docker-compose
    ```
 
 4. Once the gateway is successfully started, you can access the RestAPI endpoint at `http://localhost:80` and the gRPC endpoint at `http://localhost:81`.
@@ -99,6 +103,11 @@ Sure! Here are the additional instructions for Windows and macOS:
    + [Images storage service](https://github.com/Falokut/images_storage_service)  
    + [Image processing service](https://github.com/Falokut/image_processing_service)
    + [Email service](https://github.com/Falokut/email_service)
+   + [Movies service](https://github.com/Falokut/movies_service)
+   + [Casts service](https://github.com/Falokut/casts_service)
+   + [Genres service](https://github.com/Falokut/genres_service)
+   + [Movies people service](https://github.com/Falokut/movies_people_service)
+   + [Geo service](https://github.com/Falokut/geo_service)
 
 # Endpoints  
 * Grafana endpoint  http://localhost:3000  
@@ -112,8 +121,6 @@ Sure! Here are the additional instructions for Windows and macOS:
 # Metrics and Monitoring
 
 We use Grafana, Prometheus, and Jaeger to collect and visualize application metrics. You can track the performance of the application using these tools.
-
-
 
 # Author
 

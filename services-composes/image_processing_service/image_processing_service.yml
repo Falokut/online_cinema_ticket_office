@@ -7,7 +7,7 @@ networks:
 services:
   image_processing_service:
     image: falokut/image_processing_service_v1:latest
-    hostname: images_processing_service
+    hostname: image_processing_service
     environment:
       ENABLE_METRICS: true
     # ports:
@@ -18,7 +18,7 @@ services:
      - gateway_network
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 1
       endpoint_mode: dnsrr
       restart_policy:
           condition: unless-stopped

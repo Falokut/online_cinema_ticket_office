@@ -1,0 +1,38 @@
+log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
+healthcheck_port: 7001
+
+listen:
+  host: 0.0.0.0
+  port: 8080
+  server_mode: "BOTH"
+  
+db_config: 
+  host: "geo_db"
+  port: "5432"
+  username: "geo_service"
+  db_name: "geo_db"
+  ssl_mode: "disable"
+
+jaeger:
+  service_name: "Geo_Service"
+  address: jaeger:6831
+  log_spans: true
+
+prometheus:
+  service_name: "Geo_Service"
+  server_config:
+    host: 0.0.0.0
+    port: 7000
+
+
+country_cache: 
+  network: "tcp"
+  addr: "redis:6379"
+  db: 0
+  country_ttl: 30m
+
+city_cache: 
+  network: "tcp"
+  addr: "redis:6379"
+  db: 1
+  city_ttl: 30m

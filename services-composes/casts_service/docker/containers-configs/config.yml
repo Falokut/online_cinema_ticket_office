@@ -1,0 +1,33 @@
+log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
+healthcheck_port: 7001
+
+listen:
+  host: 0.0.0.0
+  port: 8080
+  server_mode: "BOTH"
+  
+db_config: 
+  host: "casts_db"
+  port: "5432"
+  username: "casts_service"
+  db_name: "casts_db"
+  ssl_mode: "disable"
+
+jaeger:
+  service_name: "Casts_Service"
+  address: jaeger:6831
+  log_spans: true
+
+prometheus:
+  service_name: "Casts_Service"
+  server_config:
+    host: 0.0.0.0
+    port: 7000
+
+
+casts_cache: 
+  network: "tcp"
+  addr: "redis:6379"
+  db: 0
+  cast_ttl: 30m
+

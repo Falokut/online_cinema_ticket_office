@@ -1,34 +1,32 @@
 version: "3.8"
 
 include:
-  - ../../databases/accounts_db/accounts_db.yml
-  - ../kafka-cluster/kafka-cluster.yml
+  - ../../databases/geo_db/geo_db.yml
 
 networks:
-  accounts_service_network:
-    name: "accounts_service_net"
+  geo_service_network:
+    name: "geo_service_net"
     driver: bridge
 
 services:
-  accounts_service:
-    hostname: accounts_service
-    image: falokut/accounts_service
+  geo_service:
+    image: falokut/geo_service
     volumes:
-      - ./docker/containers-configs:/configs
-    #  ports:
-    #    - 8080
+      - ./docker/containers-configs/:/configs
+    # ports:
+    #   - 9902:8080
     networks:
-      - accounts_service_network
-      - kafka_network
-      - accounts_db_network
-      - tracing_network
+      - geo_service_network
+      - geo_db_network
       - gateway_network
+      - tracing_network
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      geo_CACHE_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
-      redis:
+     geo_db:
         condition: service_healthy
-      accounts_db:
-        condition: service_healthy
-      kafka:
+     geo_service_cache:
         condition: service_healthy
     healthcheck:
       test: wget --no-verbose --tries=1 --spider 'http://localhost:7001/healthcheck' || exit 1
@@ -43,22 +41,21 @@ services:
       restart_policy:
         condition: unless-stopped
     labels:
-      servicename: "accounts_service"
+      servicename: "geo_service"
       org.label-schema.group: "monitoring"
 
-  redis:
-    container_name: account_service_cache
+  geo_service_cache:
     hostname: redis
     image: redis:7.2.1-alpine
     volumes:
       - ./.container_data/cache/data:/data
     # ports:
-    #   - 6378:6379
+    #   - 6376:6379
     networks:
-      - accounts_service_network
+      - geo_service_network
     environment:
       ALLOW_EMPTY_PASSWORD: no
-      REDIS_PASSWORD: ${REDIS_AOF_ENABLED}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
       REDIS_AOF_ENABLED: ${REDIS_AOF_ENABLED}
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]

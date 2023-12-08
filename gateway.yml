@@ -1,18 +1,17 @@
 version: "3.8"
 
 include:
-  #-----------------databases-----------------
-  - databases/accounts_db/accounts_db.yml
-  - databases/movies_db/movies_db.yml
-  - databases/profiles_db/profiles_db.yml
-
   #-----------------servises-----------------
   - services-composes/accounts_service/accounts_service.yml
   - services-composes/profiles_service/profiles_service.yml
   - services-composes/email_service/email_service.yml
   - services-composes/images_storage_service/images_storage_service.yml
   - services-composes/image_processing_service/image_processing_service.yml
-
+  - services-composes/movies_people_service/movies_people_service.yml
+  - services-composes/genres_service/genres_service.yml
+  - services-composes/movies_service/movies_service.yml
+  - services-composes/casts_service/casts_service.yml
+  - services-composes/geo_service/geo_service.yml
   #-----------------brokers-----------------
   - services-composes/kafka-cluster/kafka-cluster.yml
 
@@ -21,6 +20,8 @@ include:
 
 networks:
   gateway_network:
+    driver: bridge
+    name: "gateway_network"
 
 services:
   gateway:
@@ -30,10 +31,10 @@ services:
       - 80:80
       - 81:81
     networks:
-      - profiles_service_network
-      - accounts_service_network
-      - images_storage_network
-      - image_processing_service_network
+      # - profiles_service_network
+      # - accounts_service_network
+      # - images_storage_network
+      # - image_processing_service_network
       - gateway_network
     volumes:
       - .nginx/configs/:/etc/nginx/
@@ -52,9 +53,17 @@ services:
         condition: service_started
       image_processing_service:
         condition: service_started
+      movies_people_service:
+        condition: service_healthy
+      genres_service:
+        condition: service_healthy
+      movies_service:
+        condition: service_healthy
+      casts_service: 
+        condition: service_healthy
+      geo_service:
+        condition: service_healthy
       #------------------------------------------
-      profiles_db:
-        condition: service_started
       prometheus:
         condition: service_started
       jaeger:
@@ -62,6 +71,10 @@ services:
       grafana:
         condition: service_started
       kafka-ui:
+        condition: service_started
+      loki:
+        condition: service_started
+      promtail: 
         condition: service_started
       #------------------------------------------
       watchtower:

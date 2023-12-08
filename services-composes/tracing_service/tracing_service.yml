@@ -94,3 +94,23 @@ services:
     deploy:
       restart_policy:
         condition: unless-stopped
+
+  loki:
+    image: grafana/loki
+    hostname: loki
+    ports:
+      - 3100:3100
+    volumes:
+      - ./docker/containers-configs/loki/:/mnt/config
+    command: -config.file=/mnt/config/loki-config.yaml
+    networks:
+      - tracing_network
+
+  promtail:
+    image: grafana/promtail
+    volumes:
+      - ./docker/containers-configs/promtail:/mnt/config
+      - /var/lib/docker/containers:/var/lib/docker/containers
+    command: -config.file=/mnt/config/promtail-config.yaml
+    networks:
+      - tracing_network

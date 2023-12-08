@@ -12,7 +12,7 @@ services:
       - ./.container_data/database/postgres/data:/var/lib/postgresql/data
       - ./db/init-up.sql:/docker-entrypoint-initdb.d/init.up.sql
     ports:
-      - 5438:5432
+      - 5437:5432
     networks:
       - profiles_db_network
     environment :
