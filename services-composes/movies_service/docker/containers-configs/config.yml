@@ -26,7 +26,7 @@ prometheus:
 
 image_storage_service:
   base_poster_picture_url: "http://localhost:80/image"
-  poster_picture_category: "posters-pictures"
+  pictures_category: "posters-pictures"
 
 
 movies_cache: 
@@ -34,6 +34,12 @@ movies_cache:
   addr: "redis:6379"
   db: 0
 
+movies_preview_cache:
+  network: "tcp"
+  addr: "redis:6379"
+  db: 1
+
 repository_manager:
   movie_ttl: 10m
   filtered_ttl: 5m
+  movie_preview_ttl: 10m

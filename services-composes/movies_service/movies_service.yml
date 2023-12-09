@@ -24,6 +24,7 @@ services:
     environment:
       DB_PASSWORD: ${DB_PASSWORD}
       MOVIES_CACHE_PASSWORD: ${REDIS_PASSWORD}
+      MOVIES_PREVIEW_CACHE_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       movies_db:
         condition: service_healthy
