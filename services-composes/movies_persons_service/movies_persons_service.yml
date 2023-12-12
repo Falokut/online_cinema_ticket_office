@@ -1,33 +1,33 @@
 version: "3.8"
 
 include:
-  - ../../databases//movies_people_db/movies_people_db.yml
+  - ../../databases//movies_persons_db/movies_persons_db.yml
 
 networks:
-  movies_people_service_network:
-    name: "movies_people_service_net"
+  movies_persons_service_network:
+    name: "movies_persons_service_net"
     driver: bridge
 
 services:
-  movies_people_service:
-    hostname: movies_people_service
-    image: falokut/movies_people_service
+  movies_persons_service:
+    hostname: movies_persons_service
+    image: falokut/movies_persons_service
     volumes:
       - ./docker/containers-configs/:/configs
     # ports:
     #   - 9902:8080
     networks:
-      - movies_people_service_network
-      - movies_people_db_network
+      - movies_persons_service_network
+      - movies_persons_db_network
       - gateway_network
       - tracing_network
     environment:
       DB_PASSWORD: ${DB_PASSWORD}
-      MOVIES_PEOPLE_CACHE_PASSWORD: ${REDIS_PASSWORD}
+      MOVIES_PERSONS_CACHE_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
-      movies_people_db:
+      movies_persons_db:
         condition: service_healthy
-      movies_people_service_cache:
+      movies_persons_cache:
         condition: service_healthy
     healthcheck:
       test: wget --no-verbose --tries=1 --spider 'http://localhost:7001/healthcheck' || exit 1
@@ -42,10 +42,10 @@ services:
       restart_policy:
         condition: unless-stopped
     labels:
-      servicename: "movies_people_service"
+      servicename: "movies_persons_service"
       org.label-schema.group: "monitoring"
 
-  movies_people_service_cache:
+  movies_persons_cache:
     hostname: redis
     image: redis:7.2.1-alpine
     volumes:
@@ -53,7 +53,7 @@ services:
     # ports:
     #   - 6376:6379
     networks:
-      - movies_people_service_network
+      - movies_persons_service_network
     environment:
       ALLOW_EMPTY_PASSWORD: no
       REDIS_PASSWORD: ${REDIS_PASSWORD}

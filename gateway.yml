@@ -7,7 +7,7 @@ include:
   - services-composes/email_service/email_service.yml
   - services-composes/images_storage_service/images_storage_service.yml
   - services-composes/image_processing_service/image_processing_service.yml
-  - services-composes/movies_people_service/movies_people_service.yml
+  - services-composes/movies_persons_service/movies_persons_service.yml
   - services-composes/genres_service/genres_service.yml
   - services-composes/movies_service/movies_service.yml
   - services-composes/casts_service/casts_service.yml
@@ -31,10 +31,6 @@ services:
       - 80:80
       - 81:81
     networks:
-      # - profiles_service_network
-      # - accounts_service_network
-      # - images_storage_network
-      # - image_processing_service_network
       - gateway_network
     volumes:
       - .nginx/configs/:/etc/nginx/
@@ -53,7 +49,7 @@ services:
         condition: service_started
       image_processing_service:
         condition: service_started
-      movies_people_service:
+      movies_persons_service:
         condition: service_healthy
       genres_service:
         condition: service_healthy

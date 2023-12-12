@@ -6,7 +6,6 @@ CREATE TABLE movies (
     id SERIAL PRIMARY KEY,
     title_ru TEXT NOT NULL,
     title_en TEXT,
-    budget TEXT,
     description TEXT NOT NULL,
     short_description TEXT NOT NULL,
     directors  INT ARRAY,
