@@ -1,0 +1,35 @@
+version: "3.8"
+
+include:
+  #-----------------servises-----------------
+  - movies_persons_service/admin_movies_persons_service.yml
+  - image_processing_service/admin_image_processing_service.yml
+  - geo_service/admin_geo_service.yml
+
+networks:
+  admin_gateway_network:
+    driver: bridge
+    name: "admin_gateway_network"
+
+services:
+  admin_gateway:
+    image: nginx
+    ports:
+      - 90:80
+      - 91:81
+    networks:
+      - admin_gateway_network
+    volumes:
+      - .nginx/configs/:/etc/nginx/
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+    depends_on:
+      admin_movies_persons_service:
+       condition: service_healthy
+      admin_image_processing_service:
+       condition: service_started
+      admin_geo_service:
+       condition: service_healthy
+      admin_kafka_ui:
+        condition: service_started

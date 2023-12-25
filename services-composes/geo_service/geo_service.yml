@@ -24,8 +24,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       geo_CACHE_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
-     geo_db:
-        condition: service_healthy
+     geo_pool:
+        condition: service_started
      geo_service_cache:
         condition: service_healthy
     healthcheck:

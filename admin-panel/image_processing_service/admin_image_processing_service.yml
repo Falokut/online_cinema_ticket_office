@@ -1,21 +1,20 @@
 version: '3.8'
 
 networks:
-  image_processing_service_network:
-    name: "image_processing_service_network"
+  admin_image_processing_service_network:
+    name: "admin_image_processing_service_network"
 
 services:
-  image_processing_service:
+  admin_image_processing_service:
     image: falokut/image_processing_service
-    hostname: image_processing_service
     environment:
       ENABLE_METRICS: true
     # ports:
     #  - 8080
     networks:
-     - image_processing_service_network
+     - admin_image_processing_service_network
      - tracing_network
-     - gateway_network
+     - admin_gateway_network
     deploy:
       mode: replicated
       replicas: 1
@@ -25,5 +24,5 @@ services:
     volumes:
      - ./docker/containers-configs/:/configs
     labels:
-      servicename: "image_processing_service"
+      servicename: "admin_image_processing_service"
       org.label-schema.group: "monitoring"

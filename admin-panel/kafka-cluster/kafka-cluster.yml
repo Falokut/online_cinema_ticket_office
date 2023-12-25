@@ -1,0 +1,71 @@
+version: '3.8'
+
+networks:
+  admin_kafka_network:
+    name: "admin_kafka_network"
+    driver: bridge
+
+services:
+  admin_zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - 3181:2181
+    networks:
+      - admin_kafka_network
+    deploy:
+      restart_policy:
+          condition: unless-stopped
+    healthcheck:
+      test: nc -z localhost 2181 || exit -1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s 
+
+  admin_kafka:
+    image: wurstmeister/kafka
+    hostname: kafka
+    ports:
+      - 39092:29092
+    networks:
+      - admin_kafka_network
+    volumes:
+      - ./.container_data/kafka/:/kafka
+    environment:
+      KAFKA_BROKER_ID: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://localhost:29092
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: admin_zookeeper:3181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9997
+      KAFKA_JMX_HOSTNAME: kafka
+    depends_on:
+      admin_zookeeper:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-c", "unset" , "JMX_PORT" ,";" ,"kafka-topics.sh","--admin_zookeeper","admin_zookeeper:3181","--list"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      restart_policy:
+          condition: unless-stopped
+
+  admin_kafka_ui:
+    image: provectuslabs/kafka-ui:latest
+    volumes:
+      - ./.container_data/kafka-ui/:/etc/kafkaui
+    ports:
+      - 28082:8080
+    networks:
+      - admin_kafka_network
+    environment:
+      DYNAMIC_CONFIG_ENABLED: true
+

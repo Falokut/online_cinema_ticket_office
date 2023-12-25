@@ -11,6 +11,7 @@
 **/.container_data/
 **/container_logs/
 **/.nginx/configs/cache/
+**/.pgadmin-data/
 
 # ignore all vscode-settings
 **/.vscode
@@ -18,6 +19,7 @@
 # protected files
 *.env.yml
 *.env
+**/userlist.txt
 
 # ignore all keys
 *.cnf

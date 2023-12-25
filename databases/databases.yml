@@ -1,0 +1,33 @@
+version: '3.8'
+
+
+include:
+  - accounts_db/accounts_db.yml
+  - casts_db/casts_db.yml
+  - genres_db/genres_db.yml
+  - geo_db/geo_db.yml
+  - movies_db/movies_db.yml
+  - movies_persons_db/movies_persons_db.yml
+  - profiles_db/profiles_db.yml
+
+networks:
+  databases_network:
+    driver: bridge
+    name: "databases_network"
+
+services:
+  pg_admin:
+    image: elestio/pgadmin
+    restart: unless-stopped
+    networks:
+    - databases_network
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${ADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${ADMIN_PASSWORD}
+      - PGADMIN_LISTEN_PORT=8080
+    ports:
+     - 100:8080
+    volumes:
+      - ./.pgadmin-data/:/var/lib/pgadmin
+    depends_on:
+      - movies_persons_pool

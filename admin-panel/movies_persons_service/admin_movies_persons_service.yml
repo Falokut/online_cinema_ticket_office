@@ -1,0 +1,43 @@
+version: "3.8"
+
+include:
+  - ../../databases/movies_persons_db/movies_persons_db.yml
+
+networks:
+  admin_movies_persons_service_network:
+    name: "admin_movies_persons_service_net"
+    driver: bridge
+
+services:
+  admin_movies_persons_service:
+    image: falokut/admin_movies_persons_service
+    volumes:
+      - ./docker/containers-configs/:/configs
+    # ports:
+    #   - 9002:8080
+    networks:
+      - admin_movies_persons_service_network
+      - movies_persons_db_network
+      - tracing_network
+      - admin_gateway_network
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_ENABLE_PREPARED_STATEMENTS: true
+    depends_on:
+      movies_persons_pool:
+        condition: service_started
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider 'http://localhost:7001/healthcheck' || exit 1
+      interval: 40s
+      timeout: 20s
+      retries: 3
+      start_period: 20s
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+      restart_policy:
+        condition: unless-stopped
+    labels:
+      servicename: "admin_movies_persons_service"
+      org.label-schema.group: "monitoring"

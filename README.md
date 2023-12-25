@@ -35,8 +35,10 @@ This repository has the code for an online cinema ticket office. You can buy mov
    * [Configure movies service](https://github.com/Falokut/movies_service/blob/master/README.md#Configure)
    * [Configure genres service](https://github.com/Falokut/genres_service/blob/master/README.md#Configure)
    * [Configure geo service](https://github.com/Falokut/geo_service/blob/master/README.md#Configure)
-   * [Configure  movies persons service](https://github.com/Falokut/movies_persons_service/blob/master/README.md#Configure)
-   * [Configure  casts service](https://github.com/Falokut/casts_service/blob/master/README.md#Configure)
+   * [Configure movies persons service](https://github.com/Falokut/movies_persons_service/blob/master/README.md#Configure)
+   * [Configure casts service](https://github.com/Falokut/casts_service/blob/master/README.md#Configure)
+   * [Configure admin movies persons service](https://github.com/Falokut/admin_movies_persons_service/blob/master/README.md#Configure)
+   * [Configure admin geo service](https://github.com/Falokut/admin_geo_service/blob/master/README.md#Configure)
     
 3. Start the gateway by running the following command:
 

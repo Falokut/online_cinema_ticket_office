@@ -1,0 +1,42 @@
+log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
+healthcheck_port: 7001
+
+image_storage_service:
+  storage_addr: "host.docker.internal:81"
+  base_photo_url: "http://localhost:80/image"
+  photo_category: "person_photo"
+
+image_processing_service:
+  addr: admin_gateway:81
+  max_image_width: 1000
+  max_image_height: 4000
+  min_image_width: 200
+  min_image_height: 200
+  photo_width: 600
+  photo_height: 1000
+  image_resize_method: Lanczos
+  allowed_types: ["image/png", "image/jpeg"]
+
+listen:
+  host: 0.0.0.0
+  port: 8080
+  server_mode: "BOTH"
+  
+db_config: 
+  host: "movies_persons_pool"
+  port: "6432"
+  username: "admin_movies_persons_service"
+  db_name: "movies_persons"
+  ssl_mode: "disable"
+  
+jaeger:
+  service_name: "Admin_Movies_Persons_Service"
+  address: jaeger:6831
+  log_spans: true
+
+prometheus:
+  service_name: "Admin_Movies_Persons_Service"
+  server_config:
+    host: 0.0.0.0
+    port: 7000
+

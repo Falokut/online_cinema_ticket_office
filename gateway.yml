@@ -1,6 +1,10 @@
 version: "3.8"
 
 include:
+  #------------------------------------------
+  - admin-panel/admin-panel.yml
+  - databases/databases.yml
+
   #-----------------servises-----------------
   - services-composes/accounts_service/accounts_service.yml
   - services-composes/profiles_service/profiles_service.yml
@@ -75,7 +79,11 @@ services:
       #------------------------------------------
       watchtower:
         condition: service_started
-
+      admin_gateway:
+        condition: service_started
+      pg_admin:
+        condition: service_started
+        
   watchtower:
     image: containrrr/watchtower
     command: --interval 600

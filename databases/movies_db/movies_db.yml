@@ -13,8 +13,8 @@ services:
     volumes:
       - ./.container_data/database/postgres/data:/var/lib/postgresql/data
       - ./db/init-up.sql:/docker-entrypoint-initdb.d/init.up.sql
-    # ports:
-    #   - 5440:5432
+    ports:
+      - 5450:5432
     networks:
       - movies_db_network
     environment :

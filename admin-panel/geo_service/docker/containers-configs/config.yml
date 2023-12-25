@@ -9,30 +9,22 @@ listen:
 db_config: 
   host: "geo_pool"
   port: "6432"
-  username: "geo_service"
+  username: "admin_geo_service"
   db_name: "geo"
   ssl_mode: "disable"
-
+  
 jaeger:
-  service_name: "Geo_Service"
+  service_name: "Admin_Geo_Service"
   address: jaeger:6831
   log_spans: true
 
 prometheus:
-  service_name: "Geo_Service"
+  service_name: "Admin_Geo_Service"
   server_config:
     host: 0.0.0.0
     port: 7000
 
+kafka:
+  brokers:
+    - "kafka:9092"
 
-country_cache: 
-  network: "tcp"
-  addr: "redis:6379"
-  db: 0
-  country_ttl: 30m
-
-city_cache: 
-  network: "tcp"
-  addr: "redis:6379"
-  db: 1
-  city_ttl: 30m

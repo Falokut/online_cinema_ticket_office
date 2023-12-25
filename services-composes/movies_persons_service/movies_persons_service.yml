@@ -25,8 +25,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       MOVIES_PERSONS_CACHE_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
-      movies_persons_db:
-        condition: service_healthy
+      movies_persons_pool:
+        condition: service_started
       movies_persons_cache:
         condition: service_healthy
     healthcheck:
