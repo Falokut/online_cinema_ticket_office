@@ -9,10 +9,10 @@ listen:
     - X-Account-Id
   
 db_config: 
-  host: "profiles_db"
-  port: "5432"
+  host: "profiles_pool"
+  port: "6432"
   username: "profiles_service"
-  db_name: "profiles_db"
+  db_name: "profiles"
   ssl_mode: "disable"
 
 jaeger:

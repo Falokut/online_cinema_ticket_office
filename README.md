@@ -33,8 +33,6 @@ This repository has the code for an online cinema ticket office. You can buy mov
    * [Configure email service](https://github.com/Falokut/email_service/blob/master/README.md#Configure)
    * [Configure profiles service](https://github.com/Falokut/profiles_service/blob/master/README.md#Configure)
    * [Configure movies service](https://github.com/Falokut/movies_service/blob/master/README.md#Configure)
-   * [Configure genres service](https://github.com/Falokut/genres_service/blob/master/README.md#Configure)
-   * [Configure geo service](https://github.com/Falokut/geo_service/blob/master/README.md#Configure)
    * [Configure movies persons service](https://github.com/Falokut/movies_persons_service/blob/master/README.md#Configure)
    * [Configure casts service](https://github.com/Falokut/casts_service/blob/master/README.md#Configure)
    * [Configure admin movies persons service](https://github.com/Falokut/admin_movies_persons_service/blob/master/README.md#Configure)
@@ -107,17 +105,22 @@ Sure! Here are the additional instructions for Windows and macOS:
    + [Email service](https://github.com/Falokut/email_service)
    + [Movies service](https://github.com/Falokut/movies_service)
    + [Casts service](https://github.com/Falokut/casts_service)
-   + [Genres service](https://github.com/Falokut/genres_service)
    + [Movies persons service](https://github.com/Falokut/movies_persons_service)
-   + [Geo service](https://github.com/Falokut/geo_service)
+   + [Admin movies service](https://github.com/Falokut/admin_movies_service)
+   + [Admin casts service](https://github.com/Falokut/admin_casts_service)
+   + [Admin movies persons service](https://github.com/Falokut/admin_movies_persons_service)
 
 # Endpoints  
 * Grafana endpoint  http://localhost:3000  
 * Prometheus endpoint  http://localhost:9090
 * Jaeger UI endpoint http://localhost:16686
-* RestApi endpoint http://localhost:80
-* gRPC endpoint http://localhost:81
-* kafka-ui http://localhost:18082
+* RestApi users endpoint http://localhost:80
+* gRPC users endpoint http://localhost:81
+* kafka-ui users http://localhost:18082
+* kafka-ui admins/employee http://localhost:28082
+* pgAdmin http://localhost:100
+* RestApi admins/employee endpoint http://localhost:90
+* gRPC admins/employee endpoint http://localhost:91
 
 
 # Metrics and Monitoring

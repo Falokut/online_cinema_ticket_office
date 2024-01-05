@@ -4,8 +4,8 @@ include:
   #-----------------servises-----------------
   - movies_persons_service/admin_movies_persons_service.yml
   - image_processing_service/admin_image_processing_service.yml
-  - geo_service/admin_geo_service.yml
-
+  - casts_service/admin_casts_service.yml
+  - movies_service/admin_movies_service.yml
 networks:
   admin_gateway_network:
     driver: bridge
@@ -29,7 +29,9 @@ services:
        condition: service_healthy
       admin_image_processing_service:
        condition: service_started
-      admin_geo_service:
+      admin_movies_service:
+        condition: service_healthy
+      admin_casts_service:
        condition: service_healthy
       admin_kafka_ui:
-        condition: service_started
+       condition: service_started

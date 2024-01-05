@@ -1,31 +1,30 @@
 version: "3.8"
 
 include:
-  - ../../databases/movies_persons_db/movies_persons_db.yml
-
+  - ../../databases/movies_db/movies_db.yml
+  - ../kafka-cluster/kafka-cluster.yml
 networks:
-  admin_movies_persons_service_network:
-    name: "admin_movies_persons_service_net"
+  admin_movies_service_network:
+    name: "admin_movies_service_net"
     driver: bridge
 
 services:
-  admin_movies_persons_service:
-    image: falokut/admin_movies_persons_service
+  admin_movies_service:
+    image: falokut/admin_movies_service
     volumes:
       - ./docker/containers-configs/:/configs
     expose:
       - 8080
     networks:
-      - admin_movies_persons_service_network
-      - movies_persons_db_network
-      - tracing_network
-      - admin_gateway_network
+      - admin_movies_service_network
+      - movies_db_network
       - admin_kafka_network
+      - admin_gateway_network
+      - tracing_network
     environment:
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_ENABLE_PREPARED_STATEMENTS: true
     depends_on:
-      movies_persons_pool:
+      movies_pool:
         condition: service_started
       admin_kafka:
         condition: service_healthy
@@ -42,5 +41,5 @@ services:
       restart_policy:
         condition: unless-stopped
     labels:
-      servicename: "admin_movies_persons_service"
+      servicename: "admin_movies_service"
       org.label-schema.group: "monitoring"

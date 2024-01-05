@@ -26,19 +26,17 @@ services:
     image: wurstmeister/kafka
     hostname: kafka
     ports:
-      - 39092:29092
+      - 39092:39092
     networks:
       - admin_kafka_network
-    volumes:
-      - ./.container_data/kafka/:/kafka
     environment:
       KAFKA_BROKER_ID: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://localhost:29092
-      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:29092
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://localhost:39092
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:39092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      KAFKA_ZOOKEEPER_CONNECT: admin_zookeeper:3181
+      KAFKA_ZOOKEEPER_CONNECT: admin_zookeeper:2181
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1

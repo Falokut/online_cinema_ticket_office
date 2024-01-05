@@ -14,10 +14,10 @@ listen:
     X-Account-Id: x-account-id
 
 db_config: 
-  host: "accounts_db"
-  port: "5432"
+  host: "accounts_pool"
+  port: "6432"
   username: "accounts_service"
-  db_name: "accounts_db"
+  db_name: "accounts"
   ssl_mode: "disable"
 
 redis_registration_options:

@@ -12,8 +12,8 @@ services:
     volumes:
       - ./.container_data/database/postgres/data:/var/lib/postgresql/data
       - ./db/init-up.sql:/docker-entrypoint-initdb.d/init.up.sql
-    # ports:
-    #   - 5440:5432
+    expose:
+      - 5432
     networks:
       - movies_persons_db_network
     environment:
@@ -31,8 +31,8 @@ services:
   movies_persons_pool:
     image: bitnami/pgbouncer
     restart: unless-stopped
-    # ports:
-    #   - 6439:6432
+    expose:
+      - 6432
     networks:
       - databases_network
       - movies_persons_db_network

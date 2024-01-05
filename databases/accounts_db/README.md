@@ -19,3 +19,10 @@ CREATE ROLE accounts_service WITH
     LOGIN
     PASSWORD 'YourPasswordForAccountsService'; -- Here your password for accounts service
 ```
+
+3. setup pgbouncer:
+* create userlist.txt in docker/pgbouncer and provide passwords: 
+```
+"accounts_service" "yourpassword"
+"postgres" "yourpassword"
+```

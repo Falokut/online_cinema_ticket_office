@@ -4,7 +4,9 @@ listen:
   host: 0.0.0.0
   port: 8080
   server_mode: "BOTH"
-
+  max_request_size: 30
+  max_response_size: 30
+  
 jaeger:
   service_name: "Images_Processing_Service"
   address: jaeger:6831

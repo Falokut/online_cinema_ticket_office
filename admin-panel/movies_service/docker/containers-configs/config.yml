@@ -1,0 +1,61 @@
+log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
+healthcheck_port: 7001
+
+listen:
+  port: 8080
+  server_mode: "BOTH"
+  max_request_size: 990
+  
+db_config: 
+  host: "movies_pool"
+  port: "6432"
+  username: "admin_movies_service"
+  db_name: "movies"
+  ssl_mode: "disable"
+
+jaeger:
+  service_name: "Admin_Movies_Service"
+  address: jaeger:6831
+  log_spans: true
+
+prometheus:
+  service_name: "Admin_Movies_Service"
+  server_config:
+    host: 0.0.0.0
+    port: 7000
+
+image_storage_service:
+  base_picture_url: "http://localhost:80/image"
+  addr: "host.docker.internal:81"
+  
+image_processing_service:
+  addr: "admin_gateway:91"
+
+posters_config:
+  validate_image: false
+  check_image:
+     allowed_types: ["image/png", "image/jpeg","image/webp","image/pjpeg","image/svg+xml","image/tiff","image/vnd.microsoft.icon","image/vnd.wap.wbmp"]
+  resize_image: true
+  image_processing:
+     image_width: 600
+     image_height: 1000
+     image_resize_method: Lanczos
+  category: "posters"
+
+preview_posters_config:
+  validate_image: false
+  check_image:
+     allowed_types: ["image/png", "image/jpeg","image/webp","image/pjpeg","image/svg+xml","image/tiff","image/vnd.microsoft.icon","image/vnd.wap.wbmp"]
+  resize_image: true
+  image_processing:
+     image_width: 300
+     image_height: 500
+     image_resize_method: Lanczos
+  category: "previewposters"
+
+background_config:
+  validate_image: false
+  check_image:
+     allowed_types: ["image/png", "image/jpeg","image/webp","image/pjpeg","image/svg+xml","image/tiff","image/vnd.microsoft.icon","image/vnd.wap.wbmp"]
+  resize_image: false
+  category: "background"

@@ -16,16 +16,16 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     volumes:
       - ./docker/containers-configs/config.yml:/configs/config.yml
-    # ports:
-    # - 8080
+    expose:
+      - 8080
     networks:
       - profiles_service_network
       - profiles_db_network
       - tracing_network
       - gateway_network
     depends_on:
-      profiles_db:
-        condition: service_healthy
+      profiles_pool:
+        condition: service_started
     healthcheck:
       test: wget --no-verbose --tries=1 --spider 'http://localhost:7001/healthcheck' || exit 1
       interval: 40s

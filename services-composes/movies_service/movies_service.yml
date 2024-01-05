@@ -14,8 +14,8 @@ services:
     image: falokut/movies_service
     volumes:
       - ./docker/containers-configs/:/configs
-    # ports:
-    #   - 9901:8080
+    expose:
+      - 8080
     networks:
       - movies_service_network
       - movies_db_network
@@ -26,8 +26,8 @@ services:
       MOVIES_CACHE_PASSWORD: ${REDIS_PASSWORD}
       MOVIES_PREVIEW_CACHE_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
-      movies_db:
-        condition: service_healthy
+      movies_pool:
+        condition: service_started
       movies_service_cache:
         condition: service_healthy
     healthcheck:
@@ -52,8 +52,8 @@ services:
     image: redis:7.2.1-alpine
     volumes:
       - ./.container_data/cache/data:/data
-    # ports:
-    #   - 6377:6379
+    expose:
+      - 6379
     networks:
       - movies_service_network
     environment:

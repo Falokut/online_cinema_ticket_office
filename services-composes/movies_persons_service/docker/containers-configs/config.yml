@@ -3,7 +3,7 @@ healthcheck_port: 7001
 
 images_service:
   base_photo_url: "http://localhost:80/image"
-  pictures_category: "person_photo"
+  pictures_category: "persons"
   
 listen:
   host: 0.0.0.0

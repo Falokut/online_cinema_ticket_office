@@ -12,10 +12,8 @@ include:
   - services-composes/images_storage_service/images_storage_service.yml
   - services-composes/image_processing_service/image_processing_service.yml
   - services-composes/movies_persons_service/movies_persons_service.yml
-  - services-composes/genres_service/genres_service.yml
   - services-composes/movies_service/movies_service.yml
   - services-composes/casts_service/casts_service.yml
-  - services-composes/geo_service/geo_service.yml
   #-----------------brokers-----------------
   - services-composes/kafka-cluster/kafka-cluster.yml
 
@@ -55,13 +53,9 @@ services:
         condition: service_started
       movies_persons_service:
         condition: service_healthy
-      genres_service:
-        condition: service_healthy
       movies_service:
         condition: service_healthy
       casts_service: 
-        condition: service_healthy
-      geo_service:
         condition: service_healthy
       #------------------------------------------
       prometheus:

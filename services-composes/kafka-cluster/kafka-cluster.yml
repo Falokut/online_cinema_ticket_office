@@ -28,8 +28,6 @@ services:
       - 29092:29092
     networks:
       - kafka_network
-    volumes:
-      - ./.container_data/kafka/:/kafka
     environment:
       KAFKA_BROKER_ID: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: false

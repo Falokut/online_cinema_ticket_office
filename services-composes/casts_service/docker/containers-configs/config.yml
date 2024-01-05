@@ -7,10 +7,10 @@ listen:
   server_mode: "BOTH"
   
 db_config: 
-  host: "casts_db"
-  port: "5432"
+  host: "casts_pool"
+  port: "6432"
   username: "casts_service"
-  db_name: "casts_db"
+  db_name: "casts"
   ssl_mode: "disable"
 
 jaeger:
@@ -30,4 +30,11 @@ casts_cache:
   addr: "redis:6379"
   db: 0
   cast_ttl: 30m
+
+professions_cache:
+  network: "tcp"
+  addr: "redis:6379"
+  db: 1
+  professions_ttl: 30m
+
 

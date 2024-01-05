@@ -10,8 +10,8 @@ services:
     hostname: image_processing_service
     environment:
       ENABLE_METRICS: true
-    # ports:
-    #  - 8080
+    expose:
+      - 8080
     networks:
      - image_processing_service_network
      - tracing_network

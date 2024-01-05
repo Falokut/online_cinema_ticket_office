@@ -14,8 +14,8 @@ services:
     image: falokut/movies_persons_service
     volumes:
       - ./docker/containers-configs/:/configs
-    # ports:
-    #   - 9902:8080
+    expose:
+      - 8080
     networks:
       - movies_persons_service_network
       - movies_persons_db_network
@@ -50,8 +50,8 @@ services:
     image: redis:7.2.1-alpine
     volumes:
       - ./.container_data/cache/data:/data
-    # ports:
-    #   - 6376:6379
+    expose:
+      - 6379
     networks:
       - movies_persons_service_network
     environment:

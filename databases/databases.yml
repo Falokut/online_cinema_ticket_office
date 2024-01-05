@@ -2,10 +2,7 @@ version: '3.8'
 
 
 include:
-  - accounts_db/accounts_db.yml
   - casts_db/casts_db.yml
-  - genres_db/genres_db.yml
-  - geo_db/geo_db.yml
   - movies_db/movies_db.yml
   - movies_persons_db/movies_persons_db.yml
   - profiles_db/profiles_db.yml
@@ -31,3 +28,7 @@ services:
       - ./.pgadmin-data/:/var/lib/pgadmin
     depends_on:
       - movies_persons_pool
+      - casts_pool
+      - movies_pool
+      - profiles_pool
+      - accounts_pool

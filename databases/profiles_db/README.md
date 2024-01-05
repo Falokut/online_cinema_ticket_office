@@ -19,3 +19,9 @@ CREATE ROLE profiles_service WITH
     LOGIN
     PASSWORD 'YourPasswordForProfilesService'; -- Here your password for profiles service
 ```
+3. setup pgbouncer:
+* create userlist.txt in docker/pgbouncer and provide passwords: 
+```
+"profiles_service" "yourpassword"
+"postgres" "yourpassword"
+```

@@ -4,7 +4,7 @@ healthcheck_port: 7001
 image_storage_service:
   storage_addr: "host.docker.internal:81"
   base_photo_url: "http://localhost:80/image"
-  photo_category: "person_photo"
+  photo_category: "persons"
 
 image_processing_service:
   addr: admin_gateway:81
@@ -39,4 +39,7 @@ prometheus:
   server_config:
     host: 0.0.0.0
     port: 7000
-
+    
+kafka:
+  brokers:
+    - "kafka:9092"
