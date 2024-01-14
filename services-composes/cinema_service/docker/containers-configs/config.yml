@@ -1,0 +1,43 @@
+log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
+healthcheck_port: 7001
+
+listen:
+  host: 0.0.0.0
+  port: 8080
+  server_mode: "BOTH"
+
+db_config:
+  host: "cinema_pool"
+  port: "6432"
+  username: "cinema_service"
+  db_name: "cinema"
+  ssl_mode: "disable"
+
+jaeger:
+  service_name: "Cinema_Service"
+  address: jaeger:6831
+  log_spans: true
+
+prometheus:
+  service_name: "Cinema_Service"
+  server_config:
+    host: 0.0.0.0
+    port: 7000
+
+cities_cache:
+  network: "tcp"
+  addr: "cinema_service_cache:6379"
+  db: 0
+  ttl: 30m
+
+cinemas_cache:
+  network: "tcp"
+  addr: "cinema_service_cache:6379"
+  db: 1
+  ttl: 30m
+
+halls_cache:
+  network: "tcp"
+  addr: "cinema_service_cache:6379"
+  db: 2
+  ttl: 30m

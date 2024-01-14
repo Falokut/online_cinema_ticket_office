@@ -41,7 +41,7 @@ repository_manager:
   movie_preview_ttl: 10m
 
 pictures:
-  base_url: "http://localhost:80/image"
+  base_url: "http://109.167.154.121/image"
   posters_category: "posters"
   preview_posters_category: "previewposters"
   backgrounds_category: "background"

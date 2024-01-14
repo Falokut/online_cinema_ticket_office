@@ -14,6 +14,8 @@ include:
   - services-composes/movies_persons_service/movies_persons_service.yml
   - services-composes/movies_service/movies_service.yml
   - services-composes/casts_service/casts_service.yml
+  - services-composes/cinema_service/cinema_service.yml
+
   #-----------------brokers-----------------
   - services-composes/kafka-cluster/kafka-cluster.yml
 
@@ -56,6 +58,8 @@ services:
       movies_service:
         condition: service_healthy
       casts_service: 
+        condition: service_healthy
+      cinema_service:
         condition: service_healthy
       #------------------------------------------
       prometheus:

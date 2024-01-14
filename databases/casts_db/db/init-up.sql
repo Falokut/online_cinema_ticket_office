@@ -13,9 +13,9 @@ CREATE TABLE professions (
 );
 CREATE TABLE casts (
     movie_id INT NOT NULL,
-    actor_id INT NOT NULL,
+    person_id INT NOT NULL,
     profession_id INT REFERENCES professions(id) ON DELETE SET NULL ON UPDATE CASCADE,
-    PRIMARY KEY(movie_id,actor_id,profession_id)
+    PRIMARY KEY(movie_id,person_id,profession_id)
 );
 
 CREATE TABLE casts_labels (

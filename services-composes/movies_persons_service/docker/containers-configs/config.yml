@@ -2,7 +2,7 @@ log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "
 healthcheck_port: 7001
 
 images_service:
-  base_photo_url: "http://localhost:80/image"
+  base_photo_url: "http://109.167.154.121/image"
   pictures_category: "persons"
   
 listen:

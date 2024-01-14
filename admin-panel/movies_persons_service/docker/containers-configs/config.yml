@@ -2,8 +2,8 @@ log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "
 healthcheck_port: 7001
 
 image_storage_service:
-  storage_addr: "host.docker.internal:81"
-  base_photo_url: "http://localhost:80/image"
+  storage_addr: "109.167.154.121:81"
+  base_photo_url: "http://109.167.154.121/image"
   photo_category: "persons"
 
 image_processing_service:

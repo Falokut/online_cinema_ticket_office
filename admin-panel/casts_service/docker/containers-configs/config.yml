@@ -36,10 +36,11 @@ persons_events_kafka:
     - "kafka:9092"
   group_id: "casts_service"
   read_batch_timeout: 30s
+
 movies_service:
-  addr: admin_gateway:91
+  addr: admin_gateway:81
 movies_persons_service:
-  addr: admin_gateway:91
+  addr: admin_gateway:81
 
 
 

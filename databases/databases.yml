@@ -6,6 +6,7 @@ include:
   - movies_db/movies_db.yml
   - movies_persons_db/movies_persons_db.yml
   - profiles_db/profiles_db.yml
+  - cinema_db/cinema_db.yml
 
 networks:
   databases_network:
@@ -32,3 +33,4 @@ services:
       - movies_pool
       - profiles_pool
       - accounts_pool
+      - cinema_pool

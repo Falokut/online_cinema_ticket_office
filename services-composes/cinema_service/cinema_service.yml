@@ -1,0 +1,66 @@
+version: "3.8"
+
+include:
+  - ../../databases/cinema_db/cinema_db.yml
+networks:
+  cinema_service_network:
+    name: "cinema_service_net"
+    driver: bridge
+
+services:
+  cinema_service:
+    image: falokut/cinema_service
+    volumes:
+      - ./docker/containers-configs/:/configs
+    expose:
+      - 8080
+    networks:
+      - cinema_service_network
+      - cinema_db_network
+      - tracing_network
+      - gateway_network
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      CINEMA_CACHE_PASSWORD: ${REDIS_PASSWORD}
+      CITIES_CACHE_PASSWORD: ${REDIS_PASSWORD}
+      HALLS_CACHE_PASSWORD: ${REDIS_PASSWORD}
+    depends_on:
+      cinema_pool:
+        condition: service_started
+      cinema_service_cache:
+        condition: service_healthy
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider 'http://localhost:7001/healthcheck' || exit 1
+      interval: 40s
+      timeout: 20s
+      retries: 3
+      start_period: 20s
+    deploy:
+      mode: replicated
+      replicas: 1
+      endpoint_mode: dnsrr
+      restart_policy:
+        condition: unless-stopped
+    labels:
+      servicename: "cinema_service"
+      org.label-schema.group: "monitoring"
+  cinema_service_cache:
+    image: redis:7.2.1-alpine
+    volumes:
+      - ./.container_data/cache/data:/data
+    expose:
+      - 6379
+    networks:
+      - cinema_service_network
+    environment:
+      ALLOW_EMPTY_PASSWORD: no
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_AOF_ENABLED: ${REDIS_AOF_ENABLED}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      restart_policy:
+        condition: unless-stopped

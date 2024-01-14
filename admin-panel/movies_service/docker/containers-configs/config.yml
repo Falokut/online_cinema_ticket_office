@@ -25,11 +25,11 @@ prometheus:
     port: 7000
 
 image_storage_service:
-  base_picture_url: "http://localhost:80/image"
-  addr: "host.docker.internal:81"
+  base_picture_url: "http://109.167.154.121/image"
+  addr: "109.167.154.121:81"
   
 image_processing_service:
-  addr: "admin_gateway:91"
+  addr: "admin_gateway:81"
 
 posters_config:
   validate_image: false
@@ -59,3 +59,8 @@ background_config:
      allowed_types: ["image/png", "image/jpeg","image/webp","image/pjpeg","image/svg+xml","image/tiff","image/vnd.microsoft.icon","image/vnd.wap.wbmp"]
   resize_image: false
   category: "background"
+
+kafka:
+  brokers:
+    - "kafka:9092"
+
