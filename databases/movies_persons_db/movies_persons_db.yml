@@ -1,6 +1,5 @@
 version: "3.8"
 
-
 networks:
   movies_persons_db_network:
     name: "movies_persons_db_network"
@@ -22,8 +21,11 @@ services:
       PGUSER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: movies_persons
+      SERVICE_NAME: movies_persons_service
+      SERVICE_PASSWORD: ${SERVICE_PASSWORD}
+      ADMIN_SERVICE_PASSWORD: ${ADMIN_SERVICE_PASSWORD}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready"]
+      test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
       timeout: 5s
       retries: 5

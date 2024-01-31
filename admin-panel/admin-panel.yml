@@ -16,7 +16,7 @@ services:
     image: nginx
     ports:
       - 90:80
-      - 91:81
+      #- 91:81
     networks:
       - admin_gateway_network
     volumes:

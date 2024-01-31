@@ -24,6 +24,7 @@ services:
       CINEMA_CACHE_PASSWORD: ${REDIS_PASSWORD}
       CITIES_CACHE_PASSWORD: ${REDIS_PASSWORD}
       HALLS_CACHE_PASSWORD: ${REDIS_PASSWORD}
+      HALLS_CONFIGURATIONS_CACHE_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       cinema_pool:
         condition: service_started

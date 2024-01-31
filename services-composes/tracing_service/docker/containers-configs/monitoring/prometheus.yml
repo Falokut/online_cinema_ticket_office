@@ -47,6 +47,25 @@ scrape_configs:
         type: A
         port: 7000
 
+  - job_name: movies_service
+    dns_sd_configs:
+      - names:
+          - movies_service
+        type: A
+        port: 7000
+  - job_name: movies_persons_service
+    dns_sd_configs:
+      - names:
+          - movies_persons_service
+        type: A
+        port: 7000
+  - job_name: casts_service
+    dns_sd_configs:
+      - names:
+          - casts_service
+        type: A
+        port: 7000
+
   - job_name: admin_image_processing_service
     dns_sd_configs:
       - names:
@@ -58,20 +77,6 @@ scrape_configs:
     dns_sd_configs:
       - names:
           - admin_movies_persons_service
-        type: A
-        port: 7000
-
-  - job_name: admin_geo_service
-    dns_sd_configs:
-      - names:
-          - admin_geo_service
-        type: A
-        port: 7000
-
-  - job_name: admin_genres_service
-    dns_sd_configs:
-      - names:
-          - admin_genres_service
         type: A
         port: 7000
 

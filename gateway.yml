@@ -33,7 +33,6 @@ services:
     hostname: gateway
     ports:
       - 80:80
-      - 81:81
     networks:
       - gateway_network
     volumes:
@@ -84,7 +83,7 @@ services:
         
   watchtower:
     image: containrrr/watchtower
-    command: --interval 600
+    command: --interval 60
     environment:
       WATCHTOWER_LIFE_CYCLE_HOOKS: 1
       WATCHTOWER_NOTIFICATION: shoutrrr

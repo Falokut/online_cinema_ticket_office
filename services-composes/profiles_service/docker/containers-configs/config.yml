@@ -28,7 +28,7 @@ prometheus:
 
 image_storage_service:
   storage_addr: "gateway:82"
-  base_profile_picture_url: "http://109.167.154.121:80/image"
+  base_profile_picture_url: "http://109.167.154.121/image"
   profile_picture_category: "profiles-pictures"
 
 

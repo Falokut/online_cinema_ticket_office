@@ -2,12 +2,12 @@ log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "
 healthcheck_port: 7001
 
 image_storage_service:
-  storage_addr: "109.167.154.121:81"
+  storage_addr: "109.167.154.121"
   base_photo_url: "http://109.167.154.121/image"
   photo_category: "persons"
 
 image_processing_service:
-  addr: admin_gateway:81
+  addr: admin_gateway
   max_image_width: 1000
   max_image_height: 4000
   min_image_width: 200

@@ -110,17 +110,15 @@ Sure! Here are the additional instructions for Windows and macOS:
    + [Admin casts service](https://github.com/Falokut/admin_casts_service)
    + [Admin movies persons service](https://github.com/Falokut/admin_movies_persons_service)
 
-# Endpoints  
+# Endpoints
 * Grafana endpoint  http://localhost:3000  
 * Prometheus endpoint  http://localhost:9090
 * Jaeger UI endpoint http://localhost:16686
-* RestApi users endpoint http://localhost:80
-* gRPC users endpoint http://localhost:81
+* RestApi and gRPC users endpoint http://localhost:80
 * kafka-ui users http://localhost:18082
 * kafka-ui admins/employee http://localhost:28082
 * pgAdmin http://localhost:100
-* RestApi admins/employee endpoint http://localhost:90
-* gRPC admins/employee endpoint http://localhost:91
+* RestApi and gRPC admins/employee endpoint http://localhost:90
 
 
 # Metrics and Monitoring

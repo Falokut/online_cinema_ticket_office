@@ -41,3 +41,9 @@ halls_cache:
   addr: "cinema_service_cache:6379"
   db: 2
   ttl: 30m
+  
+halls_configurations_cache:
+  network: "tcp"
+  addr: "cinema_service_cache:6379"
+  db: 3
+  ttl: 30m

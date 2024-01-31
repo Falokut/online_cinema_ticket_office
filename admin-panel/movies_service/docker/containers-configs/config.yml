@@ -26,10 +26,10 @@ prometheus:
 
 image_storage_service:
   base_picture_url: "http://109.167.154.121/image"
-  addr: "109.167.154.121:81"
+  addr: "109.167.154.121"
   
 image_processing_service:
-  addr: "admin_gateway:81"
+  addr: "admin_gateway"
 
 posters_config:
   validate_image: false

@@ -10,20 +10,23 @@ services:
     image: postgres:16.0-alpine3.18
     volumes:
       - ./.container_data/database/postgres/data:/var/lib/postgresql/data
-      - ./db/init-up.sql:/docker-entrypoint-initdb.d/init.up.sql
+      - ./db:/docker-entrypoint-initdb.d
     expose:
       - 5432
     networks:
       - profiles_db_network
-    environment :
+    environment:
       - PGDATA=/var/lib/postgresql/data
       - POSTGRES_USER=${POSTGRES_USER}
       - PGUSER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=profiles
+      - SERVICE_NAME=profiles_service
+      - SERVICE_PASSWORD=${SERVICE_PASSWORD}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready"]
       interval: 10s
+      start_period: 10s
       timeout: 5s
       retries: 5
     deploy:

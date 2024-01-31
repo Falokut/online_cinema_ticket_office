@@ -11,7 +11,7 @@ services:
     image: postgres:16.0-alpine3.18
     volumes:
       - ./.container_data/database/postgres/data:/var/lib/postgresql/data
-      - ./db/init-up.sql:/docker-entrypoint-initdb.d/init.up.sql
+      - ./db/:/docker-entrypoint-initdb.d
     expose:
       - 5432
     networks:
@@ -22,6 +22,9 @@ services:
        PGUSER: ${POSTGRES_USER}
        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
        POSTGRES_DB: casts
+       SERVICE_NAME: casts_service
+       SERVICE_PASSWORD: ${SERVICE_PASSWORD}
+       ADMIN_SERVICE_PASSWORD: ${ADMIN_SERVICE_PASSWORD}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready"]
       interval: 10s
@@ -41,7 +44,7 @@ services:
       PGBOUNCER_AUTH_TYPE: md5
       PGBOUNCER_DATABASE: casts
       POSTGRESQL_USERNAME: ${POSTGRES_USER}
-      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD} 
     volumes:
       - ./docker/pgbouncer/pgbouncer.ini:/bitnami/pgbouncer/conf/pgbouncer.ini
       - ./docker/pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt
