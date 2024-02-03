@@ -38,9 +38,12 @@ persons_events_kafka:
   read_batch_timeout: 30s
 
 movies_service:
-  addr: admin_gateway:81
+  addr: falokut.ru:444
+  connection_config:
+    dial_method: NIL_TLS_CONFIG
 movies_persons_service:
-  addr: admin_gateway:81
-
+  addr: falokut.ru:444
+  connection_config:
+    dial_method: NIL_TLS_CONFIG
 
 

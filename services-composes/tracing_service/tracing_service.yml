@@ -28,6 +28,18 @@ services:
       - cadvisor
     labels:
       org.label-schema.group: "monitoring"
+      
+  users_nginx_exporter:
+    image: nginx/nginx-prometheus-exporter
+    environment:
+      SCRAPE_URI: http://gateway:8080/stub_status
+    ports:
+    - 9113:9113
+    networks:
+      - tracing_network
+      - gateway_network
+    labels:
+      org.label-schema.group: "monitoring"
 
   jaeger:
     image: jaegertracing/all-in-one:1.21

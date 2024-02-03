@@ -32,11 +32,13 @@ services:
     image: nginx
     hostname: gateway
     ports:
-      - 80:80
+      - 8000:80
+      - 44300:443
     networks:
       - gateway_network
     volumes:
-      - .nginx/configs/:/etc/nginx/
+      - .nginx/configs/:/etc/nginx/:ro
+      - ./certs:/certs/:ro
     deploy:
       restart_policy:
         condition: unless-stopped
@@ -64,6 +66,8 @@ services:
       prometheus:
         condition: service_started
       jaeger:
+        condition: service_started
+      users_nginx_exporter:
         condition: service_started
       grafana:
         condition: service_started

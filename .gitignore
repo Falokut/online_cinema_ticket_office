@@ -12,7 +12,8 @@
 **/container_logs/
 **/.nginx/configs/cache/
 **/.pgadmin-data/
-
+**/certbot/
+**/certs/
 # ignore all vscode-settings
 **/.vscode
 

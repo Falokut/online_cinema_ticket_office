@@ -15,12 +15,13 @@ services:
   admin_gateway:
     image: nginx
     ports:
-      - 90:80
-      #- 91:81
+      - 10080:80
+      - 10443:443
     networks:
       - admin_gateway_network
     volumes:
       - .nginx/configs/:/etc/nginx/
+      - ../certs:/certs
     deploy:
       restart_policy:
         condition: unless-stopped
