@@ -3,6 +3,8 @@ healthcheck_port: 7001
 
 image_storage_service:
   storage_addr: "falokut.ru:443"
+  connection_config:
+    dial_method: NIL_TLS_CONFIG
   base_photo_url: "https://falokut.ru/image"
   photo_category: "persons"
 

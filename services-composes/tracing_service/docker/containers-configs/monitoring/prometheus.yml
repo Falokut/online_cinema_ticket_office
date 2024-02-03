@@ -90,3 +90,9 @@ scrape_configs:
           - admin_casts_service
         type: A
         port: 7000
+  - job_name: admin_cinema_service
+    dns_sd_configs:
+      - names:
+          - admin_cinema_service
+        type: A
+        port: 7000

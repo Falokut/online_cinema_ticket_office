@@ -39,6 +39,7 @@ This repository has the code for an online cinema ticket office. You can buy mov
    * [Configure admin movies persons service](https://github.com/Falokut/admin_movies_persons_service/blob/master/README.md#Configure)
    * [Configure admin movies service](https://github.com/Falokut/admin_movies_service/blob/master/README.md#Configure)
    * [Configure admin casts service](https://github.com/Falokut/admin_casts_service/blob/master/README.md#Configure)
+   * [Configure admin cinema service](https://github.com/Falokut/admin_cinema_service/blob/master/README.md#Configure)
 
 3. Start the gateway by running the following command:
 
@@ -108,6 +109,7 @@ Sure! Here are the additional instructions for Windows and macOS:
    + [Movies service](https://github.com/Falokut/movies_service)
    + [Casts service](https://github.com/Falokut/casts_service)
    + [Movies persons service](https://github.com/Falokut/movies_persons_service)
+   + [Admin cinema service](https://github.com/Falokut/admin_cinema_service)
    + [Admin movies service](https://github.com/Falokut/admin_movies_service)
    + [Admin casts service](https://github.com/Falokut/admin_casts_service)
    + [Admin movies persons service](https://github.com/Falokut/admin_movies_persons_service)
