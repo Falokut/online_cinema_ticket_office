@@ -11,7 +11,7 @@ networks:
 
 services:
   admin_casts_service:
-    image: falokut/admin_casts_service
+    image: falokut/admin_casts_service-alpine:latest
     volumes:
       - ./docker/containers-configs/:/configs
     expose:

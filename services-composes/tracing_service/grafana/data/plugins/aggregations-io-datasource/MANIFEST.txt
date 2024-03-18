@@ -1,0 +1,43 @@
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+{
+  "manifestVersion": "2.0.0",
+  "signatureType": "commercial",
+  "signedByOrg": "aggregations",
+  "signedByOrgName": "aggregations.io",
+  "plugin": "aggregations-io-datasource",
+  "version": "1.1.1",
+  "time": 1704217144941,
+  "keyId": "7e4d0c6a708866e7",
+  "files": {
+    "CHANGELOG.md": "3c62d188939ff6fafd278cfb998d34a14629ee9f021a2499a87f51c90ea5cda0",
+    "img/charts.png": "c9ce531291f53ad50781fcc0ce899a8086d2a4d47cce72c4bb6822c06e38bb4f",
+    "img/filter-setup.png": "5213e5cf2da143033b1aeca2f225068af7a118ca6a17a574f4f775f9c676721c",
+    "img/logo.svg": "043e7342a7fbd91489e0e43fe37553e1e609587c472439a79a38efe997fc9af9",
+    "go_plugin_build_manifest": "a14b628306cffb69d96aed02ac00ae0ca1395989e5ebe76ddf32077b5489435e",
+    "plugin.json": "f7081d9a669c4086342a6f593af7cef23d918710e2b507c1ca4ff3dd1a4fc1d2",
+    "module.js.map": "a33ffd13a8e577ab140a63204c97ae9eb3efd08d712085f3fe24b7292ffcdc3e",
+    "gpx_aggregations-io_linux_amd64": "74f70cde60ba7103ae22700410bcb2d195e8e597977791e70a8761a5e4e1a116",
+    "gpx_aggregations-io_darwin_amd64": "da5c3217d97d58a42d96c1563d1baad46b5893e9d0356f03754366076e151be8",
+    "gpx_aggregations-io_linux_arm": "62338bbe7ffcdef6d2bc2a48fefb20f030d7657e70f765376d2d46fda4a7b10c",
+    "gpx_aggregations-io_linux_arm64": "d5481c36860b71677117205a5098e11a9510f301aeae9dee385358fcee518fe1",
+    "LICENSE": "0e27e9f44f59e33c484876cbb4ab09f3189bdd9207b379a2bfef765308cac2ba",
+    "gpx_aggregations-io_darwin_arm64": "ed3d2af9b9eac9d82a982913e9af2dfedd5d4f1dd2e0bb00de9fa8d0c5678f97",
+    "module.js": "cb5e53825cb34db18147db495ba40ae6b7d09b3738446aa0f5ac74078a4958c1",
+    "gpx_aggregations-io_windows_amd64.exe": "d2682deb93b9348c795515aae79e418e12b41ddb8ad8c462fcdcd7098eb72097",
+    "README.md": "cb0d4bdd4b792887892351924d38f10c6f7ac7d26bf43a0020c66ce35a0fcfc6"
+  }
+}
+-----BEGIN PGP SIGNATURE-----
+Version: OpenPGP.js v4.10.10
+Comment: https://openpgpjs.org
+
+wrgEARMKAAYFAmWUSjkAIQkQfk0ManCIZucWIQTzOyW2kQdOhGNlcPN+TQxq
+cIhm53SoAgYmQfaQgwKHSHe+PCFUdyGtyDlpE3t+lACLmeSktA2HsQXB1YZl
+zAoHKBMe6bQAl/D1LoBWfg2TdBe3GZMdr5g4qAIJAZSateDtWI9TfdNMtBOS
+O1wx8BbR41VlVYUazonpLzRt5E7peDgHQ+5DosCTGUi4OeQomY8jHzUeDrv/
+T/kjcylm
+=TK8P
+-----END PGP SIGNATURE-----

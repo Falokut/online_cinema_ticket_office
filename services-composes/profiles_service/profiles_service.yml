@@ -11,7 +11,7 @@ networks:
 services:
   profiles_service:
     hostname: profiles_service
-    image: falokut/profiles_service
+    image: falokut/profiles_service-alpine:latest
     environment:
       DB_PASSWORD: ${DB_PASSWORD}
     volumes:
@@ -23,6 +23,7 @@ services:
       - profiles_db_network
       - tracing_network
       - gateway_network
+      - kafka_network
     depends_on:
       profiles_pool:
         condition: service_started

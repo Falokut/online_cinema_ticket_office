@@ -15,7 +15,7 @@ include:
   - services-composes/movies_service/movies_service.yml
   - services-composes/casts_service/casts_service.yml
   - services-composes/cinema_service/cinema_service.yml
-
+  - services-composes/cinema_orders_service/cinema_orders_service.yml
   #-----------------brokers-----------------
   - services-composes/kafka-cluster/kafka-cluster.yml
 
@@ -34,10 +34,11 @@ services:
     ports:
       - 8000:80
       - 44300:443
+      - 8082:82
     networks:
       - gateway_network
     volumes:
-      - .nginx/configs/:/etc/nginx/:ro
+      - .nginx/configs/:/etc/nginx/
       - ./certs:/certs/:ro
     deploy:
       restart_policy:
@@ -61,6 +62,8 @@ services:
       casts_service: 
         condition: service_healthy
       cinema_service:
+        condition: service_healthy
+      cinema_orders_service:
         condition: service_healthy
       #------------------------------------------
       prometheus:
@@ -94,3 +97,6 @@ services:
       WATCHTOWER_NOTIFICATION_URL: ${NOTIFICATION_URL}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      restart_policy:
+        condition: unless-stopped

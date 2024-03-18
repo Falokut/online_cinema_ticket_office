@@ -1,0 +1,51 @@
+log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
+healthcheck_port: 7001
+
+listen:
+  host: 0.0.0.0
+  port: 8080
+  server_mode: "BOTH"
+  allowed_headers:
+    - X-Account-Id
+    - X-Session-Id
+    - X-Machine-Id
+
+db_name: "cinema_orders"
+
+jaeger:
+  service_name: "Cinema_Orders_Service"
+  address: host.docker.internal:6831
+  log_spans: true
+
+prometheus:
+  service_name: "Cinema_Orders_Service"
+  server_config:
+    host: 0.0.0.0
+    port: 7000
+
+seat_reservation_time: 10m
+reserve_cache:
+  network: "tcp"
+  addr: "cinema_orders_service_cache:6379"
+  db: 0
+
+cinema_service:
+  addr: "falokut.ru:443"
+  secure_config:
+    dial_method: NIL_TLS_CONFIG
+
+profiles_service:
+  #addr: "gateway:82"
+  addr: "falokut.ru:443"
+  secure_config:
+    #dial_method: INSECURE
+    dial_method: NIL_TLS_CONFIG
+
+payment_service:
+  payment_url: "https://falokut.ru/payment-stub"
+  payment_sleep_time: 30s
+  refund_sleep_time: 45s
+
+orders_events:
+  brokers:
+    - kafka:9092

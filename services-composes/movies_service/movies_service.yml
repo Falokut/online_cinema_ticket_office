@@ -11,7 +11,7 @@ networks:
 services:
   movies_service:
     hostname: movies_service
-    image: falokut/movies_service
+    image: falokut/movies_service-alpine:latest
     volumes:
       - ./docker/containers-configs/:/configs
     expose:

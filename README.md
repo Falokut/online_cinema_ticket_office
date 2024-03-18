@@ -36,6 +36,7 @@ This repository has the code for an online cinema ticket office. You can buy mov
    * [Configure movies persons service](https://github.com/Falokut/movies_persons_service/blob/master/README.md#Configure)
    * [Configure casts service](https://github.com/Falokut/casts_service/blob/master/README.md#Configure)
    * [Configure cinema service](https://github.com/Falokut/cinema_service/blob/master/README.md#Configure)
+   * [Configure cinema orders service](https://github.com/Falokut/cinema_orders_service/blob/master/README.md#Configure)
    * [Configure admin movies persons service](https://github.com/Falokut/admin_movies_persons_service/blob/master/README.md#Configure)
    * [Configure admin movies service](https://github.com/Falokut/admin_movies_service/blob/master/README.md#Configure)
    * [Configure admin casts service](https://github.com/Falokut/admin_casts_service/blob/master/README.md#Configure)
@@ -106,6 +107,7 @@ Sure! Here are the additional instructions for Windows and macOS:
    + [Image processing service](https://github.com/Falokut/image_processing_service)
    + [Email service](https://github.com/Falokut/email_service)
    + [Cinema service](https://github.com/Falokut/cinema_service)
+   + [Cinema orders service](https://github.com/Falokut/cinema_orders_service)
    + [Movies service](https://github.com/Falokut/movies_service)
    + [Casts service](https://github.com/Falokut/casts_service)
    + [Movies persons service](https://github.com/Falokut/movies_persons_service)
@@ -123,6 +125,7 @@ Sure! Here are the additional instructions for Windows and macOS:
 * kafka-ui admins/employee http://localhost:28082
 * pgAdmin http://localhost:100
 * RestApi and gRPC admins/employee endpoint http://localhost:10080 or https://localhost:10443
+
 # Metrics and Monitoring
 
 We use Grafana, Prometheus, and Jaeger to collect and visualize application metrics. You can track the performance of the application using these tools.

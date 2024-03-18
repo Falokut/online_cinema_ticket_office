@@ -10,7 +10,7 @@ networks:
 services:
    images_storage_service:
       hostname: images_storage_service
-      image: falokut/images_storage_service
+      image: falokut/images_storage_service-alpine:latest
       expose:
          - 8080
       networks:

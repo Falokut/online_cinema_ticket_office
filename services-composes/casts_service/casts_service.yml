@@ -11,7 +11,7 @@ networks:
 services:
   casts_service:
     hostname: casts_service
-    image: falokut/casts_service
+    image: falokut/casts_service-alpine:latest
     volumes:
       - ./docker/containers-configs/:/configs
     expose:

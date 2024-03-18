@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 networks:
   kafka_network:
@@ -14,13 +14,13 @@ services:
       - kafka_network
     deploy:
       restart_policy:
-          condition: unless-stopped
+        condition: unless-stopped
     healthcheck:
       test: nc -z localhost 2181 || exit -1
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 10s 
+      start_period: 10s
 
   kafka:
     image: wurstmeister/kafka
@@ -30,13 +30,12 @@ services:
       - kafka_network
     environment:
       KAFKA_BROKER_ID: 0
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
       KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://localhost:29092
       KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "emails:2:1"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -47,14 +46,26 @@ services:
       zookeeper:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "bash", "-c", "unset" , "JMX_PORT" ,";" ,"kafka-topics.sh","--zookeeper","zookeeper:2181","--list"]
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          "unset",
+          "JMX_PORT",
+          ";",
+          "kafka-topics.sh",
+          "--zookeeper",
+          "zookeeper:2181",
+          "--list",
+        ]
       interval: 5s
       timeout: 10s
       retries: 3
       start_period: 10s
     deploy:
       restart_policy:
-          condition: unless-stopped
+        condition: unless-stopped
 
   kafka-ui:
     container_name: kafka-ui
@@ -67,4 +78,6 @@ services:
       - kafka_network
     environment:
       DYNAMIC_CONFIG_ENABLED: true
-
+    deploy:
+      restart_policy:
+        condition: unless-stopped

@@ -6,23 +6,37 @@ mail_sender:
   email_address: "CinemaParadise@yandex.ru"
   email_login: "CinemaParadise"
   enable_TLS: false
-  templates_origin: "templates"
-mail_worker:
-  max_mail_workers_count: 3
-  mail_types:
-    - "account/activation"
-    - "account/forget-password"
-  mail_subjects_by_type:
-    "account/activation": "ActivateAccount"
-    "account/forget-password": "Forget password?"
-  templates_names:
-    "account/activation": "accountActivation.html"
-    "account/forget-password": "forgetPassword.html"
 
-kafka_config:
+cinema_service_config:
+  addr: "falokut.ru:443"
+  secure_config:
+    dial_method: INSECURE_SKIP_VERIFY
+
+movies_service_config:
+  addr: "falokut.ru:443"
+  secure_config:
+    dial_method: INSECURE_SKIP_VERIFY
+
+orders_events:
   brokers:
     - "kafka:9092"
-  group_id: "email_senders"
-  topic: "emails"
-  max_bytes: 10e6
-  queque_capacity: 1
+  group_id: "email_service"
+  read_batch_timeout: 300ms
+
+tokens_delivery_requests:
+  brokers:
+    - "kafka:9092"
+  group_id: "email_service"
+  read_batch_timeout: 300ms
+
+email_verification:
+  subject: "Подтверждение учётной записи"
+  template: "accountActivation.html"
+
+change_password:
+  subject: "Проблемы с входом в учётную запись?"
+  template: "forgetPassword.html"
+
+order_created:
+  subject: "Спасибо за заказ"
+  template: "orderCreatedNotification.html"

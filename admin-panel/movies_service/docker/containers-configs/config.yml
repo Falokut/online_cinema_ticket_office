@@ -4,9 +4,9 @@ healthcheck_port: 7001
 listen:
   port: 8080
   server_mode: "BOTH"
-  max_request_size: 990
-  
-db_config: 
+  max_request_size: 1000
+
+db_config:
   host: "movies_pool"
   port: "6432"
   username: "admin_movies_service"
@@ -25,42 +25,74 @@ prometheus:
     port: 7000
 
 image_storage_service:
-  base_picture_url: "http://109.167.154.121/image"
-  addr: "109.167.154.121"
-  
-image_processing_service:
-  addr: "admin_gateway"
+  base_picture_url: "http://falokut.ru/image"
+  addr: "falokut.ru:443"
+  secure_config:
+    dial_method: NIL_TLS_CONFIG
 
+image_processing_service:
+  addr: "falokut.ru:444"
+  secure_config:
+    dial_method: NIL_TLS_CONFIG
 posters_config:
   validate_image: false
   check_image:
-     allowed_types: ["image/png", "image/jpeg","image/webp","image/pjpeg","image/svg+xml","image/tiff","image/vnd.microsoft.icon","image/vnd.wap.wbmp"]
+    allowed_types:
+      [
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/pjpeg",
+        "image/svg+xml",
+        "image/tiff",
+        "image/vnd.microsoft.icon",
+        "image/vnd.wap.wbmp",
+      ]
   resize_image: true
   image_processing:
-     image_width: 600
-     image_height: 1000
-     image_resize_method: Lanczos
+    image_width: 600
+    image_height: 1000
+    image_resize_method: Lanczos
   category: "posters"
 
 preview_posters_config:
   validate_image: false
   check_image:
-     allowed_types: ["image/png", "image/jpeg","image/webp","image/pjpeg","image/svg+xml","image/tiff","image/vnd.microsoft.icon","image/vnd.wap.wbmp"]
+    allowed_types:
+      [
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/pjpeg",
+        "image/svg+xml",
+        "image/tiff",
+        "image/vnd.microsoft.icon",
+        "image/vnd.wap.wbmp",
+      ]
   resize_image: true
   image_processing:
-     image_width: 300
-     image_height: 500
-     image_resize_method: Lanczos
+    image_width: 300
+    image_height: 500
+    image_resize_method: Lanczos
   category: "previewposters"
 
 background_config:
   validate_image: false
   check_image:
-     allowed_types: ["image/png", "image/jpeg","image/webp","image/pjpeg","image/svg+xml","image/tiff","image/vnd.microsoft.icon","image/vnd.wap.wbmp"]
+    allowed_types:
+      [
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/pjpeg",
+        "image/svg+xml",
+        "image/tiff",
+        "image/vnd.microsoft.icon",
+        "image/vnd.wap.wbmp",
+      ]
   resize_image: false
   category: "background"
 
 kafka:
   brokers:
     - "kafka:9092"
-

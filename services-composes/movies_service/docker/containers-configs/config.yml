@@ -5,10 +5,10 @@ listen:
   host: 0.0.0.0
   port: 8080
   server_mode: "BOTH"
-  
-db_config: 
-  host: "movies_pool"
-  port: "6432"
+
+db_config:
+  host: movies_pool
+  port: 6432
   username: "movies_service"
   db_name: "movies"
   ssl_mode: "disable"
@@ -24,8 +24,7 @@ prometheus:
     host: 0.0.0.0
     port: 7000
 
-
-movies_cache: 
+movies_cache:
   network: "tcp"
   addr: "redis:6379"
   db: 0
@@ -37,7 +36,7 @@ movies_preview_cache:
 
 repository_manager:
   movie_ttl: 10m
-  filtered_ttl: 5m
+  filtered_ttl: 15m
   movie_preview_ttl: 10m
 
 pictures:

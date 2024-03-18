@@ -1,50 +1,53 @@
 log_level: "debug" # supported levels: "panic", "fatal", "error", "warning" or "warn", "info", "debug", "trace"
 sessions_ttl: 336h
-profiles_service_addr: "gateway:82"
 healthcheck_port: "7001"
+num_retries_for_terminate_sessions: 2
+retry_sleep_time_for_terminate_sessions: 30ms
 
 listen:
   host: 0.0.0.0
   port: 8080
   server_mode: "BOTH"
   allowed_headers:
-  - X-Session-Id
-  - X-Machine-Id
+    - X-Session-Id
+    - X-Machine-Id
   allowed_outgoing_header:
     X-Account-Id: x-account-id
 
-db_config: 
+db_config:
   host: "accounts_pool"
   port: "6432"
   username: "accounts_service"
   db_name: "accounts"
   ssl_mode: "disable"
 
-redis_registration_options:
+registration_repository:
   network: "tcp"
   addr: "redis:6379"
   db: 0
 
-session_cache_options:
+sessions_repository:
   network: "tcp"
   addr: "redis:6379"
   db: 1
 
-account_sessions_cache_options:
-  network: "tcp"
-  addr: "redis:6379"
-  db: 2
-  
-email_kafka_config:
+account_events:
   brokers:
     - "kafka:9092"
-  topic: "emails"
-  max_bytes: 10e6
+tokens_delivery:
+  brokers:
+    - "kafka:9092"
 
 jaeger:
   service_name: "Accounts_Service"
   address: jaeger:6831
   log_spans: true
+
+JWT:
+  change_password_token:
+    ttl: 2h
+  verify_account_token:
+    ttl: 3h
 
 prometheus:
   service_name: "Accounts_Service"

@@ -24,14 +24,7 @@ prometheus:
     host: 0.0.0.0
     port: 7000
 
-
-movies_events_kafka:
-  brokers:
-    - "kafka:9092"
-  group_id: "casts_service"
-  read_batch_timeout: 30s
-
-persons_events_kafka:
+kafka_events_config:
   brokers:
     - "kafka:9092"
   group_id: "casts_service"
@@ -40,10 +33,10 @@ persons_events_kafka:
 movies_service:
   addr: falokut.ru:444
   connection_config:
-    dial_method: NIL_TLS_CONFIG
+    dial_method: INSECURE_SKIP_VERIFY
+
 movies_persons_service:
   addr: falokut.ru:444
   connection_config:
-    dial_method: NIL_TLS_CONFIG
-
+    dial_method: INSECURE_SKIP_VERIFY
 
